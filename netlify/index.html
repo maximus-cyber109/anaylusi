@@ -19,7 +19,7 @@
             color: #ffffff;
         }
 
-        /* Animated Background Canvas */
+        /* Animated Background Canvas - FIXED */
         #background-canvas {
             position: fixed;
             top: 0;
@@ -28,6 +28,7 @@
             height: 100%;
             z-index: -1;
             background: #000000;
+            pointer-events: none;
         }
 
         /* Main Container - Full Screen */
@@ -430,7 +431,7 @@
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
+    <!-- FIXED: Animated Background with Particle Connections -->
     <canvas id="background-canvas"></canvas>
 
     <!-- Main Dashboard Container -->
@@ -546,7 +547,7 @@
     </div>
 
     <script>
-        // Particle Animation Background
+        // FIXED: Particle Animation Background with Connecting Lines
         const canvas = document.getElementById('background-canvas');
         const ctx = canvas.getContext('2d');
         
@@ -577,6 +578,7 @@
                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
 
+                // MOUSE ATTRACTION - particles follow mouse
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
@@ -603,8 +605,10 @@
             }
         }
 
+        // CONNECTING LINES - particles connect to mouse and each other
         function drawConnections() {
             for (let i = 0; i < particles.length; i++) {
+                // Connect particles to MOUSE
                 const dx = mouse.x - particles[i].x;
                 const dy = mouse.y - particles[i].y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
@@ -618,6 +622,7 @@
                     ctx.stroke();
                 }
 
+                // Connect particles to EACH OTHER
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx2 = particles[i].x - particles[j].x;
                     const dy2 = particles[i].y - particles[j].y;
@@ -637,14 +642,17 @@
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             particles.forEach(particle => {
                 particle.update();
                 particle.draw();
             });
+            
             drawConnections();
             requestAnimationFrame(animate);
         }
 
+        // MOUSE TRACKING - particles follow mouse movement
         document.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
@@ -680,7 +688,6 @@
             console.log('🔄 Fetching REAL data for date:', selectedDate);
             
             try {
-                // Call YOUR Netlify function with selected date
                 const response = await fetch(`/.netlify/functions/magento-api?date=${selectedDate}`);
                 
                 if (response.ok) {
@@ -689,7 +696,6 @@
                     if (data.success && data.realData) {
                         console.log('✅ REAL data received from Magento API:', data);
                         
-                        // Use 100% REAL data from your Magento store
                         updateDashboard({
                             totalOrders: data.totalOrders,
                             totalRevenue: data.totalRevenue,
@@ -714,21 +720,19 @@
             } catch (error) {
                 console.log('⚠️ Function error, using known fallback data only:', error.message);
                 
-                // Only use your KNOWN real data as fallback (no random numbers)
                 const isToday = selectedDate === todayStr;
                 updateDashboard({
-                    totalOrders: isToday ? 77 : 0,         // Your actual Sept 13 data
-                    totalRevenue: isToday ? 150000 : 0,    // Your actual revenue
-                    pendingOrders: isToday ? 55 : 0,       // Your actual pending
-                    processingOrders: isToday ? 18 : 0,    // Your actual processing
-                    completedOrders: isToday ? 4 : 0,      // Your actual completed
-                    cancelledOrders: isToday ? 0 : 0,      // Your actual cancelled
-                    codOrders: isToday ? 60 : 0,           // Your actual COD
-                    onlineOrders: isToday ? 17 : 0,        // Your actual online
-                    averageOrderValue: isToday ? 1948 : 0, // Your actual average
-                    successRate: isToday ? 96 : 0,         // Your actual success rate
+                    totalOrders: isToday ? 77 : 0,
+                    totalRevenue: isToday ? 150000 : 0,
+                    pendingOrders: isToday ? 55 : 0,
+                    processingOrders: isToday ? 18 : 0,
+                    completedOrders: isToday ? 4 : 0,
+                    cancelledOrders: isToday ? 0 : 0,
+                    codOrders: isToday ? 60 : 0,
+                    onlineOrders: isToday ? 17 : 0,
+                    averageOrderValue: isToday ? 1948 : 0,
+                    successRate: isToday ? 96 : 0,
                     recentOrders: isToday ? [
-                        // Your actual recent orders from Sept 13
                         { id: '000365169', customer: 'Dhananjay Kulkarni', amount: 2042, status: 'pending', time: '22:09' },
                         { id: '000365167', customer: 'Amit Jadhav', amount: 405, status: 'pending', time: '22:09' },
                         { id: '000365166', customer: 'Sufain Subair M', amount: 1353, status: 'processing', time: '22:09' },
@@ -739,7 +743,6 @@
             }
         }
 
-        // Update dashboard display with REAL data
         function updateDashboard(data) {
             document.getElementById('total-orders').textContent = data.totalOrders;
             document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
@@ -753,7 +756,6 @@
             document.getElementById('success-rate').textContent = data.successRate + '%';
             document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('en-IN');
 
-            // Update recent orders with REAL data
             if (data.recentOrders && data.recentOrders.length > 0) {
                 const ordersHtml = data.recentOrders.map(order => `
                     <div class="order-item">
@@ -773,7 +775,6 @@
                 document.getElementById('recent-orders').innerHTML = '<div class="order-item"><div class="order-info"><h4>No orders found for this date</h4></div></div>';
             }
 
-            // Remove loading states
             document.querySelectorAll('.card-value').forEach(el => {
                 el.classList.remove('loading', 'error');
             });
@@ -781,19 +782,16 @@
             console.log('✅ Dashboard updated with REAL data');
         }
 
-        // Initialize dashboard
         function initDashboard() {
-            console.log('🚀 Initializing REAL DATA Dashboard...');
+            console.log('🚀 Initializing REAL DATA Dashboard with Particles...');
             resizeCanvas();
             initParticles();
             updateSelectedDateDisplay();
             fetchRealData();
-            animate();
+            animate(); // START PARTICLE ANIMATION
         }
 
-        // Auto-refresh every 5 minutes for real-time updates
         setInterval(fetchRealData, 5 * 60 * 1000);
-
         window.addEventListener('load', initDashboard);
     </script>
 </body>
