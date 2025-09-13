@@ -2,7 +2,7 @@
   functions = "netlify/functions"
   publish = "."
 
-[[redirects]]
+[[redirects]]sdvsd
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
