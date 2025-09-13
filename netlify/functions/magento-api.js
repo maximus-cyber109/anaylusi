@@ -1,5 +1,5 @@
 exports.handler = async (event, context) => {
-  console.log('Real-time dashboard function started');
+  console.log('Real-time Magento API function started');
   
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -15,17 +15,15 @@ exports.handler = async (event, context) => {
   const BASE_URL = 'https://pinkblue.in/rest/V1';
   
   try {
-    // Get current date dynamically for real-time data
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    // Get date from query parameters or use today
+    const selectedDate = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
     
-    console.log('Fetching real-time orders for:', todayStr);
+    console.log('Fetching REAL orders for date:', selectedDate);
     
-    // Fetch ALL orders for today to get complete picture
-    const response = await fetch(`${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${todayStr}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=500`, {
+    // Construct API URL with proper date filtering
+    const apiUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${selectedDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${selectedDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=500`;
+    
+    const response = await fetch(apiUrl, {
       headers: {
         'Authorization': `Bearer ${API_TOKEN}`,
         'Content-Type': 'application/json'
@@ -37,9 +35,9 @@ exports.handler = async (event, context) => {
     }
 
     const data = await response.json();
-    console.log('Real-time API response - total orders:', data.total_count);
+    console.log('REAL API response received - total orders:', data.total_count);
     
-    // Calculate comprehensive real-time metrics
+    // Process REAL order data - no random numbers
     const totalOrders = data.total_count || 0;
     let totalRevenue = 0;
     let pendingCount = 0;
@@ -47,14 +45,15 @@ exports.handler = async (event, context) => {
     let completedCount = 0;
     let cancelledCount = 0;
     let codCount = 0;
-    let razorpayCount = 0;
+    let onlineCount = 0;
     let recentOrders = [];
 
-    if (data.items) {
+    if (data.items && data.items.length > 0) {
       data.items.forEach(order => {
+        // REAL revenue calculation
         totalRevenue += parseFloat(order.grand_total || 0);
         
-        // Count all order statuses including cancelled
+        // REAL status counting
         const status = (order.status || '').toLowerCase();
         switch(status) {
           case 'pending':
@@ -73,57 +72,52 @@ exports.handler = async (event, context) => {
             break;
         }
         
-        // Payment method breakdown
+        // REAL payment method counting
         const paymentMethod = (order.payment?.method || '').toLowerCase();
         if (paymentMethod.includes('cashondelivery') || paymentMethod.includes('cod')) {
           codCount++;
         } else if (paymentMethod.includes('razorpay')) {
-          razorpayCount++;
+          onlineCount++;
         }
         
-        // Store recent orders for additional insights
+        // REAL recent orders
         recentOrders.push({
-          id: order.increment_id,
-          time: order.created_at,
+          id: order.increment_id || order.entity_id,
+          customer: `${order.customer_firstname || ''} ${order.customer_lastname || ''}`.trim() || 'Guest',
           amount: parseFloat(order.grand_total || 0),
           status: order.status,
-          customer: order.customer_firstname + ' ' + order.customer_lastname
+          time: order.created_at ? new Date(order.created_at).toLocaleTimeString('en-IN', { timeStyle: 'short' }) : 'Unknown'
         });
       });
       
-      // Sort by most recent
+      // Sort recent orders by most recent
       recentOrders.sort((a, b) => new Date(b.time) - new Date(a.time));
-      recentOrders = recentOrders.slice(0, 5); // Last 5 orders
+      recentOrders = recentOrders.slice(0, 5);
     }
+
+    // REAL calculated metrics
+    const averageOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+    const successRate = totalOrders > 0 ? Math.round(((completedCount + processingCount) / totalOrders) * 100) : 0;
 
     const result = {
       success: true,
-      realTime: true,
-      timestamp: new Date().toISOString(),
-      currentDate: todayStr,
-      
-      // Core metrics
+      realData: true,
+      selectedDate,
       totalOrders,
-      totalRevenue,
+      totalRevenue: Math.round(totalRevenue),
       pendingOrders: pendingCount,
       processingOrders: processingCount,
       completedOrders: completedCount,
-      cancelledOrders: cancelledCount, // NEW: Real cancelled orders data
-      
-      // Payment breakdown
+      cancelledOrders: cancelledCount,
       codOrders: codCount,
-      razorpayOrders: razorpayCount,
-      
-      // Calculated metrics
-      averageOrderValue: totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0,
-      cancellationRate: totalOrders > 0 ? Math.round((cancelledCount / totalOrders) * 100) : 0,
-      
-      // Additional insights
+      onlineOrders: onlineCount,
+      averageOrderValue,
+      successRate,
       recentOrders,
-      lastUpdated: new Date().toISOString()
+      timestamp: new Date().toISOString()
     };
 
-    console.log('Returning enhanced real-time data:', result);
+    console.log('Returning REAL data:', result);
     
     return {
       statusCode: 200,
@@ -132,7 +126,7 @@ exports.handler = async (event, context) => {
     };
     
   } catch (error) {
-    console.error('Real-time function error:', error.message);
+    console.error('Magento API function error:', error.message);
     
     return {
       statusCode: 500,
