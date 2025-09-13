@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🦷 PinkBlue Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px; 
+            margin-bottom: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header h1 { font-size: 2.5em; color: #2d3748; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; color: #718096; }
+        .metrics-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; margin-bottom: 30px;
+        }
+        .metric-card { 
+            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; 
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-card h3 { color: #4a5568; margin-bottom: 15px; font-size: 1.1em; }
+        .metric-number { font-size: 3em; font-weight: bold; margin-bottom: 10px; }
+        .metric-label { color: #718096; font-size: 0.9em; }
+        .total-orders { color: #3182ce; }
+        .pending { color: #ed8936; }
+        .processing { color: #38b2ac; }
+        .revenue { color: #38a169; }
+        .payment { color: #805ad5; }
+        .footer { 
+            background: rgba(255,255,255,0.95); padding: 20px; border-radius: 15px; 
+            text-align: center; color: #718096; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .refresh-btn { 
+            background: #667eea; color: white; border: none; padding: 12px 25px; 
+            border-radius: 8px; cursor: pointer; font-size: 1em; margin-left: 15px;
+        }
+        .refresh-btn:hover { background: #5a67d8; }
+        .loading { color: #3182ce; animation: pulse 2s infinite; }
+        .error { color: #e53e3e; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @media (max-width: 768px) {
+            .metrics-grid { grid-template-columns: 1fr; gap: 20px; }
+            .metric-number { font-size: 2.5em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦷 PinkBlue Store Dashboard</h1>
+            <p>Real-time Order Analytics & Performance Metrics</p>
+            <p style="font-size: 1em; margin-top: 10px; color: #805ad5;">📅 September 13, 2025</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>📦 Total Orders Today</h3>
+                <div class="metric-number total-orders" id="total-orders">Loading...</div>
+                <div class="metric-label">Orders Placed</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>💰 Today's Revenue</h3>
+                <div class="metric-number revenue" id="total-revenue">Loading...</div>
+                <div class="metric-label">Gross Sales</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>⏳ Pending Orders</h3>
+                <div class="metric-number pending" id="pending-orders">Loading...</div>
+                <div class="metric-label">Awaiting Processing</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>🔄 Processing Orders</h3>
+                <div class="metric-number processing" id="processing-orders">Loading...</div>
+                <div class="metric-label">Being Prepared</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>💳 Cash on Delivery</h3>
+                <div class="metric-number payment" id="cod-orders">Loading...</div>
+                <div class="metric-label">COD Orders</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>💸 Online Payments</h3>
+                <div class="metric-number payment" id="razorpay-orders">Loading...</div>
+                <div class="metric-label">Razorpay Orders</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Last updated: <span id="last-updated">Never</span>
+            <button class="refresh-btn" onclick="fetchData()">🔄 Refresh</button></p>
+            <p style="margin-top: 15px;">
+                📊 Avg Order: <span id="avg-order-value">₹0</span> | 
+                🏪 Total Orders: <strong>312,979</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/.netlify/functions/magento-api');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('total-orders').textContent = data.totalOrders;
+                    document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
+                    document.getElementById('pending-orders').textContent = data.pendingOrders;
+                    document.getElementById('processing-orders').textContent = data.processingOrders;
+                    document.getElementById('cod-orders').textContent = data.codOrders;
+                    document.getElementById('razorpay-orders').textContent = data.razorpayOrders;
+                    document.getElementById('avg-order-value').textContent = '₹' + data.averageOrderValue.toLocaleString('en-IN');
+                    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('en-IN');
+                    
+                    console.log('✅ Dashboard updated!');
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.querySelectorAll('.metric-number').forEach(el => {
+                    if (el.textContent === 'Loading...') {
+                        el.textContent = 'Error';
+                        el.classList.add('error');
+                    }
+                });
+            }
+        }
+        
+        window.addEventListener('load', fetchData);
+        setInterval(fetchData, 10 * 60 * 1000); // Auto-refresh every 10 minutes
+    </script>
+</body>
+</html>
