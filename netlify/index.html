@@ -19,25 +19,25 @@
             color: #ffffff;
         }
 
-        /* Animated Background Canvas - FIXED */
+        /* FIXED: Animated Background Canvas */
         #background-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
             background: #000000;
-            pointer-events: none;
+            display: block;
         }
 
-        /* Main Container - Full Screen */
+        /* Main Container */
         .dashboard-container {
+            position: relative;
             display: flex;
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            position: relative;
             z-index: 10;
         }
 
@@ -119,7 +119,7 @@
             font-size: 0.9em;
         }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
@@ -129,7 +129,6 @@
             max-height: calc(100vh - 80px);
         }
 
-        /* Dashboard Title */
         .dashboard-title {
             text-align: center;
             margin-bottom: 30px;
@@ -149,7 +148,6 @@
             font-weight: 500;
         }
 
-        /* Metrics Grid */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -157,7 +155,6 @@
             margin-bottom: 30px;
         }
 
-        /* Metric Cards */
         .metric-card {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(20px);
@@ -229,7 +226,6 @@
         .cod .card-value { color: #ab47bc; }
         .online .card-value { color: #26c6da; }
 
-        /* Recent Orders Section */
         .recent-section {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(20px);
@@ -315,7 +311,6 @@
         .status-completed { background: rgba(102, 187, 106, 0.2); color: #66bb6a; }
         .status-cancelled { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
 
-        /* Footer */
         .footer {
             text-align: center;
             padding: 20px;
@@ -354,7 +349,6 @@
             color: #ffffff;
         }
 
-        /* Loading & Error States */
         .loading {
             animation: loadingPulse 1.8s infinite;
         }
@@ -375,7 +369,6 @@
             75% { transform: translateX(3px); }
         }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -415,14 +408,12 @@
             }
         }
 
-        /* Tablet */
         @media (max-width: 1024px) and (min-width: 769px) {
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        /* Large Desktop */
         @media (min-width: 1400px) {
             .metrics-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -431,12 +422,10 @@
     </style>
 </head>
 <body>
-    <!-- FIXED: Animated Background with Particle Connections -->
+    <!-- FIXED: Canvas for particle animation -->
     <canvas id="background-canvas"></canvas>
 
-    <!-- Main Dashboard Container -->
     <div class="dashboard-container">
-        <!-- Header -->
         <header class="header">
             <div class="date-picker-section">
                 <label class="date-label">Select Date:</label>
@@ -449,15 +438,12 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Title Section -->
             <div class="dashboard-title">
                 <h1 class="title-main">Analytics Dashboard</h1>
                 <p class="title-date" id="selected-date">Today's Performance</p>
             </div>
 
-            <!-- Dashboard Cards Grid -->
             <div class="metrics-grid">
                 <div class="metric-card total-orders">
                     <span class="card-icon">📦</span>
@@ -516,7 +502,6 @@
                 </div>
             </div>
 
-            <!-- Recent Orders -->
             <div class="recent-section">
                 <h3 class="section-title">
                     <div class="live-indicator"></div>
@@ -532,7 +517,6 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <p>
                 Last updated: <span id="last-updated" style="color: #00ff88; font-weight: 600;">Never</span>
@@ -547,123 +531,147 @@
     </div>
 
     <script>
-        // FIXED: Particle Animation Background with Connecting Lines
+        // COMPLETE WORKING PARTICLE ANIMATION WITH CONNECTING LINES
         const canvas = document.getElementById('background-canvas');
         const ctx = canvas.getContext('2d');
-        
-        let particles = [];
-        const mouse = { x: 0, y: 0 };
-        const maxDistance = 120;
-        const particleCount = 60;
 
+        // Resize canvas to full screen
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
 
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        // Particle class
         class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.radius = Math.random() * 1.5 + 0.5;
-                this.opacity = Math.random() * 0.4 + 0.2;
+            constructor(x, y) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
             }
 
             update() {
-                this.x += this.vx;
-                this.y += this.vy;
+                this.x += this.speedX;
+                this.y += this.speedY;
 
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                // Bounce off edges
+                if (this.x > canvas.width || this.x < 0) {
+                    this.speedX = -this.speedX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.speedY = -this.speedY;
+                }
 
-                // MOUSE ATTRACTION - particles follow mouse
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < 80) {
-                    const force = (80 - distance) / 80;
-                    this.x += dx * force * 0.015;
-                    this.y += dy * force * 0.015;
+                // Mouse interaction
+                if (mouse.x && mouse.y) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        let force = (100 - distance) / 100;
+                        this.x += dx * force * 0.02;
+                        this.y += dy * force * 0.02;
+                    }
                 }
             }
 
             draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255, 105, 180, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        function initParticles() {
+        // Create particles
+        function createParticles() {
             particles = [];
-            for (let i = 0; i < particleCount; i++) {
+            let numberOfParticles = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000));
+            
+            for (let i = 0; i < numberOfParticles; i++) {
                 particles.push(new Particle());
             }
         }
 
-        // CONNECTING LINES - particles connect to mouse and each other
-        function drawConnections() {
+        // Connect particles with lines
+        function connectParticles() {
+            let maxDistance = 150;
+            
             for (let i = 0; i < particles.length; i++) {
-                // Connect particles to MOUSE
-                const dx = mouse.x - particles[i].x;
-                const dy = mouse.y - particles[i].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < maxDistance) {
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = `rgba(255, 105, 180, ${(1 - distance / maxDistance) * 0.25})`;
-                    ctx.lineWidth = 0.8;
-                    ctx.stroke();
-                }
-
-                // Connect particles to EACH OTHER
                 for (let j = i + 1; j < particles.length; j++) {
-                    const dx2 = particles[i].x - particles[j].x;
-                    const dy2 = particles[i].y - particles[j].y;
-                    const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-
-                    if (distance2 < maxDistance * 0.5) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        let opacity = (1 - distance / maxDistance) * 0.4;
+                        ctx.strokeStyle = `rgba(255, 105, 180, ${opacity})`;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - distance2 / (maxDistance * 0.5)) * 0.08})`;
-                        ctx.lineWidth = 0.4;
+                        ctx.stroke();
+                    }
+                }
+                
+                // Connect to mouse if close
+                if (mouse.x && mouse.y) {
+                    let dx = particles[i].x - mouse.x;
+                    let dy = particles[i].y - mouse.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        let opacity = (1 - distance / maxDistance) * 0.6;
+                        ctx.strokeStyle = `rgba(255, 105, 180, ${opacity})`;
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
                     }
                 }
             }
         }
 
+        // Animation loop
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Update and draw all particles
             particles.forEach(particle => {
                 particle.update();
                 particle.draw();
             });
             
-            drawConnections();
+            // Draw connecting lines
+            connectParticles();
+            
             requestAnimationFrame(animate);
         }
 
-        // MOUSE TRACKING - particles follow mouse movement
-        document.addEventListener('mousemove', (e) => {
+        // Event listeners
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
         });
 
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
         });
 
-        // Date picker functionality
+        // Dashboard functionality
         const datePicker = document.getElementById('date-picker');
         const selectedDateText = document.getElementById('selected-date');
         
@@ -682,7 +690,6 @@
             fetchRealData();
         });
 
-        // REAL DATA FETCHING - Uses Netlify function, NO random numbers
         async function fetchRealData() {
             const selectedDate = datePicker.value;
             console.log('🔄 Fetching REAL data for date:', selectedDate);
@@ -718,7 +725,7 @@
                 }
 
             } catch (error) {
-                console.log('⚠️ Function error, using known fallback data only:', error.message);
+                console.log('⚠️ Function error, using known fallback data:', error.message);
                 
                 const isToday = selectedDate === todayStr;
                 updateDashboard({
@@ -782,13 +789,14 @@
             console.log('✅ Dashboard updated with REAL data');
         }
 
+        // Initialize everything
         function initDashboard() {
-            console.log('🚀 Initializing REAL DATA Dashboard with Particles...');
+            console.log('🚀 Initializing Dashboard with Particle Animation...');
             resizeCanvas();
-            initParticles();
+            createParticles();
             updateSelectedDateDisplay();
             fetchRealData();
-            animate(); // START PARTICLE ANIMATION
+            animate(); // Start particle animation
         }
 
         setInterval(fetchRealData, 5 * 60 * 1000);
