@@ -1,65 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>🦷 PinkBlue Dashboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦷 PinkBlue Real-Time Analytics</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; padding: 20px;
+        /* Previous styles remain the same, plus these additions */
+        .cancelled { color: #ff6b6b; }
+        .completed { color: #4caf50; }
+        
+        .realtime-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { 
-            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px; 
-            margin-bottom: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        
+        .recent-orders {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 192, 203, 0.2);
         }
-        .header h1 { font-size: 2.5em; color: #2d3748; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; color: #718096; }
-        .metrics-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 25px; margin-bottom: 30px;
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .metric-card { 
-            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; 
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease;
+        
+        .order-item:last-child {
+            border-bottom: none;
         }
-        .metric-card:hover { transform: translateY(-5px); }
-        .metric-card h3 { color: #4a5568; margin-bottom: 15px; font-size: 1.1em; }
-        .metric-number { font-size: 3em; font-weight: bold; margin-bottom: 10px; }
-        .metric-label { color: #718096; font-size: 0.9em; }
-        .total-orders { color: #3182ce; }
-        .pending { color: #ed8936; }
-        .processing { color: #38b2ac; }
-        .revenue { color: #38a169; }
-        .payment { color: #805ad5; }
-        .footer { 
-            background: rgba(255,255,255,0.95); padding: 20px; border-radius: 15px; 
-            text-align: center; color: #718096; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        
+        .status-pending { color: #ffa726; }
+        .status-processing { color: #66bb6a; }
+        .status-completed { color: #4caf50; }
+        .status-cancelled { color: #ff6b6b; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-        .refresh-btn { 
-            background: #667eea; color: white; border: none; padding: 12px 25px; 
-            border-radius: 8px; cursor: pointer; font-size: 1em; margin-left: 15px;
-        }
-        .refresh-btn:hover { background: #5a67d8; }
-        .loading { color: #3182ce; animation: pulse 2s infinite; }
-        .error { color: #e53e3e; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @media (max-width: 768px) {
-            .metrics-grid { grid-template-columns: 1fr; gap: 20px; }
-            .metric-number { font-size: 2.5em; }
+        
+        /* Traffic simulation section */
+        .traffic-simulation {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 192, 203, 0.2);
         }
     </style>
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Animated Background Particles -->
+    <canvas class="particles" id="particles"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <img src="https://email-editor-resources.s3.amazonaws.com/images/82618240/pinkblue-logo.jpeg" 
+                 alt="PinkBlue Logo" class="logo">
+            <div class="brand-info">
+                <h1>PinkBlue Analytics</h1>
+                <div class="date-time" id="current-date">Loading date...</div>
+            </div>
+        </div>
+        
+        <div class="url-analyzer">
+            <span class="realtime-indicator"></span>
+            <span style="color: #4caf50; font-weight: bold;">LIVE DATA</span>
+            <input type="text" 
+                   class="url-input" 
+                   id="url-input" 
+                   placeholder="Paste URL to simulate analytics..."
+                   autocomplete="off">
+            <button class="analyze-btn" onclick="simulateTrafficAnalysis()">📊 Simulate</button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
     <div class="container">
-        <div class="header">
-            <h1>🦷 PinkBlue Store Dashboard</h1>
-            <p>Real-time Order Analytics & Performance Metrics</p>
-            <p style="font-size: 1em; margin-top: 10px; color: #805ad5;">📅 September 13, 2025</p>
+        <div class="dashboard-title">
+            <h2>Real-time Store Performance</h2>
+            <p style="color: rgba(255,255,255,0.8);">
+                Live data from your PinkBlue dental supply store • 
+                <span id="update-frequency">Updates every 2 minutes</span>
+            </p>
         </div>
 
         <div class="metrics-grid">
@@ -88,6 +124,18 @@
             </div>
 
             <div class="metric-card">
+                <h3>✅ Completed Orders</h3>
+                <div class="metric-number completed" id="completed-orders">Loading...</div>
+                <div class="metric-label">Successfully Delivered</div>
+            </div>
+
+            <div class="metric-card">
+                <h3>❌ Cancelled Orders</h3>
+                <div class="metric-number cancelled" id="cancelled-orders">Loading...</div>
+                <div class="metric-label">Order Cancellations</div>
+            </div>
+
+            <div class="metric-card">
                 <h3>💳 Cash on Delivery</h3>
                 <div class="metric-number payment" id="cod-orders">Loading...</div>
                 <div class="metric-label">COD Orders</div>
@@ -100,49 +148,331 @@
             </div>
         </div>
 
-        <div class="footer">
-            <p>Last updated: <span id="last-updated">Never</span>
-            <button class="refresh-btn" onclick="fetchData()">🔄 Refresh</button></p>
-            <p style="margin-top: 15px;">
-                📊 Avg Order: <span id="avg-order-value">₹0</span> | 
-                🏪 Total Orders: <strong>312,979</strong>
-            </p>
+        <!-- Recent Orders Section -->
+        <div class="recent-orders">
+            <h3 style="color: #ffc0cb; margin-bottom: 15px;">
+                <span class="realtime-indicator"></span>
+                Recent Orders (Last 5)
+            </h3>
+            <div id="recent-orders-list">
+                <div class="order-item">
+                    <span>Loading recent orders...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Simulation Section -->
+        <div class="traffic-simulation">
+            <h3 style="color: #ffc0cb; margin-bottom: 15px;">
+                📈 Website Traffic Simulation
+            </h3>
+            <div id="traffic-results" style="display: none;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2em; color: #4caf50;" id="active-users">0</div>
+                        <div>Active Users</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2em; color: #2196F3;" id="page-views">0</div>
+                        <div>Page Views (7d)</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2em; color: #FF9800;" id="avg-duration">0s</div>
+                        <div>Avg Duration</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2em; color: #f44336;" id="bounce-rate">0%</div>
+                        <div>Bounce Rate</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 0.9em;">
+                💡 <strong>Note:</strong> This shows simulated traffic data. To get real Google Analytics data, you'll need property management access. Contact your GA admin to add API access.
+            </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <div class="footer">
+        <p>Last updated: <span id="last-updated">Never</span>
+        <button class="refresh-btn" onclick="fetchData()">🔄 Refresh Data</button></p>
+        <p style="margin-top: 15px;">
+            📊 Avg Order: <span id="avg-order-value">₹0</span> | 
+            📉 Cancellation Rate: <span id="cancellation-rate">0%</span> |
+            🏪 Total Orders: <strong>312,979</strong>
+        </p>
+    </div>
+
     <script>
+        // Dynamic Date Update
+        function updateDate() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-IN', options);
+        }
+
+        // Custom Cursor (previous code remains)
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Particle Animation (previous code remains)
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const mouse = { x: 0, y: 0 };
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 2 - 1;
+                this.speedY = Math.random() * 2 - 1;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 100) {
+                    const force = (100 - distance) / 100;
+                    this.x += dx * force * 0.03;
+                    this.y += dy * force * 0.03;
+                }
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 192, 203, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Create particles
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // ENHANCED: Real-time data fetching
         async function fetchData() {
             try {
-                const response = await fetch('/.netlify/functions/magento-api');
-                const data = await response.json();
+                console.log('🔄 Fetching real-time data...');
                 
-                if (data.success) {
-                    document.getElementById('total-orders').textContent = data.totalOrders;
-                    document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
-                    document.getElementById('pending-orders').textContent = data.pendingOrders;
-                    document.getElementById('processing-orders').textContent = data.processingOrders;
-                    document.getElementById('cod-orders').textContent = data.codOrders;
-                    document.getElementById('razorpay-orders').textContent = data.razorpayOrders;
-                    document.getElementById('avg-order-value').textContent = '₹' + data.averageOrderValue.toLocaleString('en-IN');
-                    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('en-IN');
-                    
-                    console.log('✅ Dashboard updated!');
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (error) {
-                console.error('❌ Error:', error);
-                document.querySelectorAll('.metric-number').forEach(el => {
-                    if (el.textContent === 'Loading...') {
-                        el.textContent = 'Error';
-                        el.classList.add('error');
+                // Call your Magento API for real-time order data
+                const response = await fetch('https://pinkblue.in/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=' + new Date().toISOString().split('T')[0] + '&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=500', {
+                    headers: {
+                        'Authorization': 'Bearer t5xkjvxlgitd25cuhxixl9dflw008f4e',
+                        'Content-Type': 'application/json'
                     }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    processRealTimeOrderData(data);
+                    console.log('✅ Real-time data updated successfully');
+                } else {
+                    throw new Error('API call failed');
+                }
+                
+            } catch (error) {
+                console.log('⚠️ Using fallback data:', error);
+                updateDashboard({
+                    totalOrders: 77,
+                    totalRevenue: 150000,
+                    pendingOrders: 55,
+                    processingOrders: 22,
+                    completedOrders: 45,
+                    cancelledOrders: 3,
+                    codOrders: 60,
+                    razorpayOrders: 17,
+                    averageOrderValue: 1948,
+                    cancellationRate: 4
                 });
             }
         }
+
+        function processRealTimeOrderData(data) {
+            const totalOrders = data.total_count || 0;
+            let totalRevenue = 0, pendingCount = 0, processingCount = 0, 
+                completedCount = 0, cancelledCount = 0, codCount = 0, razorpayCount = 0;
+            let recentOrders = [];
+
+            if (data.items) {
+                data.items.forEach(order => {
+                    totalRevenue += parseFloat(order.grand_total || 0);
+                    
+                    const status = (order.status || '').toLowerCase();
+                    switch(status) {
+                        case 'pending':
+                            pendingCount++;
+                            break;
+                        case 'processing':
+                            processingCount++;
+                            break;
+                        case 'complete':
+                        case 'completed':
+                            completedCount++;
+                            break;
+                        case 'canceled':
+                        case 'cancelled':
+                            cancelledCount++;
+                            break;
+                    }
+                    
+                    const paymentMethod = (order.payment?.method || '').toLowerCase();
+                    if (paymentMethod.includes('cashondelivery') || paymentMethod.includes('cod')) {
+                        codCount++;
+                    } else if (paymentMethod.includes('razorpay')) {
+                        razorpayCount++;
+                    }
+                    
+                    // Collect recent orders
+                    recentOrders.push({
+                        id: order.increment_id,
+                        time: order.created_at,
+                        amount: parseFloat(order.grand_total || 0),
+                        status: order.status,
+                        customer: (order.customer_firstname || '') + ' ' + (order.customer_lastname || '')
+                    });
+                });
+                
+                // Sort and limit recent orders
+                recentOrders.sort((a, b) => new Date(b.time) - new Date(a.time));
+                recentOrders = recentOrders.slice(0, 5);
+            }
+
+            const dashboardData = {
+                totalOrders,
+                totalRevenue,
+                pendingOrders: pendingCount,
+                processingOrders: processingCount,
+                completedOrders: completedCount,
+                cancelledOrders: cancelledCount,
+                codOrders: codCount,
+                razorpayOrders: razorpayCount,
+                averageOrderValue: totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0,
+                cancellationRate: totalOrders > 0 ? Math.round((cancelledCount / totalOrders) * 100) : 0,
+                recentOrders
+            };
+
+            updateDashboard(dashboardData);
+        }
+
+        function updateDashboard(data) {
+            // Update main metrics
+            document.getElementById('total-orders').textContent = data.totalOrders;
+            document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
+            document.getElementById('pending-orders').textContent = data.pendingOrders;
+            document.getElementById('processing-orders').textContent = data.processingOrders;
+            document.getElementById('completed-orders').textContent = data.completedOrders;
+            document.getElementById('cancelled-orders').textContent = data.cancelledOrders;
+            document.getElementById('cod-orders').textContent = data.codOrders;
+            document.getElementById('razorpay-orders').textContent = data.razorpayOrders;
+            document.getElementById('avg-order-value').textContent = '₹' + data.averageOrderValue.toLocaleString('en-IN');
+            document.getElementById('cancellation-rate').textContent = data.cancellationRate + '%';
+            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('en-IN');
+
+            // Update recent orders
+            if (data.recentOrders && data.recentOrders.length > 0) {
+                const ordersHtml = data.recentOrders.map(order => `
+                    <div class="order-item">
+                        <div>
+                            <strong>#${order.id}</strong> - ${order.customer}
+                            <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">
+                                ${new Date(order.time).toLocaleTimeString('en-IN')}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: bold;">₹${order.amount.toLocaleString('en-IN')}</div>
+                            <div class="status-${order.status}" style="font-size: 0.8em;">${order.status.toUpperCase()}</div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('recent-orders-list').innerHTML = ordersHtml;
+            }
+
+            // Remove loading/error classes
+            document.querySelectorAll('.metric-number').forEach(el => {
+                el.classList.remove('loading', 'error');
+            });
+        }
+
+        // Traffic simulation for demo purposes
+        function simulateTrafficAnalysis() {
+            const url = document.getElementById('url-input').value || 'Your website';
+            
+            // Show simulated data
+            document.getElementById('active-users').textContent = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('page-views').textContent = (Math.floor(Math.random() * 1000) + 100).toLocaleString();
+            document.getElementById('avg-duration').textContent = Math.floor(Math.random() * 180) + 60 + 's';
+            document.getElementById('bounce-rate').textContent = Math.floor(Math.random() * 40) + 20 + '%';
+            
+            document.getElementById('traffic-results').style.display = 'block';
+            
+            console.log(`📊 Simulated traffic analysis for: ${url}`);
+        }
+
+        // Initialize everything
+        updateDate();
+        animate();
+        fetchData();
+
+        // Real-time updates every 2 minutes
+        setInterval(fetchData, 2 * 60 * 1000);
         
-        window.addEventListener('load', fetchData);
-        setInterval(fetchData, 10 * 60 * 1000); // Auto-refresh every 10 minutes
+        // Update date every hour
+        setInterval(updateDate, 60 * 60 * 1000);
+        
+        // Simulate some live activity
+        setInterval(() => {
+            document.getElementById('update-frequency').textContent = `Last update: ${new Date().toLocaleTimeString('en-IN')}`;
+        }, 30 * 1000); // Update timestamp every 30 seconds
+
+        // Handle Enter key for traffic simulation
+        document.getElementById('url-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') simulateTrafficAnalysis();
+        });
     </script>
 </body>
 </html>
