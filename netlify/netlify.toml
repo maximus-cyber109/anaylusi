@@ -2,7 +2,14 @@
   functions = "functions"
   publish = "."
 
+# Add Edge Function for password protection
+[[edge_functions]]
+  path = "/*"
+  function = "basic-auth"
+
+# Keep your existing redirect but make it more specific
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  # This will still work with the edge function
