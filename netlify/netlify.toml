@@ -2,11 +2,13 @@
   functions = "functions"
   publish = "."
 
-[[edge_functions]]
-  path = "/*"
-  function = "basic-auth"
-
 [[redirects]]
   from = "/*"
+  to = "/.netlify/functions/auth-check"
+  status = 200
+  force = true
+  
+[[redirects]]
+  from = "/dashboard"
   to = "/index.html"
   status = 200
