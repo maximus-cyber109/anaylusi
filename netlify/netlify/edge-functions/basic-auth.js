@@ -1,4 +1,4 @@
-export default async (request: Request) => {
+export default async (request) => {
   const url = new URL(request.url);
   
   // Skip authentication for your existing API function
@@ -6,7 +6,7 @@ export default async (request: Request) => {
     return;
   }
   
-  // Get multiple user credentials from environment
+  // Get multiple user credentials from environment variable
   const USERS_CREDENTIALS = Deno.env.get('DASHBOARD_USERS') || 'user1:pass1,user2:pass2,manager:manager123';
   const authHeader = request.headers.get('Authorization');
   
