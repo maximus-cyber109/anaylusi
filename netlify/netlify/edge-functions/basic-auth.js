@@ -7,7 +7,7 @@ export default async (request) => {
   }
   
   // Get multiple user credentials from environment variable
-  const USERS_CREDENTIALS = Deno.env.get('DASHBOARD_USERS') || 'user1:pass1,user2:pass2,manager:manager123';
+  const USERS_CREDENTIALS = Deno.env.get('DASHBOARD_USERS');
   const authHeader = request.headers.get('Authorization');
   
   if (!authHeader || !authHeader.startsWith('Basic ')) {
@@ -55,6 +55,14 @@ export default async (request) => {
             }
             .subtitle { font-size: 1.1em; margin-bottom: 30px; }
             .note { font-size: 0.85em; opacity: 0.7; margin-top: 20px; }
+            .pulse {
+              animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+              0% { opacity: 1; }
+              50% { opacity: 0.5; }
+              100% { opacity: 1; }
+            }
           </style>
         </head>
         <body>
@@ -65,7 +73,7 @@ export default async (request) => {
               <strong>👥 Authorized Users Only</strong><br>
               Enter your assigned credentials
             </div>
-            <p class="note">Multiple team members can access this dashboard</p>
+            <p class="note pulse">Multiple team members can access this dashboard</p>
           </div>
         </body>
       </html>
@@ -94,6 +102,7 @@ export default async (request) => {
       <html>
         <head>
           <title>Access Denied - PinkBlue Analytics</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             body { 
               font-family: 'Inter', sans-serif; 
@@ -111,16 +120,43 @@ export default async (request) => {
               padding: 40px;
               border-radius: 16px;
               border: 1px solid rgba(239,83,80,0.3);
+              max-width: 400px;
+              width: 90%;
             }
-            h1 { color: #ef5350; margin-bottom: 20px; }
-            .username { color: #ffa726; font-weight: bold; }
+            h1 { 
+              color: #ef5350; 
+              margin-bottom: 20px; 
+              font-size: 2em;
+            }
+            .username { 
+              color: #ffa726; 
+              font-weight: bold; 
+            }
+            .error-details {
+              background: rgba(239,83,80,0.1);
+              border-left: 4px solid #ef5350;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 4px;
+              text-align: left;
+            }
+            .retry-note {
+              font-size: 0.9em;
+              opacity: 0.8;
+              margin-top: 20px;
+            }
           </style>
         </head>
         <body>
           <div class="error-container">
             <h1>❌ Access Denied</h1>
-            <p>Invalid credentials for user: <span class="username">${username || 'Unknown'}</span></p>
+            <div class="error-details">
+              <p><strong>Failed Login:</strong></p>
+              <p>User: <span class="username">${username || 'Unknown'}</span></p>
+              <p>Invalid credentials provided</p>
+            </div>
             <p>Please check your username and password</p>
+            <p class="retry-note">🔄 Refresh the page to try again</p>
           </div>
         </body>
       </html>
@@ -133,6 +169,9 @@ export default async (request) => {
     });
   }
   
-  // Authentication successful - user can access dashboard
+  // Authentication successful - log access (optional)
+  console.log(`✅ PinkBlue Analytics access granted: ${userCredentials.split(':')[0]} at ${new Date().toISOString()}`);
+  
+  // Continue to dashboard
   return;
 };
