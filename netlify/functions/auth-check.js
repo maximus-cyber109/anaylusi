@@ -2,10 +2,10 @@ exports.handler = async (event, context) => {
   const authHeader = event.headers.authorization;
   
   const validUsers = [
-    'admin:pinkblue2024',
-    'manager:dental123',
-    'john:john456',
-    'sarah:sarah789'
+    'blade:pb@109$',
+    'kulehi:imdumbass',
+    'user:login',
+    'password:user109'
   ];
   
   if (!authHeader || !authHeader.startsWith('Basic ')) {
