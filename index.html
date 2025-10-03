@@ -19,13 +19,18 @@
             color: #ffffff;
         }
 
-        /* Custom cursor - food treat */
+        /* Default cursor for dashboard */
         body {
-            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="%23FF6B47"/><circle cx="16" cy="16" r="6" fill="%23FFD700"/><circle cx="13" cy="13" r="1.5" fill="%23FF6B47"/><circle cx="19" cy="13" r="1.5" fill="%23FF6B47"/><circle cx="16" cy="19" r="1.5" fill="%23FF6B47"/></svg>') 16 16, pointer;
+            cursor: default;
+        }
+
+        /* Food cursor ONLY for login screen */
+        .auth-screen {
+            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="%23FFD700" stroke="%23FF6B47" stroke-width="3"/><circle cx="24" cy="24" r="12" fill="%23FF6B47"/><circle cx="18" cy="18" r="3" fill="%23FFD700"/><circle cx="30" cy="18" r="3" fill="%23FFD700"/><circle cx="24" cy="30" r="3" fill="%23FFD700"/><text x="24" y="44" text-anchor="middle" font-size="8" fill="%23FF6B47">🍖</text></svg>') 24 24, pointer;
         }
 
         .clickable {
-            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23FF69B4"/><circle cx="16" cy="16" r="8" fill="%23FFD700"/><text x="16" y="20" text-anchor="middle" font-size="12" fill="%23000">🍖</text></svg>') 16 16, pointer !important;
+            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="%23FF69B4" stroke="%23FFD700" stroke-width="4"/><circle cx="24" cy="24" r="14" fill="%23FFD700"/><text x="24" y="30" text-anchor="middle" font-size="20" fill="%23FF69B4">🍖</text></svg>') 24 24, pointer !important;
         }
 
         /* Authentication Screen Styles */
@@ -65,21 +70,21 @@
             text-align: center;
         }
 
-        /* 3D Cat Container */
+        /* Cute Yellow Cat Container */
         .cat-container {
             position: relative;
             width: 200px;
-            height: 160px;
+            height: 180px;
             margin: 0 auto 30px;
             perspective: 1000px;
             transform-style: preserve-3d;
         }
 
-        /* 3D Cat Head */
+        /* Cute Yellow Cat */
         .cat-3d {
             position: relative;
-            width: 140px;
-            height: 120px;
+            width: 150px;
+            height: 130px;
             margin: 20px auto;
             transform-style: preserve-3d;
             transition: all 0.3s ease;
@@ -87,185 +92,188 @@
 
         .cat-head {
             position: relative;
-            width: 120px;
-            height: 100px;
-            background: linear-gradient(145deg, #ff69b4, #e91e63);
-            border-radius: 60px 60px 40px 40px;
+            width: 130px;
+            height: 110px;
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-radius: 65px 65px 50px 50px;
             transform-style: preserve-3d;
             box-shadow: 
-                inset -20px -20px 40px rgba(0,0,0,0.3),
-                inset 20px 20px 40px rgba(255,255,255,0.1),
-                0 20px 40px rgba(0,0,0,0.4);
+                inset -15px -15px 30px rgba(0,0,0,0.2),
+                inset 15px 15px 30px rgba(255,255,255,0.3),
+                0 15px 30px rgba(0,0,0,0.3);
             transition: transform 0.2s ease;
         }
 
-        /* 3D Ears */
+        /* Cute Ears */
         .cat-ear-3d {
             position: absolute;
-            width: 35px;
-            height: 40px;
-            background: linear-gradient(145deg, #ff69b4, #e91e63);
+            width: 30px;
+            height: 35px;
+            background: linear-gradient(145deg, #FFD700, #FFA500);
             border-radius: 50% 50% 50% 10%;
-            top: -20px;
+            top: -15px;
             transform-style: preserve-3d;
             transition: all 0.2s ease;
             box-shadow: 
-                inset -5px -5px 10px rgba(0,0,0,0.3),
-                inset 5px 5px 10px rgba(255,255,255,0.1);
+                inset -3px -3px 8px rgba(0,0,0,0.2),
+                inset 3px 3px 8px rgba(255,255,255,0.2);
         }
 
         .cat-ear-3d.left {
-            left: 15px;
-            transform: rotate(-25deg) rotateY(-15deg);
+            left: 20px;
+            transform: rotate(-20deg) rotateY(-10deg);
         }
 
         .cat-ear-3d.right {
-            right: 15px;
-            transform: rotate(25deg) rotateY(15deg);
+            right: 20px;
+            transform: rotate(20deg) rotateY(10deg);
         }
 
         .cat-ear-3d::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 25px;
-            background: linear-gradient(145deg, #ff1493, #c2185b);
+            width: 15px;
+            height: 20px;
+            background: linear-gradient(145deg, #FF69B4, #FF1493);
             border-radius: 50% 50% 40% 10%;
             top: 8px;
             left: 50%;
             transform: translateX(-50%);
-            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3);
         }
 
-        /* 3D Eyes */
+        /* Cute Eyes */
         .cat-eyes-3d {
             position: absolute;
-            top: 35px;
+            top: 30px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 25px;
+            padding: 0 30px;
         }
 
         .cat-eye-3d {
-            width: 20px;
-            height: 18px;
-            background: linear-gradient(145deg, #000000, #333333);
+            width: 25px;
+            height: 22px;
+            background: radial-gradient(circle at 30% 30%, #87CEEB, #4169E1);
             border-radius: 50%;
             position: relative;
             transform-style: preserve-3d;
             transition: all 0.1s ease;
             box-shadow: 
-                inset -3px -3px 6px rgba(255,255,255,0.1),
-                0 3px 6px rgba(0,0,0,0.5);
+                inset -2px -2px 5px rgba(0,0,0,0.3),
+                0 2px 8px rgba(0,0,0,0.2);
+            border: 2px solid #333;
         }
 
         .cat-eye-3d::before {
             content: '';
             position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle, #ffffff 30%, transparent 70%);
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #ffffff 40%, transparent 70%);
             border-radius: 50%;
             top: 3px;
-            left: 3px;
+            left: 5px;
         }
 
         .cat-eye-3d::after {
             content: '';
             position: absolute;
             width: 12px;
-            height: 14px;
-            background: linear-gradient(to bottom, #2196F3, #1976D2);
-            border-radius: 50%;
-            top: 2px;
-            left: 4px;
-            z-index: -1;
+            height: 16px;
+            background: linear-gradient(to bottom, #000 60%, #333 100%);
+            border-radius: 6px 6px 50% 50%;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
         }
 
-        /* 3D Nose */
+        /* Cute Nose */
         .cat-nose-3d {
             position: absolute;
-            bottom: 35px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 12px;
-            height: 10px;
-            background: linear-gradient(145deg, #ff1493, #c2185b);
+            width: 10px;
+            height: 8px;
+            background: linear-gradient(145deg, #FF69B4, #FF1493);
             border-radius: 50% 50% 0 0;
             box-shadow: 
-                inset -2px -2px 4px rgba(0,0,0,0.3),
-                0 2px 4px rgba(0,0,0,0.3);
+                inset -1px -1px 3px rgba(0,0,0,0.3),
+                0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 3D Mouth */
+        /* Cute Mouth */
         .cat-mouth-3d {
             position: absolute;
-            bottom: 20px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 20px;
+            width: 25px;
+            height: 15px;
             border: 2px solid #333;
             border-top: none;
-            border-radius: 0 0 25px 25px;
+            border-radius: 0 0 20px 20px;
             transition: all 0.3s ease;
-            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.2) 100%);
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);
         }
 
         .cat-mouth-3d.open {
-            width: 40px;
-            height: 30px;
-            background: radial-gradient(ellipse at center, #000 40%, #333 100%);
-            border-radius: 20px;
+            width: 35px;
+            height: 25px;
+            background: radial-gradient(ellipse at center, #000 50%, #333 100%);
+            border-radius: 50%;
             animation: mouthOpen3D 0.3s ease;
         }
 
         @keyframes mouthOpen3D {
             0% { transform: translateX(-50%) scaleY(0); }
-            50% { transform: translateX(-50%) scaleY(1.2); }
+            50% { transform: translateX(-50%) scaleY(1.3); }
             100% { transform: translateX(-50%) scaleY(1); }
         }
 
-        /* 3D Whiskers */
+        /* Cute Whiskers */
         .cat-whiskers {
             position: absolute;
-            top: 50px;
+            top: 45px;
             width: 100%;
             height: 20px;
         }
 
         .whisker {
             position: absolute;
-            width: 40px;
+            width: 35px;
             height: 2px;
-            background: linear-gradient(to right, transparent, #666, transparent);
+            background: linear-gradient(to right, transparent, #333, transparent);
             transform-origin: center;
             transition: all 0.2s ease;
         }
 
-        .whisker.left-1 { left: -35px; top: 0px; transform: rotate(-10deg); }
-        .whisker.left-2 { left: -35px; top: 8px; transform: rotate(5deg); }
-        .whisker.right-1 { right: -35px; top: 0px; transform: rotate(10deg); }
-        .whisker.right-2 { right: -35px; top: 8px; transform: rotate(-5deg); }
+        .whisker.left-1 { left: -30px; top: 0px; transform: rotate(-8deg); }
+        .whisker.left-2 { left: -30px; top: 8px; transform: rotate(3deg); }
+        .whisker.right-1 { right: -30px; top: 0px; transform: rotate(8deg); }
+        .whisker.right-2 { right: -30px; top: 8px; transform: rotate(-3deg); }
 
-        /* Secret feeding area (invisible) */
+        /* Secret feeding area - BIGGER and more accessible */
         .secret-feeding-area {
             position: absolute;
-            bottom: 10px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 30px;
+            width: 80px;
+            height: 40px;
             background: transparent;
             cursor: pointer;
-            z-index: 20;
+            z-index: 30;
+            border-radius: 20px;
         }
 
-        /* Speech bubble (hidden by default) */
+        /* Speech bubble */
         .cat-speech {
             position: absolute;
-            top: -60px;
+            top: -70px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,255,255,0.95);
@@ -381,7 +389,7 @@
             opacity: 1;
         }
 
-        /* Dashboard styles */
+        /* Dashboard styles - Normal cursor */
         #background-canvas {
             position: fixed;
             top: 0;
@@ -400,6 +408,7 @@
             height: 100vh;
             width: 100vw;
             z-index: 10;
+            cursor: default;
         }
 
         .header {
@@ -408,9 +417,17 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 20px 30px;
             display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .header-row {
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .dashboard-controls {
@@ -453,8 +470,27 @@
             box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
         }
 
-        .toggle-comparison {
+        .apply-btn {
             background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .toggle-comparison {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
             border: none;
             color: #fff;
             padding: 8px 16px;
@@ -469,7 +505,7 @@
 
         .toggle-comparison:hover {
             transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
         }
 
         .toggle-comparison.active {
@@ -478,9 +514,6 @@
 
         .comparison-controls {
             display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
             gap: 20px;
             align-items: center;
             flex-wrap: wrap;
@@ -544,7 +577,7 @@
             flex-direction: column;
             padding: 20px 30px;
             overflow-y: auto;
-            max-height: calc(100vh - 120px);
+            max-height: calc(100vh - 160px);
         }
 
         .dashboard-title {
@@ -566,12 +599,13 @@
             font-weight: 500;
         }
 
+        /* Comparison Results with Chart */
         .comparison-results {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 30px;
             display: none;
         }
@@ -588,69 +622,117 @@
 
         .comparison-header {
             color: #ff69b4;
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         .comparison-period-info {
             background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff69b4;
+        }
+
+        .comparison-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .comparison-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .comparison-metric {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
-            border-left: 3px solid rgba(255, 105, 180, 0.3);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid rgba(255, 105, 180, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .comparison-metric:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(5px);
         }
 
         .metric-name {
             font-weight: 600;
             color: #ffffff;
-            font-size: 1em;
+            font-size: 1.1em;
         }
 
         .metric-comparison {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .metric-values {
             font-size: 0.9em;
             color: #cccccc;
+            text-align: right;
         }
 
         .metric-change {
             font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 0.9em;
-            min-width: 120px;
+            min-width: 140px;
             text-align: center;
+            white-space: nowrap;
         }
 
         .metric-change.positive {
             background: rgba(76, 175, 80, 0.2);
             color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
         }
 
         .metric-change.negative {
             background: rgba(244, 67, 54, 0.2);
             color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
         }
 
         .metric-change.neutral {
             background: rgba(158, 158, 158, 0.2);
             color: #9e9e9e;
+            border: 1px solid rgba(158, 158, 158, 0.3);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-title {
+            color: #ff69b4;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .metrics-grid {
@@ -715,10 +797,19 @@
         .cod .card-value { color: #ab47bc; }
         .online .card-value { color: #26c6da; }
 
+        @media (max-width: 1200px) {
+            .comparison-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chart-container {
+                order: -1;
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
-                flex-direction: column;
-                gap: 15px;
                 padding: 15px 20px;
             }
             
@@ -754,25 +845,25 @@
     <div class="auth-screen" id="auth-screen">
         <canvas class="auth-canvas" id="auth-canvas"></canvas>
         <div class="auth-container">
-            <!-- 3D Cat -->
+            <!-- Cute Yellow Cat -->
             <div class="cat-container">
                 <div class="cat-speech" id="cat-speech"></div>
                 <div class="cat-3d" id="cat-3d">
                     <div class="cat-head" id="cat-head">
-                        <!-- 3D Ears -->
+                        <!-- Cute Ears -->
                         <div class="cat-ear-3d left"></div>
                         <div class="cat-ear-3d right"></div>
                         
-                        <!-- 3D Eyes -->
+                        <!-- Cute Eyes -->
                         <div class="cat-eyes-3d">
                             <div class="cat-eye-3d" id="left-eye-3d"></div>
                             <div class="cat-eye-3d" id="right-eye-3d"></div>
                         </div>
                         
-                        <!-- 3D Nose -->
+                        <!-- Cute Nose -->
                         <div class="cat-nose-3d"></div>
                         
-                        <!-- 3D Mouth -->
+                        <!-- Cute Mouth -->
                         <div class="cat-mouth-3d" id="cat-mouth-3d"></div>
                         
                         <!-- Whiskers -->
@@ -785,14 +876,14 @@
                     </div>
                 </div>
                 
-                <!-- Secret feeding area (invisible) -->
+                <!-- Secret feeding area - BIGGER and more accessible -->
                 <div class="secret-feeding-area clickable" id="secret-feeding-area"></div>
             </div>
             
             <h1 class="auth-title">🔐 PinkBlue Analytics</h1>
             <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Secure Access Portal</p>
             
-            <!-- Authentication form - Always visible now -->
+            <!-- Authentication form -->
             <form class="auth-form" id="auth-form">
                 <input type="text" id="username" class="auth-input" placeholder="👤 Username" required>
                 <input type="password" id="password" class="auth-input" placeholder="🔒 Password" required>
@@ -808,39 +899,45 @@
     <!-- Dashboard -->
     <div class="dashboard-container" id="dashboard" style="display: none;">
         <header class="header">
-            <div class="dashboard-controls">
-                <div class="control-group">
-                    <label class="control-label">From:</label>
-                    <input type="date" id="start-date" class="control-input" />
-                </div>
-                
-                <div class="control-group">
-                    <label class="control-label">To:</label>
-                    <input type="date" id="end-date" class="control-input" />
-                </div>
-                
-                <button class="toggle-comparison clickable" id="toggle-comparison" onclick="toggleComparison()">
-                    📊 Enable Comparison
-                </button>
-                
-                <div class="comparison-controls" id="comparison-controls">
+            <div class="header-row">
+                <div class="dashboard-controls">
                     <div class="control-group">
-                        <label class="control-label">Compare From:</label>
-                        <input type="date" id="compare-start-date" class="control-input" />
+                        <label class="control-label">From:</label>
+                        <input type="date" id="start-date" class="control-input" />
                     </div>
                     
                     <div class="control-group">
                         <label class="control-label">To:</label>
-                        <input type="date" id="compare-end-date" class="control-input" />
+                        <input type="date" id="end-date" class="control-input" />
                     </div>
                     
-                    <button class="compare-btn clickable" onclick="compareData()">🔄 Compare</button>
+                    <button class="apply-btn" onclick="applyDateRange()">
+                        ✅ Apply
+                    </button>
+                    
+                    <button class="toggle-comparison" id="toggle-comparison" onclick="toggleComparison()">
+                        📊 Enable Comparison
+                    </button>
+                </div>
+                
+                <div class="status-section">
+                    <div class="live-indicator"></div>
+                    <span class="status-text">LIVE DATA</span>
                 </div>
             </div>
             
-            <div class="status-section">
-                <div class="live-indicator"></div>
-                <span class="status-text">LIVE DATA</span>
+            <div class="comparison-controls" id="comparison-controls">
+                <div class="control-group">
+                    <label class="control-label">Compare From:</label>
+                    <input type="date" id="compare-start-date" class="control-input" />
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">To:</label>
+                    <input type="date" id="compare-end-date" class="control-input" />
+                </div>
+                
+                <button class="compare-btn" onclick="compareData()">🔄 Compare</button>
             </div>
         </header>
 
@@ -851,9 +948,16 @@
             </div>
 
             <div class="comparison-results" id="comparison-results">
-                <div class="comparison-header">📊 Period Comparison Results</div>
+                <div class="comparison-header">📊 Period Comparison Analysis</div>
                 <div class="comparison-period-info" id="comparison-period-info"></div>
-                <div id="comparison-content"></div>
+                
+                <div class="comparison-content">
+                    <div class="comparison-metrics" id="comparison-content"></div>
+                    <div class="chart-container">
+                        <div class="chart-title">📈 Performance Chart</div>
+                        <canvas class="chart-canvas" id="comparison-chart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div class="metrics-grid">
@@ -930,6 +1034,7 @@
         let feedingComplete = false;
         let feedCount = 0;
         let comparisonMode = false;
+        let currentChart = null;
 
         // Sound effect functions
         function playClickSound() {
@@ -948,11 +1053,10 @@
             }
         }
 
-        // Add click sound to all clickable elements
+        // Add click sound to clickable elements
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('clickable') || 
-                e.target.tagName === 'BUTTON' || 
-                e.target.tagName === 'INPUT') {
+                e.target.tagName === 'BUTTON') {
                 playClickSound();
             }
         });
@@ -1055,8 +1159,8 @@
             const normalizedDistance = Math.min(distance / maxDistance, 1);
             
             // Calculate angles for 3D rotation
-            const rotateY = (deltaX / window.innerWidth) * 30; // Max 30 degrees
-            const rotateX = -(deltaY / window.innerHeight) * 20; // Max 20 degrees
+            const rotateY = (deltaX / window.innerWidth) * 25; // Max 25 degrees
+            const rotateX = -(deltaY / window.innerHeight) * 15; // Max 15 degrees
             
             // Apply 3D transformation to the entire cat head
             const cat3D = document.getElementById('cat-3d');
@@ -1066,13 +1170,13 @@
                 cat3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
                 
                 // Add subtle head tilt
-                const headTilt = (deltaX / window.innerWidth) * 10;
+                const headTilt = (deltaX / window.innerWidth) * 8;
                 catHead.style.transform = `rotateZ(${headTilt}deg)`;
             }
             
             // Eye movement within the 3D space
-            const eyeOffsetX = (deltaX / window.innerWidth) * 6;
-            const eyeOffsetY = (deltaY / window.innerHeight) * 4;
+            const eyeOffsetX = (deltaX / window.innerWidth) * 4;
+            const eyeOffsetY = (deltaY / window.innerHeight) * 3;
             
             const leftEye = document.getElementById('left-eye-3d');
             const rightEye = document.getElementById('right-eye-3d');
@@ -1085,15 +1189,15 @@
             // Whisker animation based on movement
             const whiskers = document.querySelectorAll('.whisker');
             whiskers.forEach((whisker, index) => {
-                const angle = whisker.classList.contains('left-1') ? -10 - (normalizedDistance * 5) :
-                             whisker.classList.contains('left-2') ? 5 - (normalizedDistance * 3) :
-                             whisker.classList.contains('right-1') ? 10 + (normalizedDistance * 5) :
-                             -5 + (normalizedDistance * 3);
+                const angle = whisker.classList.contains('left-1') ? -8 - (normalizedDistance * 3) :
+                             whisker.classList.contains('left-2') ? 3 - (normalizedDistance * 2) :
+                             whisker.classList.contains('right-1') ? 8 + (normalizedDistance * 3) :
+                             -3 + (normalizedDistance * 2);
                 whisker.style.transform = `rotate(${angle}deg)`;
             });
         }
 
-        // Cat speech system (hidden messages)
+        // Cat speech system
         function showCatSpeech(message, duration = 2000) {
             const speech = document.getElementById('cat-speech');
             if (speech) {
@@ -1105,10 +1209,11 @@
             }
         }
 
-        // Secret feeding mechanism
+        // Secret feeding mechanism - IMPROVED
         function secretFeed() {
             if (!credentialsValid) {
-                return; // Must enter credentials first
+                showCatSpeech('Login first! 😸', 1500);
+                return;
             }
             
             playEatingSound();
@@ -1119,22 +1224,21 @@
                 mouth.classList.add('open');
                 setTimeout(() => {
                     mouth.classList.remove('open');
-                }, 400);
+                }, 500);
             }
 
-            // Progressive responses (hidden from obvious view)
+            // Progressive responses
             if (feedCount === 1) {
-                showCatSpeech('...', 1000);
+                showCatSpeech('Yummy! 😋', 1500);
             } else if (feedCount === 2) {
-                showCatSpeech('* content *', 1000);
+                showCatSpeech('More please! 🤤', 1500);
             } else if (feedCount >= 3) {
                 feedingComplete = true;
-                showCatSpeech('Access granted!', 2000);
+                showCatSpeech('Access granted! 🎉', 2000);
                 
                 setTimeout(() => {
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'flex';
-                    sessionStorage.setItem('pinkblue_authenticated', document.getElementById('username').value);
                     initDashboard();
                 }, 2500);
             }
@@ -1142,17 +1246,19 @@
 
         // Mouse tracking for 3D cat animation
         document.addEventListener('mousemove', (e) => {
-            update3DCatAnimation(e.clientX, e.clientY);
+            if (document.getElementById('auth-screen').style.display !== 'none') {
+                update3DCatAnimation(e.clientX, e.clientY);
+            }
         });
 
-        // Secret feeding area click handler
+        // Secret feeding area click handler - IMPROVED
         document.getElementById('secret-feeding-area').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             secretFeed();
         });
 
-        // Authentication form handler
+        // Authentication form handler - NO SESSION STORAGE
         const validUsers = {
             'blade': 'pb@109$',
             'kulehi': 'imdumbass',
@@ -1171,13 +1277,11 @@
             if (validUsers[username] && validUsers[username] === password) {
                 credentialsValid = true;
                 
-                // Clear any previous messages
                 errorMsg.classList.remove('show');
                 successMsg.classList.add('show');
                 
-                // Show subtle hint without being obvious
                 setTimeout(() => {
-                    showCatSpeech('Ready...', 1500);
+                    showCatSpeech('Ready! Feed me! 😸', 2000);
                 }, 1000);
                 
             } else {
@@ -1254,6 +1358,26 @@
             requestAnimationFrame(animate);
         }
 
+        // Apply date range function
+        function applyDateRange() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+            
+            const selectedDate = document.getElementById('selected-date');
+            selectedDate.textContent = `${formatDate(startDate)} to ${formatDate(endDate)}`;
+            
+            // Simulate data refresh
+            fetchRealData();
+            
+            // Show success message
+            showToast('Data refreshed for selected date range! ✅');
+        }
+
         // Comparison toggle functionality
         function toggleComparison() {
             comparisonMode = !comparisonMode;
@@ -1269,7 +1393,126 @@
                 toggleBtn.classList.remove('active');
                 comparisonControls.classList.remove('show');
                 document.getElementById('comparison-results').classList.remove('show');
+                if (currentChart) {
+                    currentChart.destroy();
+                    currentChart = null;
+                }
             }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(76, 175, 80, 0.9);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Simple Chart Implementation
+        function drawComparisonChart(canvas, currentData, previousData, labels) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Set up chart area
+            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+            
+            // Find max value for scaling
+            const allValues = [...Object.values(currentData), ...Object.values(previousData)];
+            const maxValue = Math.max(...allValues);
+            const minValue = 0;
+            
+            // Draw background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.fillRect(margin.left, margin.top, chartWidth, chartHeight);
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(margin.left + chartWidth, y);
+                ctx.stroke();
+                
+                // Y-axis labels
+                const value = maxValue - (maxValue / 5) * i;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.round(value).toLocaleString(), margin.left - 10, y + 4);
+            }
+            
+            // Draw bars
+            const barWidth = chartWidth / (labels.length * 2.5);
+            const barSpacing = barWidth * 0.5;
+            
+            labels.forEach((label, index) => {
+                const x = margin.left + (index * (barWidth * 2.5));
+                
+                // Current period bar
+                const currentValue = currentData[label] || 0;
+                const currentHeight = (currentValue / maxValue) * chartHeight;
+                const currentY = margin.top + chartHeight - currentHeight;
+                
+                ctx.fillStyle = '#ff69b4';
+                ctx.fillRect(x, currentY, barWidth, currentHeight);
+                
+                // Previous period bar
+                const previousValue = previousData[label] || 0;
+                const previousHeight = (previousValue / maxValue) * chartHeight;
+                const previousY = margin.top + chartHeight - previousHeight;
+                
+                ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
+                ctx.fillRect(x + barWidth + barSpacing, previousY, barWidth, previousHeight);
+                
+                // X-axis labels
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.font = '10px Inter';
+                ctx.textAlign = 'center';
+                const labelX = x + barWidth + barSpacing / 2;
+                const words = label.split(' ');
+                words.forEach((word, wordIndex) => {
+                    ctx.fillText(word, labelX, margin.top + chartHeight + 15 + (wordIndex * 12));
+                });
+            });
+            
+            // Legend
+            ctx.fillStyle = '#ff69b4';
+            ctx.fillRect(width - 150, 20, 15, 15);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'left';
+            ctx.fillText('Current Period', width - 130, 32);
+            
+            ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
+            ctx.fillRect(width - 150, 40, 15, 15);
+            ctx.fillText('Previous Period', width - 130, 52);
         }
 
         // Date range functionality
@@ -1295,6 +1538,11 @@
             const compareStartDate = document.getElementById('compare-start-date').value;
             const compareEndDate = document.getElementById('compare-end-date').value;
 
+            if (!compareStartDate || !compareEndDate) {
+                alert('Please select comparison date range');
+                return;
+            }
+
             const currentPeriodData = {
                 totalOrders: 150,
                 totalRevenue: 285000,
@@ -1312,12 +1560,13 @@
                 pendingOrders: 70,
                 processingOrders: 35,
                 completedOrders: 15,
-                cancelledOrders: 0,
+                cancelledOrders: 2,
                 codOrders: 80,
                 onlineOrders: 40
             };
 
             displayComparison(currentPeriodData, previousPeriodData, startDate, endDate, compareStartDate, compareEndDate);
+            showToast('Comparison analysis complete! 📊');
         }
 
         function displayComparison(current, previous, startDate, endDate, compareStartDate, compareEndDate) {
@@ -1337,9 +1586,17 @@
             ];
 
             comparisonPeriodInfo.innerHTML = `
-                <h4 style="color: #ff69b4; margin-bottom: 10px;">📅 Comparison Periods</h4>
-                <p><strong>Current Period:</strong> ${formatDate(startDate)} to ${formatDate(endDate)}</p>
-                <p><strong>Previous Period:</strong> ${formatDate(compareStartDate)} to ${formatDate(compareEndDate)}</p>
+                <h4 style="color: #ff69b4; margin-bottom: 15px; font-size: 1.2em;">📅 Comparison Periods</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <strong style="color: #4CAF50;">Current Period:</strong><br>
+                        <span style="color: #ccc;">${formatDate(startDate)} to ${formatDate(endDate)}</span>
+                    </div>
+                    <div>
+                        <strong style="color: #FF9800;">Previous Period:</strong><br>
+                        <span style="color: #ccc;">${formatDate(compareStartDate)} to ${formatDate(compareEndDate)}</span>
+                    </div>
+                </div>
             `;
 
             let comparisonHtml = '';
@@ -1369,9 +1626,13 @@
                     <div class="comparison-metric">
                         <div class="metric-name">${metric.name}</div>
                         <div class="metric-comparison">
-                            <div class="metric-values">${formattedCurrent} vs ${formattedPrevious}</div>
+                            <div class="metric-values">
+                                <div><strong>Current:</strong> ${formattedCurrent}</div>
+                                <div><strong>Previous:</strong> ${formattedPrevious}</div>
+                            </div>
                             <div class="metric-change ${changeClass}">
-                                ${changeIcon} ${percentChange.toFixed(1)}% (${difference >= 0 ? '+' : '-'}${formattedDifference})
+                                ${changeIcon} ${percentChange.toFixed(1)}%<br>
+                                <small>(${difference >= 0 ? '+' : '-'}${formattedDifference})</small>
                             </div>
                         </div>
                     </div>
@@ -1379,6 +1640,34 @@
             });
 
             comparisonContent.innerHTML = comparisonHtml;
+            
+            // Draw chart
+            const chartCanvas = document.getElementById('comparison-chart');
+            chartCanvas.width = 360;
+            chartCanvas.height = 280;
+            
+            const chartLabels = ['Total Orders', 'Revenue', 'Pending', 'Processing', 'Completed', 'COD', 'Online'];
+            const chartCurrentData = {
+                'Total Orders': current.totalOrders,
+                'Revenue': current.totalRevenue / 1000, // Scale down for chart
+                'Pending': current.pendingOrders,
+                'Processing': current.processingOrders,
+                'Completed': current.completedOrders,
+                'COD': current.codOrders,
+                'Online': current.onlineOrders
+            };
+            const chartPreviousData = {
+                'Total Orders': previous.totalOrders,
+                'Revenue': previous.totalRevenue / 1000, // Scale down for chart
+                'Pending': previous.pendingOrders,
+                'Processing': previous.processingOrders,
+                'Completed': previous.completedOrders,
+                'COD': previous.codOrders,
+                'Online': previous.onlineOrders
+            };
+            
+            drawComparisonChart(chartCanvas, chartCurrentData, chartPreviousData, chartLabels);
+            
             comparisonResults.classList.add('show');
         }
 
@@ -1389,14 +1678,14 @@
 
         function fetchRealData() {
             const data = {
-                totalOrders: 150,
-                totalRevenue: 285000,
-                pendingOrders: 85,
-                processingOrders: 42,
-                completedOrders: 23,
-                cancelledOrders: 0,
-                codOrders: 95,
-                onlineOrders: 55
+                totalOrders: Math.floor(Math.random() * 50) + 100,
+                totalRevenue: Math.floor(Math.random() * 100000) + 200000,
+                pendingOrders: Math.floor(Math.random() * 30) + 50,
+                processingOrders: Math.floor(Math.random() * 20) + 30,
+                completedOrders: Math.floor(Math.random() * 15) + 10,
+                cancelledOrders: Math.floor(Math.random() * 5),
+                codOrders: Math.floor(Math.random() * 40) + 60,
+                onlineOrders: Math.floor(Math.random() * 30) + 40
             };
 
             updateDashboard(data);
@@ -1420,6 +1709,10 @@
             initializeDateInputs();
             fetchRealData();
             animate();
+            
+            // Update selected date display
+            const selectedDate = document.getElementById('selected-date');
+            selectedDate.textContent = `${formatDate(weekAgoStr)} to ${formatDate(todayStr)}`;
         }
 
         // Event listeners
@@ -1430,16 +1723,10 @@
             createAuthParticles();
         });
 
-        // Initialize
-        if (sessionStorage.getItem('pinkblue_authenticated')) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
-            initDashboard();
-        } else {
-            resizeAuthCanvas();
-            createAuthParticles();
-            animateAuthParticles();
-        }
+        // Initialize - NO SESSION STORAGE CHECK
+        resizeAuthCanvas();
+        createAuthParticles();
+        animateAuthParticles();
     </script>
 </body>
 </html>
