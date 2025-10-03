@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics Dashboard - Upgraded</title>
+    <title>PinkBlue Analytics Dashboard - Lion Fixed</title>
     <!-- Import Three.js and the GLTF Loader -->
     <script type="importmap">
         {
@@ -403,7 +403,6 @@
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // --- GLOBAL STATE ---
         let credentialsValid = false;
@@ -492,8 +491,8 @@
             scene = new THREE.Scene();
             
             // Camera
-            camera = new THREE.PerspectiveCamera(45, lionContainer.clientWidth / lionContainer.clientHeight, 0.1, 1000);
-            camera.position.z = 2.5;
+            camera = new THREE.PerspectiveCamera(50, lionContainer.clientWidth / lionContainer.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 2);
 
             // Renderer
             renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -504,22 +503,37 @@
             // Lighting
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
             scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-            directionalLight.position.set(2, 5, 5);
-            scene.add(directionalLight);
+            const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+            keyLight.position.set(1, 1, 2);
+            scene.add(keyLight);
+            const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            fillLight.position.set(-1, -1, -1);
+            scene.add(fillLight);
+
 
             // Load Model
             const loader = new GLTFLoader();
-            // IMPORTANT: Replace this URL with a link to your own 3D lion model.
-            // You can find free models on Sketchfab (make sure to check the license).
-            loader.load('https://raw.githubusercontent.com/baronwatts/models/master/rocks/rock-01.glb', (gltf) => {
-                lionHead = gltf.scene;
-                lionHead.scale.set(1, 1, 1); // Adjust scale as needed
-                lionHead.position.y = -0.5; // Adjust position as needed
-                scene.add(lionHead);
-            }, undefined, (error) => {
-                console.error('An error happened while loading the 3D model:', error);
-            });
+            // *** NEW, RELIABLE 3D MODEL URL ***
+            // This is a free model from Sketchfab by "Alexander..V"
+            const modelUrl = 'https://raw.githubusercontent.com/dkastner/three-js-example-scene/main/public/models/lion.glb';
+
+            loader.load(modelUrl, 
+                // *** On Load Success ***
+                (gltf) => {
+                    console.log("3D model loaded successfully!");
+                    lionHead = gltf.scene;
+                    lionHead.scale.set(1.5, 1.5, 1.5); // Adjust scale to fit container
+                    lionHead.position.y = -0.8; // Adjust position to center it
+                    scene.add(lionHead);
+                }, 
+                // *** On Load Progress (optional) ***
+                undefined, 
+                // *** NEW: On Error ***
+                (error) => {
+                    console.error('An error happened while loading the 3D model:', error);
+                    lionContainer.innerHTML = '<p style="color: red; text-align: center; margin-top: 50%;">Failed to load 3D model. Check console for errors.</p>';
+                }
+            );
             
             animate3D();
         }
@@ -537,7 +551,7 @@
                 lionHead.rotation.y += ( (mouse.x * 0.5) - lionHead.rotation.y) * 0.05;
                 lionHead.rotation.x += (-(mouse.y * 0.5) - lionHead.rotation.x) * 0.05;
             }
-            renderer.render(scene, camera);
+            if (renderer) renderer.render(scene, camera);
         }
 
         // --- AUTHENTICATION LOGIC ---
@@ -589,7 +603,7 @@
             } else {
                 credentialsValid = false;
                 feedCount = 0;
-                successMsg.classList.remove('show');
+                successMsg.classList.removeshow('show');
                 errorMsg.classList.add('show');
                 setTimeout(() => errorMsg.classList.remove('show'), 3000);
             }
@@ -603,7 +617,6 @@
         const dashboardCtx = dashboardCanvas.getContext('2d');
         let dashboardParticles = [];
         
-        // Use the same Particle class as auth screen
         function resizeDashboardCanvas() {
             dashboardCanvas.width = window.innerWidth;
             dashboardCanvas.height = window.innerHeight;
@@ -621,7 +634,6 @@
              if (document.getElementById('dashboard').style.display === 'none') return;
             dashboardCtx.clearRect(0, 0, dashboardCanvas.width, dashboardCanvas.height);
             dashboardParticles.forEach(p => { p.update(); p.draw(); });
-            // You can add the connect lines logic here as well if you want it on the dashboard
             requestAnimationFrame(animateDashboard);
         }
         
@@ -643,7 +655,6 @@
 
             } catch (error) {
                 console.error('Error fetching real Magento data:', error);
-                // Display error state in cards
                 document.querySelectorAll('.card-value').forEach(el => el.textContent = 'Error');
             } finally {
                 loadingIndicator.classList.remove('show');
@@ -671,7 +682,6 @@
             createDashboardParticles();
             animateDashboard();
             fetchRealMagentoData();
-            // Refresh data every 5 minutes
             setInterval(fetchRealMagentoData, 5 * 60 * 1000);
         }
 
@@ -687,8 +697,8 @@
         window.addEventListener('resize', () => {
              resizeAuthCanvas(); 
              createAuthParticles();
-             if (renderer) renderer.setSize(lionContainer.clientWidth, lionContainer.clientHeight);
-             if (camera) {
+             if (renderer && camera) {
+                renderer.setSize(lionContainer.clientWidth, lionContainer.clientHeight);
                 camera.aspect = lionContainer.clientWidth / lionContainer.clientHeight;
                 camera.updateProjectionMatrix();
              }
