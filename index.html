@@ -70,246 +70,329 @@
             text-align: center;
         }
 
-        /* Cute Yellow Cat Container */
-        .cat-container {
+        /* Adorable Apple Emoji Style Lion Container */
+        .lion-container {
             position: relative;
-            width: 200px;
-            height: 180px;
+            width: 220px;
+            height: 200px;
             margin: 0 auto 30px;
             perspective: 1000px;
             transform-style: preserve-3d;
         }
 
-        /* Cute Yellow Cat */
-        .cat-3d {
+        /* Adorable Cartoon Lion */
+        .lion-3d {
             position: relative;
-            width: 150px;
-            height: 130px;
+            width: 160px;
+            height: 140px;
             margin: 20px auto;
             transform-style: preserve-3d;
             transition: all 0.3s ease;
         }
 
-        .cat-head {
+        .lion-head {
             position: relative;
-            width: 130px;
-            height: 110px;
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            border-radius: 65px 65px 50px 50px;
+            width: 140px;
+            height: 120px;
+            background: linear-gradient(145deg, #FFB84D, #FF8C42);
+            border-radius: 70px;
             transform-style: preserve-3d;
             box-shadow: 
-                inset -15px -15px 30px rgba(0,0,0,0.2),
-                inset 15px 15px 30px rgba(255,255,255,0.3),
-                0 15px 30px rgba(0,0,0,0.3);
+                inset -10px -10px 20px rgba(0,0,0,0.1),
+                inset 10px 10px 20px rgba(255,255,255,0.2),
+                0 10px 25px rgba(0,0,0,0.2);
             transition: transform 0.2s ease;
         }
 
-        /* Cute Ears */
-        .cat-ear-3d {
+        /* Lion Mane - Apple emoji style */
+        .lion-mane {
             position: absolute;
-            width: 30px;
+            width: 180px;
+            height: 160px;
+            background: radial-gradient(circle, #CD853F 40%, #D2691E 70%);
+            border-radius: 50%;
+            top: -20px;
+            left: -20px;
+            z-index: -1;
+            box-shadow: 
+                inset -15px -15px 30px rgba(0,0,0,0.1),
+                inset 15px 15px 30px rgba(255,255,255,0.1),
+                0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Mane spikes for cartoon effect */
+        .mane-spike {
+            position: absolute;
+            background: linear-gradient(145deg, #CD853F, #D2691E);
+            border-radius: 50%;
+        }
+
+        .mane-spike:nth-child(1) {
+            width: 25px;
             height: 35px;
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            border-radius: 50% 50% 50% 10%;
+            top: -10px;
+            left: 30px;
+            transform: rotate(-20deg);
+        }
+
+        .mane-spike:nth-child(2) {
+            width: 30px;
+            height: 40px;
             top: -15px;
+            left: 75px;
+            transform: rotate(0deg);
+        }
+
+        .mane-spike:nth-child(3) {
+            width: 25px;
+            height: 35px;
+            top: -10px;
+            right: 30px;
+            transform: rotate(20deg);
+        }
+
+        .mane-spike:nth-child(4) {
+            width: 30px;
+            height: 25px;
+            top: 20px;
+            left: -5px;
+            transform: rotate(-45deg);
+        }
+
+        .mane-spike:nth-child(5) {
+            width: 30px;
+            height: 25px;
+            top: 20px;
+            right: -5px;
+            transform: rotate(45deg);
+        }
+
+        .mane-spike:nth-child(6) {
+            width: 25px;
+            height: 30px;
+            bottom: 10px;
+            left: 20px;
+            transform: rotate(-30deg);
+        }
+
+        .mane-spike:nth-child(7) {
+            width: 25px;
+            height: 30px;
+            bottom: 10px;
+            right: 20px;
+            transform: rotate(30deg);
+        }
+
+        /* Adorable Lion Ears */
+        .lion-ear-3d {
+            position: absolute;
+            width: 35px;
+            height: 30px;
+            background: linear-gradient(145deg, #FFB84D, #FF8C42);
+            border-radius: 50% 50% 20% 20%;
+            top: 10px;
             transform-style: preserve-3d;
             transition: all 0.2s ease;
             box-shadow: 
-                inset -3px -3px 8px rgba(0,0,0,0.2),
-                inset 3px 3px 8px rgba(255,255,255,0.2);
+                inset -3px -3px 6px rgba(0,0,0,0.1),
+                inset 3px 3px 6px rgba(255,255,255,0.1);
         }
 
-        .cat-ear-3d.left {
-            left: 20px;
-            transform: rotate(-20deg) rotateY(-10deg);
+        .lion-ear-3d.left {
+            left: 15px;
+            transform: rotate(-15deg) rotateY(-10deg);
         }
 
-        .cat-ear-3d.right {
-            right: 20px;
-            transform: rotate(20deg) rotateY(10deg);
+        .lion-ear-3d.right {
+            right: 15px;
+            transform: rotate(15deg) rotateY(10deg);
         }
 
-        .cat-ear-3d::after {
+        .lion-ear-3d::after {
             content: '';
             position: absolute;
-            width: 15px;
-            height: 20px;
+            width: 20px;
+            height: 15px;
             background: linear-gradient(145deg, #FF69B4, #FF1493);
-            border-radius: 50% 50% 40% 10%;
+            border-radius: 50%;
             top: 8px;
             left: 50%;
             transform: translateX(-50%);
-            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Cute Eyes */
-        .cat-eyes-3d {
+        /* Big Adorable Eyes - Apple emoji style */
+        .lion-eyes-3d {
             position: absolute;
-            top: 30px;
+            top: 35px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 30px;
+            padding: 0 25px;
         }
 
-        .cat-eye-3d {
-            width: 25px;
-            height: 22px;
-            background: radial-gradient(circle at 30% 30%, #87CEEB, #4169E1);
+        .lion-eye-3d {
+            width: 30px;
+            height: 28px;
+            background: radial-gradient(circle at 35% 35%, #FFFFFF, #F0F0F0);
             border-radius: 50%;
             position: relative;
             transform-style: preserve-3d;
             transition: all 0.1s ease;
             box-shadow: 
-                inset -2px -2px 5px rgba(0,0,0,0.3),
-                0 2px 8px rgba(0,0,0,0.2);
+                inset -2px -2px 4px rgba(0,0,0,0.1),
+                0 2px 8px rgba(0,0,0,0.1);
             border: 2px solid #333;
         }
 
-        .cat-eye-3d::before {
+        .lion-eye-3d::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #000 40%, #333 100%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .lion-eye-3d::after {
             content: '';
             position: absolute;
             width: 8px;
             height: 8px;
-            background: radial-gradient(circle, #ffffff 40%, transparent 70%);
+            background: radial-gradient(circle, #ffffff 50%, transparent 70%);
             border-radius: 50%;
-            top: 3px;
-            left: 5px;
+            top: 6px;
+            left: 8px;
+            z-index: 2;
         }
 
-        .cat-eye-3d::after {
-            content: '';
+        /* Cute Lion Nose */
+        .lion-nose-3d {
             position: absolute;
-            width: 12px;
-            height: 16px;
-            background: linear-gradient(to bottom, #000 60%, #333 100%);
-            border-radius: 6px 6px 50% 50%;
-            top: 3px;
+            bottom: 45px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1;
-        }
-
-        /* Cute Nose */
-        .cat-nose-3d {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 10px;
-            height: 8px;
+            width: 15px;
+            height: 12px;
             background: linear-gradient(145deg, #FF69B4, #FF1493);
-            border-radius: 50% 50% 0 0;
+            border-radius: 50% 50% 50% 50%;
             box-shadow: 
-                inset -1px -1px 3px rgba(0,0,0,0.3),
-                0 2px 4px rgba(0,0,0,0.2);
+                inset -2px -2px 4px rgba(0,0,0,0.2),
+                0 2px 6px rgba(0,0,0,0.2);
         }
 
-        /* Cute Mouth */
-        .cat-mouth-3d {
+        /* Happy Lion Mouth */
+        .lion-mouth-3d {
             position: absolute;
             bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 25px;
-            height: 15px;
-            border: 2px solid #333;
+            width: 30px;
+            height: 18px;
+            border: 3px solid #333;
             border-top: none;
-            border-radius: 0 0 20px 20px;
+            border-radius: 0 0 25px 25px;
             transition: all 0.3s ease;
             background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);
         }
 
-        .cat-mouth-3d.open {
-            width: 35px;
-            height: 25px;
-            background: radial-gradient(ellipse at center, #000 50%, #333 100%);
+        .lion-mouth-3d.open {
+            width: 45px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, #FF69B4 30%, #000 60%, #333 100%);
             border-radius: 50%;
-            animation: mouthOpen3D 0.3s ease;
+            animation: mouthOpen3D 0.4s ease;
+            border: 3px solid #333;
         }
 
         @keyframes mouthOpen3D {
             0% { transform: translateX(-50%) scaleY(0); }
-            50% { transform: translateX(-50%) scaleY(1.3); }
+            50% { transform: translateX(-50%) scaleY(1.4); }
             100% { transform: translateX(-50%) scaleY(1); }
         }
 
-        /* Cute Whiskers */
-        .cat-whiskers {
+        /* Lion Whiskers */
+        .lion-whiskers {
             position: absolute;
-            top: 45px;
+            top: 50px;
             width: 100%;
-            height: 20px;
+            height: 25px;
         }
 
         .whisker {
             position: absolute;
-            width: 35px;
-            height: 2px;
-            background: linear-gradient(to right, transparent, #333, transparent);
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #8B4513, transparent);
             transform-origin: center;
             transition: all 0.2s ease;
+            border-radius: 2px;
         }
 
-        .whisker.left-1 { left: -30px; top: 0px; transform: rotate(-8deg); }
-        .whisker.left-2 { left: -30px; top: 8px; transform: rotate(3deg); }
-        .whisker.right-1 { right: -30px; top: 0px; transform: rotate(8deg); }
-        .whisker.right-2 { right: -30px; top: 8px; transform: rotate(-3deg); }
+        .whisker.left-1 { left: -35px; top: 2px; transform: rotate(-5deg); }
+        .whisker.left-2 { left: -35px; top: 12px; transform: rotate(5deg); }
+        .whisker.right-1 { right: -35px; top: 2px; transform: rotate(5deg); }
+        .whisker.right-2 { right: -35px; top: 12px; transform: rotate(-5deg); }
 
-        /* Secret feeding area - BIGGER and more accessible */
+        /* MUCH BIGGER secret feeding area with visual debug */
         .secret-feeding-area {
             position: absolute;
-            bottom: 15px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 40px;
-            background: transparent;
+            width: 100px;
+            height: 50px;
+            background: rgba(255, 0, 0, 0.1); /* Slightly visible for debugging */
             cursor: pointer;
-            z-index: 30;
-            border-radius: 20px;
+            z-index: 50;
+            border-radius: 25px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
         }
 
         /* Speech bubble */
-        .cat-speech {
+        .lion-speech {
             position: absolute;
-            top: -70px;
+            top: -80px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,255,255,0.95);
             color: #000;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 0.9em;
+            padding: 15px 20px;
+            border-radius: 25px;
+            font-size: 1em;
             font-weight: bold;
             white-space: nowrap;
             opacity: 0;
             transition: opacity 0.3s ease;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border: 2px solid #FF69B4;
         }
 
-        .cat-speech::after {
+        .lion-speech::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 10px solid rgba(255,255,255,0.95);
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 12px solid rgba(255,255,255,0.95);
         }
 
-        .cat-speech.show {
+        .lion-speech.show {
             opacity: 1;
-            animation: bounce3D 0.5s ease;
+            animation: bounce3D 0.6s ease;
         }
 
         @keyframes bounce3D {
             0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0) translateZ(0); }
-            40% { transform: translateX(-50%) translateY(-10px) translateZ(10px); }
-            60% { transform: translateX(-50%) translateY(-5px) translateZ(5px); }
+            40% { transform: translateX(-50%) translateY(-15px) translateZ(15px); }
+            60% { transform: translateX(-50%) translateY(-8px) translateZ(8px); }
         }
 
         /* Authentication form styles */
@@ -845,29 +928,40 @@
     <div class="auth-screen" id="auth-screen">
         <canvas class="auth-canvas" id="auth-canvas"></canvas>
         <div class="auth-container">
-            <!-- Cute Yellow Cat -->
-            <div class="cat-container">
-                <div class="cat-speech" id="cat-speech"></div>
-                <div class="cat-3d" id="cat-3d">
-                    <div class="cat-head" id="cat-head">
-                        <!-- Cute Ears -->
-                        <div class="cat-ear-3d left"></div>
-                        <div class="cat-ear-3d right"></div>
+            <!-- Adorable Apple Emoji Style Lion -->
+            <div class="lion-container">
+                <div class="lion-speech" id="lion-speech"></div>
+                <div class="lion-3d" id="lion-3d">
+                    <div class="lion-head" id="lion-head">
+                        <!-- Lion Mane with spikes -->
+                        <div class="lion-mane">
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                            <div class="mane-spike"></div>
+                        </div>
                         
-                        <!-- Cute Eyes -->
-                        <div class="cat-eyes-3d">
-                            <div class="cat-eye-3d" id="left-eye-3d"></div>
-                            <div class="cat-eye-3d" id="right-eye-3d"></div>
+                        <!-- Adorable Ears -->
+                        <div class="lion-ear-3d left"></div>
+                        <div class="lion-ear-3d right"></div>
+                        
+                        <!-- Big Adorable Eyes -->
+                        <div class="lion-eyes-3d">
+                            <div class="lion-eye-3d" id="left-eye-3d"></div>
+                            <div class="lion-eye-3d" id="right-eye-3d"></div>
                         </div>
                         
                         <!-- Cute Nose -->
-                        <div class="cat-nose-3d"></div>
+                        <div class="lion-nose-3d"></div>
                         
-                        <!-- Cute Mouth -->
-                        <div class="cat-mouth-3d" id="cat-mouth-3d"></div>
+                        <!-- Happy Mouth -->
+                        <div class="lion-mouth-3d" id="lion-mouth-3d"></div>
                         
                         <!-- Whiskers -->
-                        <div class="cat-whiskers">
+                        <div class="lion-whiskers">
                             <div class="whisker left-1"></div>
                             <div class="whisker left-2"></div>
                             <div class="whisker right-1"></div>
@@ -876,7 +970,7 @@
                     </div>
                 </div>
                 
-                <!-- Secret feeding area - BIGGER and more accessible -->
+                <!-- MUCH BIGGER secret feeding area with visual indication -->
                 <div class="secret-feeding-area clickable" id="secret-feeding-area"></div>
             </div>
             
@@ -1141,17 +1235,17 @@
             }
         }
 
-        // Enhanced 3D cat animation with proper head tracking
-        function update3DCatAnimation(mouseX, mouseY) {
-            const catContainer = document.querySelector('.cat-container');
-            if (!catContainer) return;
+        // Enhanced 3D lion animation with proper head tracking
+        function update3DLionAnimation(mouseX, mouseY) {
+            const lionContainer = document.querySelector('.lion-container');
+            if (!lionContainer) return;
             
-            const rect = catContainer.getBoundingClientRect();
-            const catCenterX = rect.left + rect.width / 2;
-            const catCenterY = rect.top + rect.height / 2;
+            const rect = lionContainer.getBoundingClientRect();
+            const lionCenterX = rect.left + rect.width / 2;
+            const lionCenterY = rect.top + rect.height / 2;
             
-            const deltaX = mouseX - catCenterX;
-            const deltaY = mouseY - catCenterY;
+            const deltaX = mouseX - lionCenterX;
+            const deltaY = mouseY - lionCenterY;
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             
             // Normalize the movement
@@ -1159,24 +1253,24 @@
             const normalizedDistance = Math.min(distance / maxDistance, 1);
             
             // Calculate angles for 3D rotation
-            const rotateY = (deltaX / window.innerWidth) * 25; // Max 25 degrees
+            const rotateY = (deltaX / window.innerWidth) * 20; // Max 20 degrees
             const rotateX = -(deltaY / window.innerHeight) * 15; // Max 15 degrees
             
-            // Apply 3D transformation to the entire cat head
-            const cat3D = document.getElementById('cat-3d');
-            const catHead = document.getElementById('cat-head');
+            // Apply 3D transformation to the entire lion head
+            const lion3D = document.getElementById('lion-3d');
+            const lionHead = document.getElementById('lion-head');
             
-            if (cat3D && catHead) {
-                cat3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+            if (lion3D && lionHead) {
+                lion3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
                 
                 // Add subtle head tilt
-                const headTilt = (deltaX / window.innerWidth) * 8;
-                catHead.style.transform = `rotateZ(${headTilt}deg)`;
+                const headTilt = (deltaX / window.innerWidth) * 6;
+                lionHead.style.transform = `rotateZ(${headTilt}deg)`;
             }
             
             // Eye movement within the 3D space
-            const eyeOffsetX = (deltaX / window.innerWidth) * 4;
-            const eyeOffsetY = (deltaY / window.innerHeight) * 3;
+            const eyeOffsetX = (deltaX / window.innerWidth) * 3;
+            const eyeOffsetY = (deltaY / window.innerHeight) * 2;
             
             const leftEye = document.getElementById('left-eye-3d');
             const rightEye = document.getElementById('right-eye-3d');
@@ -1189,17 +1283,17 @@
             // Whisker animation based on movement
             const whiskers = document.querySelectorAll('.whisker');
             whiskers.forEach((whisker, index) => {
-                const angle = whisker.classList.contains('left-1') ? -8 - (normalizedDistance * 3) :
-                             whisker.classList.contains('left-2') ? 3 - (normalizedDistance * 2) :
-                             whisker.classList.contains('right-1') ? 8 + (normalizedDistance * 3) :
-                             -3 + (normalizedDistance * 2);
+                const angle = whisker.classList.contains('left-1') ? -5 - (normalizedDistance * 2) :
+                             whisker.classList.contains('left-2') ? 5 - (normalizedDistance * 2) :
+                             whisker.classList.contains('right-1') ? 5 + (normalizedDistance * 2) :
+                             -5 + (normalizedDistance * 2);
                 whisker.style.transform = `rotate(${angle}deg)`;
             });
         }
 
-        // Cat speech system
-        function showCatSpeech(message, duration = 2000) {
-            const speech = document.getElementById('cat-speech');
+        // Lion speech system
+        function showLionSpeech(message, duration = 2500) {
+            const speech = document.getElementById('lion-speech');
             if (speech) {
                 speech.textContent = message;
                 speech.classList.add('show');
@@ -1209,53 +1303,73 @@
             }
         }
 
-        // Secret feeding mechanism - IMPROVED
+        // Secret feeding mechanism - COMPLETELY FIXED
         function secretFeed() {
+            console.log('secretFeed called, credentialsValid:', credentialsValid, 'feedCount:', feedCount);
+            
             if (!credentialsValid) {
-                showCatSpeech('Login first! 😸', 1500);
+                showLionSpeech('🔒 Please login first!', 2000);
                 return;
             }
             
             playEatingSound();
             feedCount++;
+            console.log('Feed count increased to:', feedCount);
             
-            const mouth = document.getElementById('cat-mouth-3d');
+            const mouth = document.getElementById('lion-mouth-3d');
             if (mouth) {
                 mouth.classList.add('open');
                 setTimeout(() => {
                     mouth.classList.remove('open');
-                }, 500);
+                }, 600);
             }
 
-            // Progressive responses
+            // Progressive responses with GUARANTEED access
             if (feedCount === 1) {
-                showCatSpeech('Yummy! 😋', 1500);
+                showLionSpeech('🦁 ROAR! Delicious!', 2000);
             } else if (feedCount === 2) {
-                showCatSpeech('More please! 🤤', 1500);
+                showLionSpeech('😋 More treats please!', 2000);
             } else if (feedCount >= 3) {
                 feedingComplete = true;
-                showCatSpeech('Access granted! 🎉', 2000);
+                showLionSpeech('🎉 WELCOME! Access Granted!', 3000);
                 
                 setTimeout(() => {
+                    console.log('Granting access to dashboard...');
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'flex';
                     initDashboard();
-                }, 2500);
+                }, 3500);
             }
         }
 
-        // Mouse tracking for 3D cat animation
+        // Mouse tracking for 3D lion animation
         document.addEventListener('mousemove', (e) => {
             if (document.getElementById('auth-screen').style.display !== 'none') {
-                update3DCatAnimation(e.clientX, e.clientY);
+                update3DLionAnimation(e.clientX, e.clientY);
             }
         });
 
-        // Secret feeding area click handler - IMPROVED
-        document.getElementById('secret-feeding-area').addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            secretFeed();
+        // Secret feeding area click handler - COMPLETELY FIXED
+        document.addEventListener('DOMContentLoaded', function() {
+            const feedingArea = document.getElementById('secret-feeding-area');
+            console.log('Feeding area element:', feedingArea);
+            
+            if (feedingArea) {
+                feedingArea.addEventListener('click', function(e) {
+                    console.log('Feeding area clicked!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    secretFeed();
+                });
+                
+                // Also add touch support for mobile
+                feedingArea.addEventListener('touchstart', function(e) {
+                    console.log('Feeding area touched!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    secretFeed();
+                });
+            }
         });
 
         // Authentication form handler - NO SESSION STORAGE
@@ -1274,14 +1388,17 @@
             const errorMsg = document.getElementById('error-message');
             const successMsg = document.getElementById('success-message');
             
+            console.log('Login attempt:', username);
+            
             if (validUsers[username] && validUsers[username] === password) {
                 credentialsValid = true;
+                console.log('Credentials validated');
                 
                 errorMsg.classList.remove('show');
                 successMsg.classList.add('show');
                 
                 setTimeout(() => {
-                    showCatSpeech('Ready! Feed me! 😸', 2000);
+                    showLionSpeech('🦁 Ready for treats! Click my mouth!', 3000);
                 }, 1000);
                 
             } else {
@@ -1727,6 +1844,9 @@
         resizeAuthCanvas();
         createAuthParticles();
         animateAuthParticles();
+        
+        // Debug: Log when page loads
+        console.log('Page loaded, authentication system ready');
     </script>
 </body>
 </html>
