@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics - Final Merged Dashboard</title>
+    <title>PinkBlue Analytics - The Final Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Global Styles */
@@ -14,10 +14,10 @@
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #000000;
             color: #ffffff;
-            cursor: none; /* Hide default system cursor */
+            cursor: none;
         }
         
-        /* NEW: Techy Custom Cursor */
+        /* CORRECTED: Techy Custom Cursor */
         .tech-cursor {
             position: fixed;
             width: 28px;
@@ -45,25 +45,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-
-        /* Set all clickable elements to use the custom cursor effect */
-        .clickable {
-            cursor: none;
-        }
+        .clickable { cursor: none; }
 
         /* --- AUTHENTICATION SCREEN --- */
-        .auth-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(135deg, #000000, #1a0033);
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-        }
+        .auth-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #000000, #1a0033); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .auth-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-        .auth-container {
-            position: relative; z-index: 10; background: rgba(255,255,255,0.08);
-            padding: 60px 40px; border-radius: 20px; border: 1px solid rgba(255,105,180,0.4);
-            backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            max-width: 450px; width: 90%; text-align: center;
-        }
+        .auth-container { position: relative; z-index: 10; background: rgba(255,255,255,0.08); padding: 60px 40px; border-radius: 20px; border: 1px solid rgba(255,105,180,0.4); backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); max-width: 450px; width: 90%; text-align: center; }
         .cat-container { position: relative; width: 120px; height: 100px; margin: 0 auto 30px; }
         .cat { width: 120px; height: 80px; background: #ff69b4; border-radius: 50px 50px 30px 30px; position: relative; margin: 10px auto; }
         .cat-ear { width: 25px; height: 25px; background: #ff69b4; border-radius: 50% 50% 50% 0; position: absolute; top: -15px; }
@@ -80,9 +67,9 @@
         .error-message.show { opacity: 1; }
 
         /* --- DASHBOARD STYLES --- */
-        #background-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        #background-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; } /* FIXED Z-INDEX */
         .dashboard-container { position: relative; display: flex; flex-direction: column; height: 100vh; width: 100vw; z-index: 10; }
-        .header { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 30px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
+        .header { background: rgba(12, 12, 12, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 30px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
         .header-row, .dashboard-controls, .control-group { display: flex; align-items: center; gap: 15px; }
         .header-row { justify-content: space-between; flex-wrap: wrap; }
         .control-label { font-weight: 600; }
@@ -98,22 +85,30 @@
         .title-main { font-size: 2.8em; font-weight: 800; }
         .title-date { font-size: 1.2em; color: #ccc; }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .metric-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; text-align: center; }
-        .card-value { font-size: 2.2em; font-weight: 800; }
+        
+        /* NEW: Cool UI Metric Card styles */
+        .metric-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; text-align: center; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+        .metric-card::before { content: ''; position: absolute; top: 0; left: -150%; width: 75%; height: 100%; background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%); transform: skewX(-25deg); transition: left 0.7s ease; }
+        .metric-card:hover::before { left: 150%; }
+        .card-value { font-size: 2.5em; font-weight: 700; }
+        
         .loading-indicator { display: none; text-align: center; padding: 20px; font-size: 1.2em; color: #ff69b4; }
         .loading-indicator.show { display: block; }
         .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,105,180,0.3); border-radius: 50%; border-top-color: #ff69b4; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .comparison-results { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; margin-bottom: 30px; display: none; }
+        
+        /* NEW: Cool UI Comparison Results */
+        .comparison-results { background: rgba(255,255,255,0.04); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; margin-bottom: 30px; display: none; }
         .comparison-results.show { display: block; }
         .comparison-header { color: #ff69b4; font-size: 1.8em; font-weight: bold; margin-bottom: 20px; text-align: center; }
         .comparison-content { display: grid; grid-template-columns: 1fr 400px; gap: 30px; margin-top: 20px; }
-        .comparison-metric { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; }
+        .comparison-metric { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; }
         .metric-name { font-weight: 600; font-size: 1.1em; }
-        .metric-change { font-weight: bold; padding: 8px 15px; border-radius: 8px; font-size: 0.9em; min-width: 140px; text-align: center; }
-        .metric-change.positive { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
-        .metric-change.negative { background: rgba(244, 67, 54, 0.2); color: #f44336; }
-        .metric-change.neutral { background: rgba(158, 158, 158, 0.2); color: #9e9e9e; }
+        .metric-change { font-weight: bold; padding: 8px 15px; border-radius: 8px; font-size: 1.1em; text-align: right; }
+        .metric-change.positive { color: #4caf50; }
+        .metric-change.negative { color: #f44336; }
+        .metric-change.neutral { color: #9e9e9e; }
         .chart-container { background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
@@ -127,10 +122,7 @@
                 <div class="cat">
                     <div class="cat-ear left"></div>
                     <div class="cat-ear right"></div>
-                    <div class="cat-eyes">
-                        <div class="cat-eye" id="left-eye"></div>
-                        <div class="cat-eye" id="right-eye"></div>
-                    </div>
+                    <div class="cat-eyes"><div class="cat-eye" id="left-eye"></div><div class="cat-eye" id="right-eye"></div></div>
                     <div class="cat-mouth"></div>
                 </div>
             </div>
@@ -149,39 +141,22 @@
         <header class="header">
             <div class="header-row">
                 <div class="dashboard-controls">
-                    <div class="control-group">
-                        <label class="control-label">From:</label>
-                        <input type="date" id="start-date" class="control-input clickable" />
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">To:</label>
-                        <input type="date" id="end-date" class="control-input clickable" />
-                    </div>
+                    <div class="control-group"><label class="control-label">From:</label><input type="date" id="start-date" class="control-input clickable" /></div>
+                    <div class="control-group"><label class="control-label">To:</label><input type="date" id="end-date" class="control-input clickable" /></div>
                     <button class="apply-btn clickable" id="apply-btn">Apply</button>
                 </div>
                 <button class="toggle-comparison clickable" id="toggle-comparison">Enable Comparison</button>
             </div>
             <div class="comparison-controls" id="comparison-controls">
-                <div class="control-group">
-                    <label class="control-label">Compare From:</label>
-                    <input type="date" id="compare-start-date" class="control-input clickable" />
-                </div>
-                <div class="control-group">
-                    <label class="control-label">To:</label>
-                    <input type="date" id="compare-end-date" class="control-input clickable" />
-                </div>
+                <div class="control-group"><label class="control-label">Compare From:</label><input type="date" id="compare-start-date" class="control-input clickable" /></div>
+                <div class="control-group"><label class="control-label">To:</label><input type="date" id="compare-end-date" class="control-input clickable" /></div>
                 <button class="compare-btn clickable" id="compare-btn">Compare</button>
             </div>
         </header>
 
         <main class="main-content" id="main-content">
-            <div class="dashboard-title">
-                <h1 class="title-main">Analytics Dashboard</h1>
-                <p class="title-date" id="selected-date">Live Data</p>
-            </div>
-            <div class="loading-indicator" id="loading-indicator">
-                <div class="spinner"></div> Loading real data from Magento...
-            </div>
+            <div class="dashboard-title"><h1 class="title-main">Analytics Dashboard</h1><p class="title-date" id="selected-date">Live Data</p></div>
+            <div class="loading-indicator" id="loading-indicator"><div class="spinner"></div> Loading...</div>
             <div class="comparison-results" id="comparison-results-container"></div>
             <div class="metrics-grid" id="metrics-grid"></div>
         </main>
@@ -190,259 +165,65 @@
     <script>
         // --- AUTHENTICATION & LOGIN UI ---
         const validUsers = { 'blade': 'pb@109$', 'kulehi': 'imdumbass', 'user': 'login', 'password': 'user109' };
-        
-        document.getElementById('auth-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (validUsers[username] && validUsers[username] === password) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'flex';
-                initDashboard();
-            } else {
-                const errorMsg = document.getElementById('error-message');
-                errorMsg.classList.add('show');
-                setTimeout(() => errorMsg.classList.remove('show'), 3000);
-            }
-        });
+        document.getElementById('auth-form').addEventListener('submit', function(e) { e.preventDefault(); const u = document.getElementById('username').value; const p = document.getElementById('password').value; if (validUsers[u] && validUsers[u] === p) { document.getElementById('auth-screen').style.display = 'none'; document.getElementById('dashboard').style.display = 'flex'; initDashboard(); } else { const err = document.getElementById('error-message'); err.classList.add('show'); setTimeout(() => err.classList.remove('show'), 3000); } });
 
         // --- DASHBOARD UI & API LOGIC ---
-        const API_ENDPOINT = '/.netlify/functions/magento-api'; // CORRECTED
+        const API_ENDPOINT = '/.netlify/functions/magento-api';
         let comparisonChart = null;
-
-        document.getElementById('toggle-comparison').addEventListener('click', () => {
-            const btn = document.getElementById('toggle-comparison');
-            const controls = document.getElementById('comparison-controls');
-            const isActive = controls.classList.toggle('show');
-            btn.textContent = isActive ? 'Disable Comparison' : 'Enable Comparison';
-        });
+        document.getElementById('toggle-comparison').addEventListener('click', () => { const btn = document.getElementById('toggle-comparison'); const ctrls = document.getElementById('comparison-controls'); const isActive = ctrls.classList.toggle('show'); btn.textContent = isActive ? 'Disable Comparison' : 'Enable Comparison'; });
         document.getElementById('apply-btn').addEventListener('click', applyDateRange);
         document.getElementById('compare-btn').addEventListener('click', compareData);
-
-        function initDashboard() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('start-date').value = today;
-            document.getElementById('end-date').value = today;
-            setupParticleCanvas('background-canvas');
-            applyDateRange();
-        }
+        function initDashboard() { const t = new Date().toISOString().split('T')[0]; document.getElementById('start-date').value = t; document.getElementById('end-date').value = t; setupParticleCanvas('background-canvas'); applyDateRange(); }
+        async function fetchDataForRange(startDate, endDate) { const l = document.getElementById('loading-indicator'); l.classList.add('show'); try { const r = await fetch(`${API_ENDPOINT}?startDate=${startDate}&endDate=${endDate}`); if (!r.ok) throw new Error(`API Error: ${r.status}`); const d = await r.json(); if (!d.success) throw new Error(d.error || 'API call failed'); return d; } catch (e) { console.error('Fetch Error:', e); alert(`Error: ${e.message}`); return null; } finally { l.classList.remove('show'); } }
+        async function applyDateRange() { const s = document.getElementById('start-date').value; const e = document.getElementById('end-date').value; if (!s || !e) return; document.getElementById('comparison-results-container').classList.remove('show'); document.getElementById('metrics-grid').style.display = 'grid'; const d = await fetchDataForRange(s, e); if (d) { updateMetrics(d); document.getElementById('selected-date').textContent = `Data for ${s} to ${e}`; } }
+        async function compareData() { const s1=document.getElementById('start-date').value, e1=document.getElementById('end-date').value, s2=document.getElementById('compare-start-date').value, e2=document.getElementById('compare-end-date').value; if(!s1||!e1||!s2||!e2) return alert("Select both date ranges."); const [d1,d2] = await Promise.all([fetchDataForRange(s1,e1), fetchDataForRange(s2,e2)]); if(d1&&d2) { document.getElementById('metrics-grid').style.display='none'; displayComparison(d1,d2,{start:s1,end:e1},{start:s2,end:e2}); } }
         
-        async function fetchDataForRange(startDate, endDate) {
-            const loadingIndicator = document.getElementById('loading-indicator');
-            loadingIndicator.classList.add('show');
-            try {
-                const response = await fetch(`${API_ENDPOINT}?startDate=${startDate}&endDate=${endDate}`);
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const data = await response.json();
-                if (!data.success) throw new Error(data.error || 'API call failed');
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
-                alert(`Error: ${error.message}`);
-                return null;
-            } finally {
-                loadingIndicator.classList.remove('show');
-            }
-        }
-        
-        async function applyDateRange() {
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            if (!startDate || !endDate) return;
-
-            document.getElementById('comparison-results-container').classList.remove('show');
-            document.getElementById('metrics-grid').style.display = 'grid';
-
-            const data = await fetchDataForRange(startDate, endDate);
-            if (data) {
-                updateMetrics(data);
-                document.getElementById('selected-date').textContent = `Data for ${startDate} to ${endDate}`;
-            }
-        }
-
-        async function compareData() {
-            const startDate1 = document.getElementById('start-date').value;
-            const endDate1 = document.getElementById('end-date').value;
-            const startDate2 = document.getElementById('compare-start-date').value;
-            const endDate2 = document.getElementById('compare-end-date').value;
-            if (!startDate1 || !endDate1 || !startDate2 || !endDate2) {
-                alert("Please select both primary and comparison date ranges.");
-                return;
-            }
-
-            const [data1, data2] = await Promise.all([
-                fetchDataForRange(startDate1, endDate1),
-                fetchDataForRange(startDate2, endDate2)
-            ]);
-
-            if (data1 && data2) {
-                document.getElementById('metrics-grid').style.display = 'none';
-                displayComparison(data1, data2, {start: startDate1, end: endDate1}, {start: startDate2, end: endDate2});
-            }
-        }
-        
+        // NEW: Count-up animation
+        function animateValue(element, start, end, duration) { let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); element.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('en-IN'); if (progress < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
         function updateMetrics(data) {
             const grid = document.getElementById('metrics-grid');
-            grid.innerHTML = `
-                <div class="metric-card"><h3>Total Orders</h3><div class="card-value">${data.totalOrders || 0}</div></div>
-                <div class="metric-card"><h3>Revenue</h3><div class="card-value">₹${(data.totalRevenue || 0).toLocaleString('en-IN')}</div></div>
-                <div class="metric-card"><h3>Pending</h3><div class="card-value">${data.pendingOrders || 0}</div></div>
-                <div class="metric-card"><h3>Processing</h3><div class="card-value">${data.processingOrders || 0}</div></div>
-                <div class="metric-card"><h3>Completed</h3><div class="card-value">${data.completedOrders || 0}</div></div>
-                <div class="metric-card"><h3>Cancelled</h3><div class="card-value">${data.cancelledOrders || 0}</div></div>
-                <div class="metric-card"><h3>COD</h3><div class="card-value">${data.codOrders || 0}</div></div>
-                <div class="metric-card"><h3>Online</h3><div class="card-value">${data.onlineOrders || 0}</div></div>
-            `;
+            grid.innerHTML = `<div class="metric-card"><h3>Total Orders</h3><div class="card-value" id="val-orders">0</div></div> <div class="metric-card"><h3>Revenue</h3><div class="card-value" id="val-revenue">0</div></div> <div class="metric-card"><h3>Pending</h3><div class="card-value" id="val-pending">0</div></div> <div class="metric-card"><h3>Processing</h3><div class="card-value" id="val-processing">0</div></div> <div class="metric-card"><h3>Completed</h3><div class="card-value" id="val-completed">0</div></div> <div class="metric-card"><h3>Cancelled</h3><div class="card-value" id="val-cancelled">0</div></div> <div class="metric-card"><h3>COD</h3><div class="card-value" id="val-cod">0</div></div> <div class="metric-card"><h3>Online</h3><div class="card-value" id="val-online">0</div></div>`;
+            setTimeout(() => {
+                animateValue(document.getElementById('val-orders'), 0, data.totalOrders || 0, 1500);
+                animateValue(document.getElementById('val-revenue'), 0, data.totalRevenue || 0, 1500);
+                document.getElementById('val-revenue').innerHTML = `₹${document.getElementById('val-revenue').innerHTML}`; // Add currency symbol
+                animateValue(document.getElementById('val-pending'), 0, data.pendingOrders || 0, 1500);
+                animateValue(document.getElementById('val-processing'), 0, data.processingOrders || 0, 1500);
+                animateValue(document.getElementById('val-completed'), 0, data.completedOrders || 0, 1500);
+                animateValue(document.getElementById('val-cancelled'), 0, data.cancelledOrders || 0, 1500);
+                animateValue(document.getElementById('val-cod'), 0, data.codOrders || 0, 1500);
+                animateValue(document.getElementById('val-online'), 0, data.onlineOrders || 0, 1500);
+            }, 100);
         }
-
         function displayComparison(data1, data2, p1, p2) {
-            const container = document.getElementById('comparison-results-container');
-            let contentHTML = `<h2 class="comparison-header">Comparison</h2><p style="text-align:center; margin-bottom: 20px;">Period 1: ${p1.start} to ${p1.end} | Period 2: ${p2.start} to ${p2.end}</p>`;
-            contentHTML += '<div class="comparison-content"><div class="comparison-metrics">';
-            
-            const metrics = [
-                { key: 'totalOrders', name: 'Total Orders' }, { key: 'totalRevenue', name: 'Revenue', isCurrency: true },
-                { key: 'averageOrderValue', name: 'Avg. Order Value', isCurrency: true }, { key: 'successRate', name: 'Success Rate', isPercent: true }
-            ];
-
-            metrics.forEach(metric => {
-                const val1 = data1[metric.key] || 0;
-                const val2 = data2[metric.key] || 0;
-                const diff = val1 - val2;
-                const change = val2 === 0 ? (val1 > 0 ? 100 : 0) : ((diff / val2) * 100);
-                const changeClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : 'neutral');
-                const sign = diff >= 0 ? '+' : '';
-                
-                contentHTML += `
-                    <div class="comparison-metric">
-                        <div class="metric-name">${metric.name}</div>
-                        <div class="metric-values">${metric.isCurrency ? '₹' : ''}${val1.toLocaleString('en-IN')} vs ${metric.isCurrency ? '₹' : ''}${val2.toLocaleString('en-IN')}</div>
-                        <div class="metric-change ${changeClass}">${sign}${change.toFixed(1)}%</div>
-                    </div>`;
+            const cont = document.getElementById('comparison-results-container');
+            let html = `<h2 class="comparison-header">Comparison</h2><p style="text-align:center; margin-bottom: 20px;">${p1.start} to ${p1.end} vs ${p2.start} to ${p2.end}</p><div class="comparison-content"><div class="comparison-metrics">`;
+            const metrics = [{k:'totalOrders',n:'Total Orders'},{k:'totalRevenue',n:'Revenue',c:true}];
+            metrics.forEach(m => {
+                const v1=data1[m.k]||0, v2=data2[m.k]||0, diff=v1-v2, chg=v2===0?(v1>0?100:0):((diff/v2)*100);
+                const cls=diff>0?'positive':(diff<0?'negative':'neutral'), icon=diff>0?'▲':(diff<0?'▼':'');
+                html += `<div class="comparison-metric"><div class="metric-name">${m.n}</div><div class="metric-change ${cls}">${icon} ${chg.toFixed(1)}%</div></div>`;
             });
-
-            contentHTML += '</div><div class="chart-container"><canvas id="comparisonChart"></canvas></div></div>';
-            container.innerHTML = contentHTML;
-            container.classList.add('show');
-
-            const ctx = document.getElementById('comparisonChart').getContext('2d');
-            if (comparisonChart) comparisonChart.destroy();
-            comparisonChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Orders', 'Revenue'],
-                    datasets: [
-                        { label: `Period 1`, data: [data1.totalOrders || 0, data1.totalRevenue || 0], backgroundColor: 'rgba(255, 105, 180, 0.7)' },
-                        { label: `Period 2`, data: [data2.totalOrders || 0, data2.totalRevenue || 0], backgroundColor: 'rgba(75, 192, 192, 0.7)' }
-                    ]
-                },
-                options: { scales: { y: { beginAtZero: true } } }
-            });
+            html += '</div><div class="chart-container"><canvas id="comparisonChart"></canvas></div></div>';
+            cont.innerHTML = html; cont.classList.add('show');
+            const ctx=document.getElementById('comparisonChart').getContext('2d'); if(comparisonChart)comparisonChart.destroy();
+            comparisonChart=new Chart(ctx,{type:'bar',data:{labels:['Orders','Revenue'],datasets:[{label:`P1`,data:[data1.totalOrders||0,data1.totalRevenue||0],backgroundColor:'rgba(255,105,180,0.7)'},{label:`P2`,data:[data2.totalOrders||0,data2.totalRevenue||0],backgroundColor:'rgba(75,192,192,0.7)'}]},options:{scales:{y:{beginAtZero:true}}}});
         }
 
-        // --- CURSOR & PARTICLE ANIMATION LOGIC ---
+        // --- CURSOR & PARTICLE ANIMATION ---
         const cursor = document.getElementById('tech-cursor');
-        const mousePos = { x: 0, y: 0 };
-        
-        window.addEventListener('mousemove', e => {
-            mousePos.x = e.clientX;
-            mousePos.y = e.clientY;
-            cursor.style.left = `${e.clientX}px`;
-            cursor.style.top = `${e.clientY}px`;
-        });
-        
-        document.querySelectorAll('.clickable').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-        });
-
+        window.addEventListener('mousemove', e => { cursor.style.left = `${e.clientX}px`; cursor.style.top = `${e.clientY}px`; });
+        document.querySelectorAll('.clickable').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('hover')); el.addEventListener('mouseleave', () => cursor.classList.remove('hover')); });
         function setupParticleCanvas(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            
-            const resize = () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                particles = [];
-                const particleCount = 80;
-                for(let i=0; i<particleCount; i++) particles.push(new Particle());
-            };
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2 + 1;
-                    this.speedX = (Math.random() - 0.5) * 0.4;
-                    this.speedY = (Math.random() - 0.5) * 0.4;
-                    this.opacity = Math.random() * 0.4 + 0.1;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
-                    if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.fillStyle = `rgba(255, 105, 180, ${this.opacity})`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            function connectParticles() {
-                const maxDistance = 120; // Max distance for lines to appear
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < maxDistance) {
-                           const opacity = 1 - (distance / maxDistance);
-                           ctx.strokeStyle = `rgba(255, 105, 180, ${opacity * 0.3})`;
-                           ctx.lineWidth = 1;
-                           ctx.beginPath();
-                           ctx.moveTo(particles[i].x, particles[i].y);
-                           ctx.lineTo(particles[j].x, particles[j].y);
-                           ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            const animate = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => { p.update(); p.draw(); });
-                connectParticles();
-                requestAnimationFrame(animate);
-            };
-
-            window.addEventListener('resize', resize);
-            resize();
-            animate();
+            const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); let particles = [];
+            const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particles = []; const pCount = 80; for(let i=0; i<pCount; i++) particles.push(new Particle()); };
+            class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = (Math.random() - 0.5) * 0.3; this.speedY = (Math.random() - 0.5) * 0.3; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX *= -1; if (this.y > canvas.height || this.y < 0) this.speedY *= -1; } draw() { ctx.fillStyle = `rgba(255, 105, 180, 0.4)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+            function connectParticles() { const maxDist = 120; for (let i = 0; i < particles.length; i++) { for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const dist = Math.sqrt(dx * dx + dy * dy); if (dist < maxDist) { const op = 1 - (dist / maxDist); ctx.strokeStyle = `rgba(255, 105, 180, ${op * 0.25})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } }
+            const animate = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); connectParticles(); requestAnimationFrame(animate); };
+            window.addEventListener('resize', resize); resize(); animate();
         }
-        
         setupParticleCanvas('auth-canvas');
-
-        document.addEventListener('mousemove', (e) => {
-            if (document.getElementById('auth-screen').style.display === 'none') return;
-            const catContainer = document.querySelector('.cat-container');
-            if(!catContainer) return;
-            const rect = catContainer.getBoundingClientRect();
-            const catCenterX = rect.left + rect.width / 2;
-            const catCenterY = rect.top + rect.height / 2;
-            const [deltaX, deltaY] = [e.clientX - catCenterX, e.clientY - catCenterY];
-            const angle = Math.atan2(deltaY, deltaX);
-            const distance = Math.min(3, Math.hypot(deltaX, deltaY) / 100);
-            const [eyeOffsetX, eyeOffsetY] = [Math.cos(angle) * distance, Math.sin(angle) * distance];
-            document.getElementById('left-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
-            document.getElementById('right-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
-        });
-
+        document.addEventListener('mousemove', (e) => { if (document.getElementById('auth-screen').style.display !== 'none') { const cat=document.querySelector('.cat-container'); if(!cat)return; const r=cat.getBoundingClientRect(), cX=r.left+r.width/2, cY=r.top+r.height/2, dX=e.clientX-cX, dY=e.clientY-cY, ang=Math.atan2(dY,dX), dist=Math.min(3,Math.hypot(dX,dY)/100), oX=Math.cos(ang)*dist, oY=Math.sin(ang)*dist; document.getElementById('left-eye').style.transform=`translate(${oX}px,${oY}px)`; document.getElementById('right-eye').style.transform=`translate(${oX}px,${oY}px)`; } });
     </script>
 </body>
 </html>
