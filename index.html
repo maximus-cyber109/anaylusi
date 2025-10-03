@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics Dashboard - Enhanced</title>
+    <title>PinkBlue Analytics Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -65,140 +65,219 @@
             text-align: center;
         }
 
+        /* 3D Cat Container */
         .cat-container {
+            position: relative;
+            width: 200px;
+            height: 160px;
+            margin: 0 auto 30px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        /* 3D Cat Head */
+        .cat-3d {
             position: relative;
             width: 140px;
             height: 120px;
-            margin: 0 auto 30px;
-        }
-
-        .cat {
-            width: 120px;
-            height: 80px;
-            background: #ff69b4;
-            border-radius: 50px 50px 30px 30px;
-            position: relative;
-            margin: 10px auto;
+            margin: 20px auto;
+            transform-style: preserve-3d;
             transition: all 0.3s ease;
         }
 
-        .cat.hungry {
-            animation: wiggle 0.5s ease-in-out infinite alternate;
+        .cat-head {
+            position: relative;
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(145deg, #ff69b4, #e91e63);
+            border-radius: 60px 60px 40px 40px;
+            transform-style: preserve-3d;
+            box-shadow: 
+                inset -20px -20px 40px rgba(0,0,0,0.3),
+                inset 20px 20px 40px rgba(255,255,255,0.1),
+                0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease;
         }
 
-        @keyframes wiggle {
-            0% { transform: rotate(-2deg) scale(1); }
-            100% { transform: rotate(2deg) scale(1.05); }
-        }
-
-        .cat-ear {
-            width: 25px;
-            height: 25px;
-            background: #ff69b4;
-            border-radius: 50% 50% 50% 0;
+        /* 3D Ears */
+        .cat-ear-3d {
             position: absolute;
-            top: -15px;
+            width: 35px;
+            height: 40px;
+            background: linear-gradient(145deg, #ff69b4, #e91e63);
+            border-radius: 50% 50% 50% 10%;
+            top: -20px;
+            transform-style: preserve-3d;
             transition: all 0.2s ease;
+            box-shadow: 
+                inset -5px -5px 10px rgba(0,0,0,0.3),
+                inset 5px 5px 10px rgba(255,255,255,0.1);
         }
 
-        .cat-ear.left {
-            left: 20px;
-            transform: rotate(-45deg);
+        .cat-ear-3d.left {
+            left: 15px;
+            transform: rotate(-25deg) rotateY(-15deg);
         }
 
-        .cat-ear.right {
-            right: 20px;
-            transform: rotate(45deg);
+        .cat-ear-3d.right {
+            right: 15px;
+            transform: rotate(25deg) rotateY(15deg);
         }
 
-        .cat.hungry .cat-ear {
-            animation: earTwitch 0.6s ease-in-out infinite alternate;
-        }
-
-        @keyframes earTwitch {
-            0% { transform: rotate(-45deg) scale(1); }
-            100% { transform: rotate(-35deg) scale(1.1); }
-        }
-
-        .cat.hungry .cat-ear.right {
-            animation: earTwitchRight 0.6s ease-in-out infinite alternate;
-        }
-
-        @keyframes earTwitchRight {
-            0% { transform: rotate(45deg) scale(1); }
-            100% { transform: rotate(35deg) scale(1.1); }
-        }
-
-        .cat-eyes {
+        .cat-ear-3d::after {
+            content: '';
             position: absolute;
-            top: 25px;
+            width: 20px;
+            height: 25px;
+            background: linear-gradient(145deg, #ff1493, #c2185b);
+            border-radius: 50% 50% 40% 10%;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4);
+        }
+
+        /* 3D Eyes */
+        .cat-eyes-3d {
+            position: absolute;
+            top: 35px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 30px;
+            padding: 0 25px;
         }
 
-        .cat-eye {
-            width: 12px;
-            height: 12px;
-            background: #000;
+        .cat-eye-3d {
+            width: 20px;
+            height: 18px;
+            background: linear-gradient(145deg, #000000, #333333);
             border-radius: 50%;
             position: relative;
+            transform-style: preserve-3d;
             transition: all 0.1s ease;
+            box-shadow: 
+                inset -3px -3px 6px rgba(255,255,255,0.1),
+                0 3px 6px rgba(0,0,0,0.5);
         }
 
-        .cat-mouth {
+        .cat-eye-3d::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #ffffff 30%, transparent 70%);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+
+        .cat-eye-3d::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 14px;
+            background: linear-gradient(to bottom, #2196F3, #1976D2);
+            border-radius: 50%;
+            top: 2px;
+            left: 4px;
+            z-index: -1;
+        }
+
+        /* 3D Nose */
+        .cat-nose-3d {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 10px;
+            background: linear-gradient(145deg, #ff1493, #c2185b);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 
+                inset -2px -2px 4px rgba(0,0,0,0.3),
+                0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 3D Mouth */
+        .cat-mouth-3d {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 20px;
-            height: 15px;
-            border: 2px solid #000;
-            border-top: none;
-            border-radius: 0 0 20px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .cat-mouth.open {
             width: 30px;
-            height: 25px;
-            background: #000;
-            border-radius: 15px;
-            animation: mouthOpen 0.3s ease;
+            height: 20px;
+            border: 2px solid #333;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+            transition: all 0.3s ease;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.2) 100%);
         }
 
-        @keyframes mouthOpen {
+        .cat-mouth-3d.open {
+            width: 40px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, #000 40%, #333 100%);
+            border-radius: 20px;
+            animation: mouthOpen3D 0.3s ease;
+        }
+
+        @keyframes mouthOpen3D {
             0% { transform: translateX(-50%) scaleY(0); }
+            50% { transform: translateX(-50%) scaleY(1.2); }
             100% { transform: translateX(-50%) scaleY(1); }
         }
 
-        .feeding-area {
+        /* 3D Whiskers */
+        .cat-whiskers {
             position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: transparent;
-            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23FFD700"/><text x="16" y="20" text-anchor="middle" font-size="12">🍖</text></svg>') 16 16, pointer;
+            top: 50px;
+            width: 100%;
+            height: 20px;
         }
 
+        .whisker {
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #666, transparent);
+            transform-origin: center;
+            transition: all 0.2s ease;
+        }
+
+        .whisker.left-1 { left: -35px; top: 0px; transform: rotate(-10deg); }
+        .whisker.left-2 { left: -35px; top: 8px; transform: rotate(5deg); }
+        .whisker.right-1 { right: -35px; top: 0px; transform: rotate(10deg); }
+        .whisker.right-2 { right: -35px; top: 8px; transform: rotate(-5deg); }
+
+        /* Secret feeding area (invisible) */
+        .secret-feeding-area {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 30px;
+            background: transparent;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* Speech bubble (hidden by default) */
         .cat-speech {
             position: absolute;
-            top: -50px;
+            top: -60px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,255,255,0.95);
             color: #000;
-            padding: 10px 15px;
-            border-radius: 15px;
+            padding: 12px 18px;
+            border-radius: 20px;
             font-size: 0.9em;
             font-weight: bold;
             white-space: nowrap;
             opacity: 0;
             transition: opacity 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
 
         .cat-speech::after {
@@ -209,22 +288,23 @@
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid rgba(255,255,255,0.95);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(255,255,255,0.95);
         }
 
         .cat-speech.show {
             opacity: 1;
-            animation: bounce 0.5s ease;
+            animation: bounce3D 0.5s ease;
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
+        @keyframes bounce3D {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0) translateZ(0); }
+            40% { transform: translateX(-50%) translateY(-10px) translateZ(10px); }
+            60% { transform: translateX(-50%) translateY(-5px) translateZ(5px); }
         }
 
+        /* Authentication form styles */
         .auth-title {
             color: #ff69b4;
             font-size: 2.2em;
@@ -260,6 +340,23 @@
             color: rgba(255,255,255,0.6);
         }
 
+        .auth-submit {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,105,180,0.4);
+        }
+
         .error-message {
             color: #ef5350;
             font-size: 0.9em;
@@ -272,6 +369,19 @@
             opacity: 1;
         }
 
+        .success-message {
+            color: #4caf50;
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+        }
+
+        /* Dashboard styles */
         #background-canvas {
             position: fixed;
             top: 0;
@@ -582,33 +692,58 @@
     <div class="auth-screen" id="auth-screen">
         <canvas class="auth-canvas" id="auth-canvas"></canvas>
         <div class="auth-container">
+            <!-- 3D Cat -->
             <div class="cat-container">
-                <div class="cat-speech" id="cat-speech">Feed me to login! 🍖</div>
-                <div class="cat" id="auth-cat">
-                    <div class="cat-ear left"></div>
-                    <div class="cat-ear right"></div>
-                    <div class="cat-eyes">
-                        <div class="cat-eye" id="left-eye"></div>
-                        <div class="cat-eye" id="right-eye"></div>
+                <div class="cat-speech" id="cat-speech"></div>
+                <div class="cat-3d" id="cat-3d">
+                    <div class="cat-head" id="cat-head">
+                        <!-- 3D Ears -->
+                        <div class="cat-ear-3d left"></div>
+                        <div class="cat-ear-3d right"></div>
+                        
+                        <!-- 3D Eyes -->
+                        <div class="cat-eyes-3d">
+                            <div class="cat-eye-3d" id="left-eye-3d"></div>
+                            <div class="cat-eye-3d" id="right-eye-3d"></div>
+                        </div>
+                        
+                        <!-- 3D Nose -->
+                        <div class="cat-nose-3d"></div>
+                        
+                        <!-- 3D Mouth -->
+                        <div class="cat-mouth-3d" id="cat-mouth-3d"></div>
+                        
+                        <!-- Whiskers -->
+                        <div class="cat-whiskers">
+                            <div class="whisker left-1"></div>
+                            <div class="whisker left-2"></div>
+                            <div class="whisker right-1"></div>
+                            <div class="whisker right-2"></div>
+                        </div>
                     </div>
-                    <div class="cat-mouth" id="cat-mouth"></div>
                 </div>
-                <div class="feeding-area clickable" id="feeding-area"></div>
+                
+                <!-- Secret feeding area (invisible) -->
+                <div class="secret-feeding-area clickable" id="secret-feeding-area"></div>
             </div>
             
             <h1 class="auth-title">🔐 PinkBlue Analytics</h1>
-            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Feed the cat to access dashboard</p>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Secure Access Portal</p>
             
-            <form class="auth-form" id="auth-form" style="display: none;">
+            <!-- Authentication form -->
+            <form class="auth-form" id="auth-form">
                 <input type="text" id="username" class="auth-input" placeholder="👤 Username" required>
                 <input type="password" id="password" class="auth-input" placeholder="🔒 Password" required>
+                <button type="submit" class="auth-submit clickable">🚀 Access Dashboard</button>
                 <div class="error-message" id="error-message">Invalid credentials!</div>
+                <div class="success-message" id="success-message">Credentials verified. Complete authentication...</div>
             </form>
         </div>
     </div>
 
     <canvas id="background-canvas"></canvas>
 
+    <!-- Dashboard -->
     <div class="dashboard-container" id="dashboard" style="display: none;">
         <header class="header">
             <div class="date-range-section">
@@ -712,9 +847,10 @@
     </audio>
 
     <script>
-        // Enhanced cat authentication with feeding mechanism
+        // Authentication state
+        let credentialsValid = false;
+        let feedingComplete = false;
         let feedCount = 0;
-        let isAuthenticated = false;
 
         // Sound effect functions
         function playClickSound() {
@@ -742,11 +878,10 @@
             }
         });
 
-        // Cat animation and particle system
+        // Particle system for background
         const authCanvas = document.getElementById('auth-canvas');
         const authCtx = authCanvas.getContext('2d');
         let authParticles = [];
-        let mousePos = { x: 0, y: 0 };
 
         function resizeAuthCanvas() {
             authCanvas.width = window.innerWidth;
@@ -823,89 +958,119 @@
             }
         }
 
-        // Enhanced cat eye and head tracking
-        function updateCatAnimation(mouseX, mouseY) {
+        // Enhanced 3D cat animation with proper head tracking
+        function update3DCatAnimation(mouseX, mouseY) {
             const catContainer = document.querySelector('.cat-container');
+            if (!catContainer) return;
+            
             const rect = catContainer.getBoundingClientRect();
             const catCenterX = rect.left + rect.width / 2;
             const catCenterY = rect.top + rect.height / 2;
             
             const deltaX = mouseX - catCenterX;
             const deltaY = mouseY - catCenterY;
-            const angle = Math.atan2(deltaY, deltaX);
-            const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 100, 3);
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             
-            // Eye movement
-            const eyeOffsetX = Math.cos(angle) * distance;
-            const eyeOffsetY = Math.sin(angle) * distance;
+            // Normalize the movement
+            const maxDistance = 200;
+            const normalizedDistance = Math.min(distance / maxDistance, 1);
             
-            document.getElementById('left-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
-            document.getElementById('right-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+            // Calculate angles for 3D rotation
+            const rotateY = (deltaX / window.innerWidth) * 30; // Max 30 degrees
+            const rotateX = -(deltaY / window.innerHeight) * 20; // Max 20 degrees
             
-            // Subtle head tilt following mouse
-            const cat = document.getElementById('auth-cat');
-            const headTilt = (deltaX / window.innerWidth) * 5; // Max 5 degree tilt
-            cat.style.transform = `rotate(${headTilt}deg)`;
+            // Apply 3D transformation to the entire cat head
+            const cat3D = document.getElementById('cat-3d');
+            const catHead = document.getElementById('cat-head');
+            
+            if (cat3D && catHead) {
+                cat3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+                
+                // Add subtle head tilt
+                const headTilt = (deltaX / window.innerWidth) * 10;
+                catHead.style.transform = `rotateZ(${headTilt}deg)`;
+            }
+            
+            // Eye movement within the 3D space
+            const eyeOffsetX = (deltaX / window.innerWidth) * 6;
+            const eyeOffsetY = (deltaY / window.innerHeight) * 4;
+            
+            const leftEye = document.getElementById('left-eye-3d');
+            const rightEye = document.getElementById('right-eye-3d');
+            
+            if (leftEye && rightEye) {
+                leftEye.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+                rightEye.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+            }
+            
+            // Whisker animation based on movement
+            const whiskers = document.querySelectorAll('.whisker');
+            whiskers.forEach((whisker, index) => {
+                const angle = whisker.classList.contains('left-1') ? -10 - (normalizedDistance * 5) :
+                             whisker.classList.contains('left-2') ? 5 - (normalizedDistance * 3) :
+                             whisker.classList.contains('right-1') ? 10 + (normalizedDistance * 5) :
+                             -5 + (normalizedDistance * 3);
+                whisker.style.transform = `rotate(${angle}deg)`;
+            });
         }
 
-        // Cat speech and behavior
-        function showCatSpeech(message, duration = 3000) {
+        // Cat speech system (hidden messages)
+        function showCatSpeech(message, duration = 2000) {
             const speech = document.getElementById('cat-speech');
-            speech.textContent = message;
-            speech.classList.add('show');
-            setTimeout(() => {
-                speech.classList.remove('show');
-            }, duration);
+            if (speech) {
+                speech.textContent = message;
+                speech.classList.add('show');
+                setTimeout(() => {
+                    speech.classList.remove('show');
+                }, duration);
+            }
         }
 
-        function makeCatHungry() {
-            const cat = document.getElementById('auth-cat');
-            cat.classList.add('hungry');
-            showCatSpeech('I\\'m hungry! Feed me! 🐱');
-        }
-
-        function feedCat() {
+        // Secret feeding mechanism
+        function secretFeed() {
+            if (!credentialsValid) {
+                return; // Must enter credentials first
+            }
+            
             playEatingSound();
             feedCount++;
-            const cat = document.getElementById('auth-cat');
-            const mouth = document.getElementById('cat-mouth');
             
-            // Open mouth animation
-            mouth.classList.add('open');
-            setTimeout(() => {
-                mouth.classList.remove('open');
-            }, 300);
+            const mouth = document.getElementById('cat-mouth-3d');
+            if (mouth) {
+                mouth.classList.add('open');
+                setTimeout(() => {
+                    mouth.classList.remove('open');
+                }, 400);
+            }
 
-            // Cat reactions based on feed count
+            // Progressive responses (hidden from obvious view)
             if (feedCount === 1) {
-                showCatSpeech('Mmm! More please! 😺', 2000);
+                showCatSpeech('...', 1000);
             } else if (feedCount === 2) {
-                showCatSpeech('Getting full... One more! 😸', 2000);
+                showCatSpeech('* content *', 1000);
             } else if (feedCount >= 3) {
-                cat.classList.remove('hungry');
-                showCatSpeech('Purrrfect! Access granted! 🎉', 2000);
+                feedingComplete = true;
+                showCatSpeech('Access granted!', 2000);
                 
                 setTimeout(() => {
-                    document.getElementById('auth-form').style.display = 'flex';
-                    showCatSpeech('Now enter credentials!', 3000);
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'flex';
+                    sessionStorage.setItem('pinkblue_authenticated', document.getElementById('username').value);
+                    initDashboard();
                 }, 2500);
             }
         }
 
-        // Mouse tracking
+        // Mouse tracking for 3D cat animation
         document.addEventListener('mousemove', (e) => {
-            mousePos.x = e.clientX;
-            mousePos.y = e.clientY;
-            updateCatAnimation(e.clientX, e.clientY);
+            update3DCatAnimation(e.clientX, e.clientY);
         });
 
-        // Feeding area click handler
-        document.getElementById('feeding-area').addEventListener('click', function(e) {
+        // Secret feeding area click handler
+        document.getElementById('secret-feeding-area').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (!isAuthenticated) {
-                feedCat();
-            }
+            secretFeed();
         });
 
         // Authentication form handler
@@ -922,20 +1087,28 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('error-message');
+            const successMsg = document.getElementById('success-message');
             
             if (validUsers[username] && validUsers[username] === password) {
-                showCatSpeech('Welcome! Loading dashboard... 🚀');
-                isAuthenticated = true;
+                credentialsValid = true;
                 
+                // Clear any previous messages
+                errorMsg.classList.remove('show');
+                successMsg.classList.add('show');
+                
+                // Show subtle hint without being obvious
                 setTimeout(() => {
-                    document.getElementById('auth-screen').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'flex';
-                    sessionStorage.setItem('pinkblue_authenticated', username);
-                    initDashboard();
-                }, 2000);
+                    showCatSpeech('Ready...', 1500);
+                }, 1000);
+                
+                // Disable form after valid credentials
+                const inputs = this.querySelectorAll('input, button');
+                inputs.forEach(input => input.disabled = true);
                 
             } else {
-                showCatSpeech('Wrong credentials! Try again! 😾');
+                credentialsValid = false;
+                feedCount = 0;
+                successMsg.classList.remove('show');
                 errorMsg.classList.add('show');
                 
                 setTimeout(() => {
@@ -946,11 +1119,10 @@
             }
         });
 
-        // Dashboard initialization
+        // Dashboard functionality
         const canvas = document.getElementById('background-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let mouse = { x: null, y: null };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -1007,7 +1179,7 @@
             requestAnimationFrame(animate);
         }
 
-        // Date range and comparison functionality
+        // Date range functionality
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
         const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -1028,7 +1200,6 @@
             const compareStartDate = document.getElementById('compare-start-date').value;
             const compareEndDate = document.getElementById('compare-end-date').value;
 
-            // Mock data for demonstration
             const currentPeriodData = {
                 totalOrders: 150,
                 totalRevenue: 285000,
@@ -1121,7 +1292,6 @@
         }
 
         function fetchRealData() {
-            // Mock data for demonstration
             const data = {
                 totalOrders: 150,
                 totalRevenue: 285000,
@@ -1130,9 +1300,7 @@
                 completedOrders: 23,
                 cancelledOrders: 0,
                 codOrders: 95,
-                onlineOrders: 55,
-                averageOrderValue: 1900,
-                successRate: 98
+                onlineOrders: 55
             };
 
             updateDashboard(data);
@@ -1150,7 +1318,7 @@
         }
 
         function initDashboard() {
-            console.log('🚀 Initializing Enhanced Dashboard...');
+            console.log('🚀 Initializing Dashboard...');
             resizeCanvas();
             createParticles();
             initializeDateInputs();
@@ -1166,12 +1334,7 @@
             createAuthParticles();
         });
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        // Check authentication and initialize
+        // Initialize
         if (sessionStorage.getItem('pinkblue_authenticated')) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'flex';
@@ -1180,11 +1343,6 @@
             resizeAuthCanvas();
             createAuthParticles();
             animateAuthParticles();
-            
-            // Start with hungry cat
-            setTimeout(() => {
-                makeCatHungry();
-            }, 2000);
         }
     </script>
 </body>
