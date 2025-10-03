@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics Dashboard - Lion Fixed</title>
-    <!-- Import Three.js and the GLTF Loader -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+    <title>PinkBlue Analytics Dashboard - Cute Lion</title>
     <style>
         /* General Styles */
         body, html {
@@ -67,13 +58,20 @@
             text-align: center;
         }
 
-        /* 3D Lion container */
+        /* Lion image container */
         #lion-container {
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
             margin: -50px auto 0;
             position: relative;
             z-index: 11;
+        }
+
+        #bitmoji-lion {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.1s ease-out; /* Smooth transition for mouse follow */
         }
         
         .auth-title {
@@ -127,7 +125,6 @@
             transform: translateX(-50%);
             width: 150px;
             height: 60px;
-            /* background: rgba(255,0,0,0.2); /* Uncomment for debugging */
             cursor: pointer;
             z-index: 100;
         }
@@ -176,112 +173,49 @@
         .error-message.show, .success-message.show { opacity: 1; }
 
 
-        /* --- Dashboard Styles --- */
+        /* --- Dashboard Styles (Unchanged) --- */
         #background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
         }
-        
         .dashboard-container {
-            position: relative;
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            z-index: 10;
+            position: relative; display: none; flex-direction: column; height: 100vh; width: 100vw; z-index: 10;
         }
-        
         .header {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 30px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;
         }
-
         .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        
         .status-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
         .live-indicator {
-            width: 8px;
-            height: 8px;
-            background: #00ff00;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+            width: 8px; height: 8px; background: #00ff00; border-radius: 50%; animation: pulse 2s infinite;
         }
-        
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
-        
         .status-text {
-            font-weight: 600;
-            color: #00ff00;
-            font-size: 0.85em;
+            font-weight: 600; color: #00ff00; font-size: 0.85em;
         }
-
         .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 30px;
-            overflow-y: auto;
-            max-height: calc(100vh - 160px);
+            flex: 1; display: flex; flex-direction: column; padding: 20px 30px; overflow-y: auto; max-height: calc(100vh - 160px);
         }
-
         .dashboard-title {
-            text-align: center;
-            margin-bottom: 30px;
+            text-align: center; margin-bottom: 30px;
         }
         .title-main { font-size: 2.8em; font-weight: 800; color: #fff; margin-bottom: 10px; }
         .title-date { font-size: 1.2em; color: #ccc; font-weight: 500; }
-
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;
         }
-
         .metric-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; text-align: center; transition: all 0.4s ease;
         }
         .metric-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 105, 180, 0.4);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px); border-color: rgba(255, 105, 180, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         .card-title { font-size: 0.9em; color: #fff; margin-bottom: 15px; font-weight: 600; }
         .card-value { font-size: 2.2em; font-weight: 800; margin-bottom: 5px; }
         .card-label { font-size: 0.8em; color: #aaa; font-weight: 500; }
-
-        /* Card color coding */
         .total-orders .card-value { color: #00d4ff; }
         .revenue .card-value { color: #00ff88; }
         .pending .card-value { color: #ffa726; }
@@ -290,25 +224,12 @@
         .cancelled .card-value { color: #ef5350; }
         .cod .card-value { color: #ab47bc; }
         .online .card-value { color: #26c6da; }
-        
         .loading-indicator {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            font-size: 1.2em;
-            color: #ff69b4;
+            display: none; text-align: center; padding: 20px; font-size: 1.2em; color: #ff69b4;
         }
         .loading-indicator.show { display: block; }
-        
         .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 105, 180, 0.3);
-            border-radius: 50%;
-            border-top-color: #ff69b4;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+            display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 105, 180, 0.3); border-radius: 50%; border-top-color: #ff69b4; animation: spin 1s ease-in-out infinite; margin-right: 10px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -320,9 +241,10 @@
     <div class="auth-screen" id="auth-screen">
         <canvas id="auth-canvas"></canvas>
         <div class="auth-container">
-            <!-- 3D Lion will be rendered here -->
+            <!-- *** NEW: CUTE LION IMAGE *** -->
             <div id="lion-container">
-                 <div class="bitmoji-speech" id="bitmoji-speech"></div>
+                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/d4a81a8f-47b8-4f08-b28e-c79852f4355c.png" alt="Cute Lion" id="bitmoji-lion">
+                <div class="bitmoji-speech" id="bitmoji-speech"></div>
             </div>
             
             <h1 class="auth-title">PinkBlue Analytics</h1>
@@ -336,12 +258,11 @@
                 <div class="success-message" id="success-message">Credentials verified. Now feed the lion...</div>
             </form>
             
-            <!-- Secret area to "feed" the lion -->
             <div class="secret-feeding-area" id="secret-feeding-area"></div>
         </div>
     </div>
     
-    <!-- --- Dashboard --- -->
+    <!-- --- Dashboard (Unchanged) --- -->
     <div class="dashboard-container" id="dashboard">
         <canvas id="background-canvas"></canvas>
         <header class="header">
@@ -352,67 +273,36 @@
                 </div>
             </div>
         </header>
-
         <main class="main-content">
             <div class="dashboard-title">
                 <h1 class="title-main">Analytics Dashboard</h1>
                 <p class="title-date" id="selected-date">Live Data</p>
             </div>
-            
             <div class="loading-indicator" id="loading-indicator">
                 <div class="spinner"></div> Loading real data from Magento...
             </div>
-
             <div class="metrics-grid">
-                <div class="metric-card total-orders">
-                    <h3 class="card-title">Total Orders</h3>
-                    <div class="card-value" id="total-orders">...</div>
-                </div>
-                <div class="metric-card revenue">
-                    <h3 class="card-title">Revenue</h3>
-                    <div class="card-value" id="total-revenue">...</div>
-                </div>
-                <div class="metric-card pending">
-                    <h3 class="card-title">Pending</h3>
-                    <div class="card-value" id="pending-orders">...</div>
-                </div>
-                <div class="metric-card processing">
-                    <h3 class="card-title">Processing</h3>
-                    <div class="card-value" id="processing-orders">...</div>
-                </div>
-                <div class="metric-card completed">
-                    <h3 class="card-title">Completed</h3>
-                    <div class="card-value" id="completed-orders">...</div>
-                </div>
-                <div class="metric-card cancelled">
-                    <h3 class="card-title">Cancelled</h3>
-                    <div class="card-value" id="cancelled-orders">...</div>
-                </div>
-                 <div class="metric-card cod">
-                    <h3 class="card-title">Cash on Delivery</h3>
-                    <div class="card-value" id="cod-orders">...</div>
-                </div>
-                <div class="metric-card online">
-                    <h3 class="card-title">Online Payments</h3>
-                    <div class="card-value" id="online-orders">...</div>
-                </div>
+                <div class="metric-card total-orders"><h3 class="card-title">Total Orders</h3><div class="card-value" id="total-orders">...</div></div>
+                <div class="metric-card revenue"><h3 class="card-title">Revenue</h3><div class="card-value" id="total-revenue">...</div></div>
+                <div class="metric-card pending"><h3 class="card-title">Pending</h3><div class="card-value" id="pending-orders">...</div></div>
+                <div class="metric-card processing"><h3 class="card-title">Processing</h3><div class="card-value" id="processing-orders">...</div></div>
+                <div class="metric-card completed"><h3 class="card-title">Completed</h3><div class="card-value" id="completed-orders">...</div></div>
+                <div class="metric-card cancelled"><h3 class="card-title">Cancelled</h3><div class="card-value" id="cancelled-orders">...</div></div>
+                <div class="metric-card cod"><h3 class="card-title">Cash on Delivery</h3><div class="card-value" id="cod-orders">...</div></div>
+                <div class="metric-card online"><h3 class="card-title">Online Payments</h3><div class="card-value" id="online-orders">...</div></div>
             </div>
         </main>
     </div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+    <script>
         // --- GLOBAL STATE ---
         let credentialsValid = false;
-        let feedingComplete = false;
         let feedCount = 0;
         
         // --- API CONFIG ---
         const API_ENDPOINT = '/.netlify/functions/magento-orders';
         
-        // --- AUTH PARTICLE SYSTEM (from paste-2.txt) ---
+        // --- AUTH PARTICLE SYSTEM ---
         const authCanvas = document.getElementById('auth-canvas');
         const authCtx = authCanvas.getContext('2d');
         let authParticles = [];
@@ -453,106 +343,30 @@
             }
         }
 
-        function connectAuthParticles() {
-            const maxDistance = 120;
-            for (let i = 0; i < authParticles.length; i++) {
-                for (let j = i + 1; j < authParticles.length; j++) {
-                    const dx = authParticles[i].x - authParticles[j].x;
-                    const dy = authParticles[i].y - authParticles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < maxDistance) {
-                        const opacity = 1 - (distance / maxDistance);
-                        authCtx.strokeStyle = `rgba(255, 105, 180, ${opacity * 0.3})`;
-                        authCtx.lineWidth = 1;
-                        authCtx.beginPath();
-                        authCtx.moveTo(authParticles[i].x, authParticles[i].y);
-                        authCtx.lineTo(authParticles[j].x, authParticles[j].y);
-                        authCtx.stroke();
-                    }
-                }
-            }
-        }
-
         function animateAuthParticles() {
             if (document.getElementById('auth-screen').style.display === 'none') return;
             authCtx.clearRect(0, 0, authCanvas.width, authCanvas.height);
             authParticles.forEach(p => { p.update(); p.draw(); });
-            connectAuthParticles();
             requestAnimationFrame(animateAuthParticles);
         }
+
+        // *** NEW: SIMPLE MOUSE FOLLOW FOR LION IMAGE ***
+        const lionImg = document.getElementById('bitmoji-lion');
+        document.addEventListener('mousemove', e => {
+            const rect = lionImg.getBoundingClientRect();
+            // Calculate mouse position relative to the center of the image
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            // Define rotation strength (smaller number = less rotation)
+            const rotX = (y / rect.height) * -15; // Invert for natural feel
+            const rotY = (x / rect.width) * 15;
+            // Apply a 3D transformation
+            lionImg.style.transform = `perspective(500px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        });
+        document.addEventListener('mouseleave', () => {
+            lionImg.style.transform = 'perspective(500px) rotateX(0deg) rotateY(0deg)';
+        });
         
-        
-        // --- 3D LION SETUP ---
-        const lionContainer = document.getElementById('lion-container');
-        let camera, scene, renderer, lionHead;
-        const mouse = new THREE.Vector2();
-
-        function init3D() {
-            scene = new THREE.Scene();
-            
-            // Camera
-            camera = new THREE.PerspectiveCamera(50, lionContainer.clientWidth / lionContainer.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 2);
-
-            // Renderer
-            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(lionContainer.clientWidth, lionContainer.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            lionContainer.appendChild(renderer.domElement);
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
-            scene.add(ambientLight);
-            const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
-            keyLight.position.set(1, 1, 2);
-            scene.add(keyLight);
-            const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
-            fillLight.position.set(-1, -1, -1);
-            scene.add(fillLight);
-
-
-            // Load Model
-            const loader = new GLTFLoader();
-            // *** NEW, RELIABLE 3D MODEL URL ***
-            // This is a free model from Sketchfab by "Alexander..V"
-            const modelUrl = 'https://raw.githubusercontent.com/dkastner/three-js-example-scene/main/public/models/lion.glb';
-
-            loader.load(modelUrl, 
-                // *** On Load Success ***
-                (gltf) => {
-                    console.log("3D model loaded successfully!");
-                    lionHead = gltf.scene;
-                    lionHead.scale.set(1.5, 1.5, 1.5); // Adjust scale to fit container
-                    lionHead.position.y = -0.8; // Adjust position to center it
-                    scene.add(lionHead);
-                }, 
-                // *** On Load Progress (optional) ***
-                undefined, 
-                // *** NEW: On Error ***
-                (error) => {
-                    console.error('An error happened while loading the 3D model:', error);
-                    lionContainer.innerHTML = '<p style="color: red; text-align: center; margin-top: 50%;">Failed to load 3D model. Check console for errors.</p>';
-                }
-            );
-            
-            animate3D();
-        }
-        
-        function onMouseMove(event) {
-            // Normalize mouse position from -1 to 1
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            if (lionHead) {
-                // Make the head follow the mouse with a smooth delay
-                lionHead.rotation.y += ( (mouse.x * 0.5) - lionHead.rotation.y) * 0.05;
-                lionHead.rotation.x += (-(mouse.y * 0.5) - lionHead.rotation.x) * 0.05;
-            }
-            if (renderer) renderer.render(scene, camera);
-        }
 
         // --- AUTHENTICATION LOGIC ---
         function showBitmojiSpeech(message, duration = 2500) {
@@ -569,13 +383,10 @@
                 showBitmojiSpeech('Please login first!', 2000);
                 return;
             }
-
             feedCount++;
-            
             if (feedCount === 1) showBitmojiSpeech('Yummy! Two more!', 2000);
             else if (feedCount === 2) showBitmojiSpeech('So close!', 2000);
             else if (feedCount >= 3) {
-                feedingComplete = true;
                 showBitmojiSpeech('ACCESS GRANTED!', 3000);
                 setTimeout(() => {
                     document.getElementById('auth-screen').style.display = 'none';
@@ -592,7 +403,6 @@
             const errorMsg = document.getElementById('error-message');
             const successMsg = document.getElementById('success-message');
             
-            // IMPORTANT: Use a secure authentication method in production
             const validUsers = { 'blade': 'pb109', 'kulehi': 'imdumbass', 'user': 'login', 'password':'user109' };
 
             if (validUsers[username] && validUsers[username] === password) {
@@ -603,7 +413,7 @@
             } else {
                 credentialsValid = false;
                 feedCount = 0;
-                successMsg.classList.removeshow('show');
+                successMsg.classList.remove('show');
                 errorMsg.classList.add('show');
                 setTimeout(() => errorMsg.classList.remove('show'), 3000);
             }
@@ -626,7 +436,7 @@
             dashboardParticles = [];
             const particleCount = Math.min(100, Math.floor(dashboardCanvas.width * dashboardCanvas.height / 15000));
             for (let i = 0; i < particleCount; i++) {
-                dashboardParticles.push(new AuthParticle()); // Re-using the same class
+                dashboardParticles.push(new AuthParticle());
             }
         }
         
@@ -645,14 +455,10 @@
             try {
                 const url = `${API_ENDPOINT}?date=${new Date().toISOString().split('T')[0]}`;
                 const response = await fetch(url, { method: 'GET', headers: {'Content-Type': 'application/json'} });
-
                 if (!response.ok) throw new Error(`API request failed: ${response.status}`);
-                
                 const data = await response.json();
                 if (!data.success) throw new Error(data.error || 'API returned an error');
-
                 updateDashboard(data);
-
             } catch (error) {
                 console.error('Error fetching real Magento data:', error);
                 document.querySelectorAll('.card-value').forEach(el => el.textContent = 'Error');
@@ -677,7 +483,6 @@
 
         // --- INITIALIZATION ---
         function initDashboard() {
-            console.log("Initializing Dashboard...");
             resizeDashboardCanvas();
             createDashboardParticles();
             animateDashboard();
@@ -686,28 +491,19 @@
         }
 
         function initAuthScreen() {
-            console.log("Initializing Auth Screen...");
             resizeAuthCanvas();
             createAuthParticles();
             animateAuthParticles();
-            init3D();
         }
         
-        // Event Listeners
         window.addEventListener('resize', () => {
              resizeAuthCanvas(); 
              createAuthParticles();
-             if (renderer && camera) {
-                renderer.setSize(lionContainer.clientWidth, lionContainer.clientHeight);
-                camera.aspect = lionContainer.clientWidth / lionContainer.clientHeight;
-                camera.updateProjectionMatrix();
-             }
              if (document.getElementById('dashboard').style.display !== 'none') {
                 resizeDashboardCanvas();
                 createDashboardParticles();
              }
         });
-        document.addEventListener('mousemove', onMouseMove);
 
         // Start the application
         initAuthScreen();
