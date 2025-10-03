@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics Dashboard</title>
+    <title>PinkBlue Analytics Dashboard - Enhanced</title>
     <style>
         * {
             margin: 0;
@@ -17,6 +17,15 @@
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #000000;
             color: #ffffff;
+        }
+
+        /* Custom cursor - food treat */
+        body {
+            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="%23FF6B47"/><circle cx="16" cy="16" r="6" fill="%23FFD700"/><circle cx="13" cy="13" r="1.5" fill="%23FF6B47"/><circle cx="19" cy="13" r="1.5" fill="%23FF6B47"/><circle cx="16" cy="19" r="1.5" fill="%23FF6B47"/></svg>') 16 16, pointer;
+        }
+
+        .clickable {
+            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23FF69B4"/><circle cx="16" cy="16" r="8" fill="%23FFD700"/><text x="16" y="20" text-anchor="middle" font-size="12" fill="%23000">🍖</text></svg>') 16 16, pointer !important;
         }
 
         /* Authentication Screen Styles */
@@ -58,8 +67,8 @@
 
         .cat-container {
             position: relative;
-            width: 120px;
-            height: 100px;
+            width: 140px;
+            height: 120px;
             margin: 0 auto 30px;
         }
 
@@ -70,6 +79,16 @@
             border-radius: 50px 50px 30px 30px;
             position: relative;
             margin: 10px auto;
+            transition: all 0.3s ease;
+        }
+
+        .cat.hungry {
+            animation: wiggle 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes wiggle {
+            0% { transform: rotate(-2deg) scale(1); }
+            100% { transform: rotate(2deg) scale(1.05); }
         }
 
         .cat-ear {
@@ -79,6 +98,7 @@
             border-radius: 50% 50% 50% 0;
             position: absolute;
             top: -15px;
+            transition: all 0.2s ease;
         }
 
         .cat-ear.left {
@@ -89,6 +109,24 @@
         .cat-ear.right {
             right: 20px;
             transform: rotate(45deg);
+        }
+
+        .cat.hungry .cat-ear {
+            animation: earTwitch 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes earTwitch {
+            0% { transform: rotate(-45deg) scale(1); }
+            100% { transform: rotate(-35deg) scale(1.1); }
+        }
+
+        .cat.hungry .cat-ear.right {
+            animation: earTwitchRight 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes earTwitchRight {
+            0% { transform: rotate(45deg) scale(1); }
+            100% { transform: rotate(35deg) scale(1.1); }
         }
 
         .cat-eyes {
@@ -119,6 +157,32 @@
             border: 2px solid #000;
             border-top: none;
             border-radius: 0 0 20px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .cat-mouth.open {
+            width: 30px;
+            height: 25px;
+            background: #000;
+            border-radius: 15px;
+            animation: mouthOpen 0.3s ease;
+        }
+
+        @keyframes mouthOpen {
+            0% { transform: translateX(-50%) scaleY(0); }
+            100% { transform: translateX(-50%) scaleY(1); }
+        }
+
+        .feeding-area {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            cursor: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="%23FFD700"/><text x="16" y="20" text-anchor="middle" font-size="12">🍖</text></svg>') 16 16, pointer;
         }
 
         .cat-speech {
@@ -196,25 +260,6 @@
             color: rgba(255,255,255,0.6);
         }
 
-        .auth-btn {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            border: none;
-            color: #fff;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255,105,180,0.4);
-        }
-
         .error-message {
             color: #ef5350;
             font-size: 0.9em;
@@ -227,7 +272,6 @@
             opacity: 1;
         }
 
-        /* FIXED: Animated Background Canvas */
         #background-canvas {
             position: fixed;
             top: 0;
@@ -239,7 +283,6 @@
             display: block;
         }
 
-        /* Main Container */
         .dashboard-container {
             position: relative;
             display: flex;
@@ -249,7 +292,6 @@
             z-index: 10;
         }
 
-        /* Header */
         .header {
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(20px);
@@ -259,12 +301,15 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .date-picker-section {
+        .date-range-section {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .date-label {
@@ -293,9 +338,94 @@
             box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
         }
 
-        .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+        .comparison-section {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .compare-btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,105,180,0.4);
+        }
+
+        .comparison-results {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .comparison-results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .metric-comparison {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metric-change {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .metric-change.positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .metric-change.negative {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .metric-change.neutral {
+            background: rgba(158, 158, 158, 0.2);
+            color: #9e9e9e;
         }
 
         .status-section {
@@ -327,14 +457,13 @@
             font-size: 0.9em;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 20px 30px;
             overflow-y: auto;
-            max-height: calc(100vh - 80px);
+            max-height: calc(100vh - 120px);
         }
 
         .dashboard-title {
@@ -382,21 +511,6 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            transition: left 0.6s;
-        }
-
-        .metric-card:hover::before {
-            left: 100%;
-        }
-
         .card-icon {
             font-size: 2.2em;
             margin-bottom: 15px;
@@ -424,7 +538,6 @@
             font-weight: 500;
         }
 
-        /* Color Coding */
         .total-orders .card-value { color: #00d4ff; }
         .revenue .card-value { color: #00ff88; }
         .pending .card-value { color: #ffa726; }
@@ -433,149 +546,6 @@
         .cancelled .card-value { color: #ef5350; }
         .cod .card-value { color: #ab47bc; }
         .online .card-value { color: #26c6da; }
-
-        .recent-section {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .orders-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .order-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .order-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 105, 180, 0.3);
-        }
-
-        .order-info h4 {
-            font-size: 1em;
-            color: #ffffff;
-            font-weight: 700;
-            margin-bottom: 3px;
-        }
-
-        .order-info p {
-            font-size: 0.85em;
-            color: #cccccc;
-            margin-bottom: 2px;
-        }
-
-        .order-info small {
-            font-size: 0.75em;
-            color: #888888;
-        }
-
-        .order-details {
-            text-align: right;
-        }
-
-        .order-amount {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #00ff88;
-            margin-bottom: 3px;
-        }
-
-        .order-status {
-            font-size: 0.7em;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .status-pending { background: rgba(255, 167, 38, 0.2); color: #ffa726; }
-        .status-processing { background: rgba(66, 165, 245, 0.2); color: #42a5f5; }
-        .status-completed { background: rgba(102, 187, 106, 0.2); color: #66bb6a; }
-        .status-cancelled { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            flex-shrink: 0;
-        }
-
-        .refresh-btn {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            border: none;
-            color: #ffffff;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: 10px;
-        }
-
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.4);
-        }
-
-        .footer-stats {
-            margin-top: 10px;
-            font-size: 0.95em;
-            color: #cccccc;
-        }
-
-        .footer-stats strong {
-            color: #ffffff;
-        }
-
-        .loading {
-            animation: loadingPulse 1.8s infinite;
-        }
-
-        @keyframes loadingPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .error {
-            color: #ef5350 !important;
-            animation: errorShake 0.4s ease;
-        }
-
-        @keyframes errorShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
-        }
 
         @media (max-width: 768px) {
             .header {
@@ -604,33 +574,6 @@
             .title-main {
                 font-size: 2.2em;
             }
-            
-            .order-item {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-            
-            .date-input {
-                min-width: 140px;
-            }
-            
-            .auth-container {
-                padding: 40px 30px;
-                margin: 20px;
-            }
-        }
-
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .metrics-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
     </style>
 </head>
@@ -640,38 +583,47 @@
         <canvas class="auth-canvas" id="auth-canvas"></canvas>
         <div class="auth-container">
             <div class="cat-container">
-                <div class="cat-speech" id="cat-speech">Meow!</div>
-                <div class="cat">
+                <div class="cat-speech" id="cat-speech">Feed me to login! 🍖</div>
+                <div class="cat" id="auth-cat">
                     <div class="cat-ear left"></div>
                     <div class="cat-ear right"></div>
                     <div class="cat-eyes">
                         <div class="cat-eye" id="left-eye"></div>
                         <div class="cat-eye" id="right-eye"></div>
                     </div>
-                    <div class="cat-mouth"></div>
+                    <div class="cat-mouth" id="cat-mouth"></div>
                 </div>
+                <div class="feeding-area clickable" id="feeding-area"></div>
             </div>
             
             <h1 class="auth-title">🔐 PinkBlue Analytics</h1>
-            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Secure Team Dashboard</p>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Feed the cat to access dashboard</p>
             
-            <form class="auth-form" id="auth-form">
+            <form class="auth-form" id="auth-form" style="display: none;">
                 <input type="text" id="username" class="auth-input" placeholder="👤 Username" required>
                 <input type="password" id="password" class="auth-input" placeholder="🔒 Password" required>
-                <button type="submit" class="auth-btn">Login</button>
                 <div class="error-message" id="error-message">Invalid credentials!</div>
             </form>
         </div>
     </div>
 
-    <!-- FIXED: Canvas for particle animation -->
     <canvas id="background-canvas"></canvas>
 
     <div class="dashboard-container" id="dashboard" style="display: none;">
         <header class="header">
-            <div class="date-picker-section">
-                <label class="date-label">Select Date:</label>
-                <input type="date" id="date-picker" class="date-input" />
+            <div class="date-range-section">
+                <label class="date-label">From:</label>
+                <input type="date" id="start-date" class="date-input" />
+                <label class="date-label">To:</label>
+                <input type="date" id="end-date" class="date-input" />
+                
+                <div class="comparison-section">
+                    <label class="date-label">Compare with:</label>
+                    <input type="date" id="compare-start-date" class="date-input" />
+                    <label class="date-label">to:</label>
+                    <input type="date" id="compare-end-date" class="date-input" />
+                    <button class="compare-btn clickable" onclick="compareData()">🔄 Compare</button>
+                </div>
             </div>
             
             <div class="status-section">
@@ -683,7 +635,12 @@
         <main class="main-content">
             <div class="dashboard-title">
                 <h1 class="title-main">Analytics Dashboard</h1>
-                <p class="title-date" id="selected-date">Today's Performance</p>
+                <p class="title-date" id="selected-date">Performance Overview</p>
+            </div>
+
+            <div class="comparison-results" id="comparison-results">
+                <h3 style="color: #ff69b4; margin-bottom: 20px;">📊 Comparison Results</h3>
+                <div id="comparison-content"></div>
             </div>
 
             <div class="metrics-grid">
@@ -743,46 +700,49 @@
                     <p class="card-label">Digital Transactions</p>
                 </div>
             </div>
-
-            <div class="recent-section">
-                <h3 class="section-title">
-                    <div class="live-indicator"></div>
-                    Recent Orders
-                </h3>
-                <div class="orders-list" id="recent-orders">
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h4>Loading real orders...</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
-
-        <footer class="footer">
-            <p>
-                Last updated: <span id="last-updated" style="color: #00ff88; font-weight: 600;">Never</span>
-                <button class="refresh-btn" onclick="fetchRealData()">🔄 Refresh</button>
-            </p>
-            <div class="footer-stats">
-                📊 Avg Order: <strong id="avg-order">₹0</strong> • 
-                📈 Success Rate: <strong id="success-rate">0%</strong> • 
-                🏪 Total System Orders: <strong>312,979</strong>
-            </div>
-        </footer>
     </div>
 
-    <script>
-        // Authentication System
-        const validUsers = {
-            'blade': 'pb@109$',
-            'kulehi': 'imdumbass',
-            'user': 'login',
-            'password': 'user109'
-            'ashwani': 'aloopudi'
-        };
+    <!-- Audio elements for sound effects -->
+    <audio id="click-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhCjiJ1fPTgjMHImfA7+OZERE" type="audio/wav">
+    </audio>
+    <audio id="eating-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhCjiJ1fPTgjMHImfA7+OZERE" type="audio/wav">
+    </audio>
 
-        // Cat animation and particle system for auth screen
+    <script>
+        // Enhanced cat authentication with feeding mechanism
+        let feedCount = 0;
+        let isAuthenticated = false;
+
+        // Sound effect functions
+        function playClickSound() {
+            const clickSound = document.getElementById('click-sound');
+            if (clickSound) {
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+
+        function playEatingSound() {
+            const eatingSound = document.getElementById('eating-sound');
+            if (eatingSound) {
+                eatingSound.currentTime = 0;
+                eatingSound.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+
+        // Add click sound to all clickable elements
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('clickable') || 
+                e.target.tagName === 'BUTTON' || 
+                e.target.tagName === 'INPUT') {
+                playClickSound();
+            }
+        });
+
+        // Cat animation and particle system
         const authCanvas = document.getElementById('auth-canvas');
         const authCtx = authCanvas.getContext('2d');
         let authParticles = [];
@@ -863,8 +823,8 @@
             }
         }
 
-        // Cat eye tracking
-        function updateCatEyes(mouseX, mouseY) {
+        // Enhanced cat eye and head tracking
+        function updateCatAnimation(mouseX, mouseY) {
             const catContainer = document.querySelector('.cat-container');
             const rect = catContainer.getBoundingClientRect();
             const catCenterX = rect.left + rect.width / 2;
@@ -875,31 +835,87 @@
             const angle = Math.atan2(deltaY, deltaX);
             const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 100, 3);
             
+            // Eye movement
             const eyeOffsetX = Math.cos(angle) * distance;
             const eyeOffsetY = Math.sin(angle) * distance;
             
             document.getElementById('left-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
             document.getElementById('right-eye').style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+            
+            // Subtle head tilt following mouse
+            const cat = document.getElementById('auth-cat');
+            const headTilt = (deltaX / window.innerWidth) * 5; // Max 5 degree tilt
+            cat.style.transform = `rotate(${headTilt}deg)`;
         }
 
-        // Cat speech
-        function showCatSpeech(message) {
+        // Cat speech and behavior
+        function showCatSpeech(message, duration = 3000) {
             const speech = document.getElementById('cat-speech');
             speech.textContent = message;
             speech.classList.add('show');
             setTimeout(() => {
                 speech.classList.remove('show');
-            }, 3000);
+            }, duration);
+        }
+
+        function makeCatHungry() {
+            const cat = document.getElementById('auth-cat');
+            cat.classList.add('hungry');
+            showCatSpeech('I\\'m hungry! Feed me! 🐱');
+        }
+
+        function feedCat() {
+            playEatingSound();
+            feedCount++;
+            const cat = document.getElementById('auth-cat');
+            const mouth = document.getElementById('cat-mouth');
+            
+            // Open mouth animation
+            mouth.classList.add('open');
+            setTimeout(() => {
+                mouth.classList.remove('open');
+            }, 300);
+
+            // Cat reactions based on feed count
+            if (feedCount === 1) {
+                showCatSpeech('Mmm! More please! 😺', 2000);
+            } else if (feedCount === 2) {
+                showCatSpeech('Getting full... One more! 😸', 2000);
+            } else if (feedCount >= 3) {
+                cat.classList.remove('hungry');
+                showCatSpeech('Purrrfect! Access granted! 🎉', 2000);
+                
+                setTimeout(() => {
+                    document.getElementById('auth-form').style.display = 'flex';
+                    showCatSpeech('Now enter credentials!', 3000);
+                }, 2500);
+            }
         }
 
         // Mouse tracking
         document.addEventListener('mousemove', (e) => {
             mousePos.x = e.clientX;
             mousePos.y = e.clientY;
-            updateCatEyes(e.clientX, e.clientY);
+            updateCatAnimation(e.clientX, e.clientY);
+        });
+
+        // Feeding area click handler
+        document.getElementById('feeding-area').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isAuthenticated) {
+                feedCat();
+            }
         });
 
         // Authentication form handler
+        const validUsers = {
+            'blade': 'pb@109$',
+            'kulehi': 'imdumbass',
+            'user': 'login',
+            'password': 'user109'
+        };
+
         document.getElementById('auth-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -908,8 +924,8 @@
             const errorMsg = document.getElementById('error-message');
             
             if (validUsers[username] && validUsers[username] === password) {
-                // Correct credentials
-                showCatSpeech('AYYY BOLNE LAGI! 🎉');
+                showCatSpeech('Welcome! Loading dashboard... 🚀');
+                isAuthenticated = true;
                 
                 setTimeout(() => {
                     document.getElementById('auth-screen').style.display = 'none';
@@ -919,37 +935,18 @@
                 }, 2000);
                 
             } else {
-                // Wrong credentials
-                showCatSpeech('Mat Kar Lala Mat Kar! 😾');
+                showCatSpeech('Wrong credentials! Try again! 😾');
                 errorMsg.classList.add('show');
-                
-                // Shake the form
-                const authContainer = document.querySelector('.auth-container');
-                authContainer.style.animation = 'errorShake 0.5s ease';
                 
                 setTimeout(() => {
                     errorMsg.classList.remove('show');
-                    authContainer.style.animation = '';
                 }, 3000);
                 
-                // Clear inputs
                 document.getElementById('password').value = '';
             }
         });
 
-        // Check if already authenticated
-        if (sessionStorage.getItem('pinkblue_authenticated')) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
-            initDashboard();
-        } else {
-            // Initialize auth screen
-            resizeAuthCanvas();
-            createAuthParticles();
-            animateAuthParticles();
-        }
-
-        // Dashboard initialization and particle animation
+        // Dashboard initialization
         const canvas = document.getElementById('background-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -980,18 +977,6 @@
                 if (this.y > canvas.height || this.y < 0) {
                     this.speedY = -this.speedY;
                 }
-
-                if (mouse.x && mouse.y) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 100) {
-                        let force = (100 - distance) / 100;
-                        this.x += dx * force * 0.02;
-                        this.y += dy * force * 0.02;
-                    }
-                }
             }
 
             draw() {
@@ -1011,44 +996,6 @@
             }
         }
 
-        function connectParticles() {
-            let maxDistance = 150;
-            
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    let dx = particles[i].x - particles[j].x;
-                    let dy = particles[i].y - particles[j].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < maxDistance) {
-                        let opacity = (1 - distance / maxDistance) * 0.4;
-                        ctx.strokeStyle = `rgba(255, 105, 180, ${opacity})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-                
-                if (mouse.x && mouse.y) {
-                    let dx = particles[i].x - mouse.x;
-                    let dy = particles[i].y - mouse.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < maxDistance) {
-                        let opacity = (1 - distance / maxDistance) * 0.6;
-                        ctx.strokeStyle = `rgba(255, 105, 180, ${opacity})`;
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(mouse.x, mouse.y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
@@ -1057,11 +1004,161 @@
                 particle.draw();
             });
             
-            connectParticles();
-            
             requestAnimationFrame(animate);
         }
 
+        // Date range and comparison functionality
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const weekAgoStr = weekAgo.toISOString().split('T')[0];
+
+        function initializeDateInputs() {
+            document.getElementById('start-date').value = weekAgoStr;
+            document.getElementById('end-date').value = todayStr;
+            
+            const twoWeeksAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+            document.getElementById('compare-start-date').value = twoWeeksAgo.toISOString().split('T')[0];
+            document.getElementById('compare-end-date').value = weekAgoStr;
+        }
+
+        function compareData() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const compareStartDate = document.getElementById('compare-start-date').value;
+            const compareEndDate = document.getElementById('compare-end-date').value;
+
+            // Mock data for demonstration
+            const currentPeriodData = {
+                totalOrders: 150,
+                totalRevenue: 285000,
+                pendingOrders: 85,
+                processingOrders: 42,
+                completedOrders: 23,
+                cancelledOrders: 0,
+                codOrders: 95,
+                onlineOrders: 55
+            };
+
+            const previousPeriodData = {
+                totalOrders: 120,
+                totalRevenue: 240000,
+                pendingOrders: 70,
+                processingOrders: 35,
+                completedOrders: 15,
+                cancelledOrders: 0,
+                codOrders: 80,
+                onlineOrders: 40
+            };
+
+            displayComparison(currentPeriodData, previousPeriodData, startDate, endDate, compareStartDate, compareEndDate);
+        }
+
+        function displayComparison(current, previous, startDate, endDate, compareStartDate, compareEndDate) {
+            const comparisonResults = document.getElementById('comparison-results');
+            const comparisonContent = document.getElementById('comparison-content');
+
+            const metrics = [
+                { key: 'totalOrders', name: 'Total Orders' },
+                { key: 'totalRevenue', name: 'Revenue', format: 'currency' },
+                { key: 'pendingOrders', name: 'Pending Orders' },
+                { key: 'processingOrders', name: 'Processing Orders' },
+                { key: 'completedOrders', name: 'Completed Orders' },
+                { key: 'cancelledOrders', name: 'Cancelled Orders' },
+                { key: 'codOrders', name: 'COD Orders' },
+                { key: 'onlineOrders', name: 'Online Orders' }
+            ];
+
+            let comparisonHtml = `
+                <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                    <h4 style="color: #ff69b4; margin-bottom: 10px;">📅 Period Comparison</h4>
+                    <p><strong>Current:</strong> ${formatDate(startDate)} to ${formatDate(endDate)}</p>
+                    <p><strong>Previous:</strong> ${formatDate(compareStartDate)} to ${formatDate(compareEndDate)}</p>
+                </div>
+            `;
+
+            metrics.forEach(metric => {
+                const currentValue = current[metric.key];
+                const previousValue = previous[metric.key];
+                const difference = currentValue - previousValue;
+                const percentChange = previousValue === 0 ? 0 : ((difference / previousValue) * 100);
+                
+                let changeClass = 'neutral';
+                let changeIcon = '➡️';
+                
+                if (percentChange > 0) {
+                    changeClass = 'positive';
+                    changeIcon = '📈';
+                } else if (percentChange < 0) {
+                    changeClass = 'negative';
+                    changeIcon = '📉';
+                }
+
+                const formattedCurrent = metric.format === 'currency' ? `₹${currentValue.toLocaleString('en-IN')}` : currentValue;
+                const formattedPrevious = metric.format === 'currency' ? `₹${previousValue.toLocaleString('en-IN')}` : previousValue;
+                const formattedDifference = metric.format === 'currency' ? `₹${Math.abs(difference).toLocaleString('en-IN')}` : Math.abs(difference);
+
+                comparisonHtml += `
+                    <div class="comparison-metric">
+                        <div class="metric-name">${metric.name}</div>
+                        <div class="metric-comparison">
+                            <span>${formattedCurrent} vs ${formattedPrevious}</span>
+                            <div class="metric-change ${changeClass}">
+                                ${changeIcon} ${percentChange.toFixed(1)}% (${difference >= 0 ? '+' : '-'}${formattedDifference})
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            comparisonContent.innerHTML = comparisonHtml;
+            comparisonResults.classList.add('show');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function fetchRealData() {
+            // Mock data for demonstration
+            const data = {
+                totalOrders: 150,
+                totalRevenue: 285000,
+                pendingOrders: 85,
+                processingOrders: 42,
+                completedOrders: 23,
+                cancelledOrders: 0,
+                codOrders: 95,
+                onlineOrders: 55,
+                averageOrderValue: 1900,
+                successRate: 98
+            };
+
+            updateDashboard(data);
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('total-orders').textContent = data.totalOrders;
+            document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
+            document.getElementById('pending-orders').textContent = data.pendingOrders;
+            document.getElementById('processing-orders').textContent = data.processingOrders;
+            document.getElementById('completed-orders').textContent = data.completedOrders;
+            document.getElementById('cancelled-orders').textContent = data.cancelledOrders;
+            document.getElementById('cod-orders').textContent = data.codOrders;
+            document.getElementById('online-orders').textContent = data.onlineOrders;
+        }
+
+        function initDashboard() {
+            console.log('🚀 Initializing Enhanced Dashboard...');
+            resizeCanvas();
+            createParticles();
+            initializeDateInputs();
+            fetchRealData();
+            animate();
+        }
+
+        // Event listeners
         window.addEventListener('resize', () => {
             resizeCanvas();
             createParticles();
@@ -1074,146 +1171,21 @@
             mouse.y = e.clientY;
         });
 
-        window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
-
-        // Dashboard functionality
-        const datePicker = document.getElementById('date-picker');
-        const selectedDateText = document.getElementById('selected-date');
-        
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        if (datePicker) datePicker.value = todayStr;
-        
-        function updateSelectedDateDisplay() {
-            const selectedDate = new Date(datePicker.value);
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            selectedDateText.textContent = selectedDate.toLocaleDateString('en-IN', options) + ' Performance';
-        }
-
-        if (datePicker) {
-            datePicker.addEventListener('change', () => {
-                updateSelectedDateDisplay();
-                fetchRealData();
-            });
-        }
-
-        async function fetchRealData() {
-            const selectedDate = datePicker.value;
-            console.log('🔄 Fetching REAL data for date:', selectedDate);
+        // Check authentication and initialize
+        if (sessionStorage.getItem('pinkblue_authenticated')) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+            initDashboard();
+        } else {
+            resizeAuthCanvas();
+            createAuthParticles();
+            animateAuthParticles();
             
-            try {
-                const response = await fetch(`/.netlify/functions/magento-api?date=${selectedDate}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data.success && data.realData) {
-                        console.log('✅ REAL data received from Magento API:', data);
-                        
-                        updateDashboard({
-                            totalOrders: data.totalOrders,
-                            totalRevenue: data.totalRevenue,
-                            pendingOrders: data.pendingOrders,
-                            processingOrders: data.processingOrders,
-                            completedOrders: data.completedOrders,
-                            cancelledOrders: data.cancelledOrders,
-                            codOrders: data.codOrders,
-                            onlineOrders: data.onlineOrders,
-                            averageOrderValue: data.averageOrderValue,
-                            successRate: data.successRate,
-                            recentOrders: data.recentOrders
-                        });
-                        
-                    } else {
-                        throw new Error(data.error || 'API returned failure');
-                    }
-                } else {
-                    throw new Error(`Function returned ${response.status}`);
-                }
-
-            } catch (error) {
-                console.log('⚠️ Function error, using known fallback data:', error.message);
-                
-                const isToday = selectedDate === todayStr;
-                updateDashboard({
-                    totalOrders: isToday ? 77 : 0,
-                    totalRevenue: isToday ? 150000 : 0,
-                    pendingOrders: isToday ? 55 : 0,
-                    processingOrders: isToday ? 18 : 0,
-                    completedOrders: isToday ? 4 : 0,
-                    cancelledOrders: isToday ? 0 : 0,
-                    codOrders: isToday ? 60 : 0,
-                    onlineOrders: isToday ? 17 : 0,
-                    averageOrderValue: isToday ? 1948 : 0,
-                    successRate: isToday ? 96 : 0,
-                    recentOrders: isToday ? [
-                        { id: '000365169', customer: 'Dhananjay Kulkarni', amount: 2042, status: 'pending', time: '22:09' },
-                        { id: '000365167', customer: 'Amit Jadhav', amount: 405, status: 'pending', time: '22:09' },
-                        { id: '000365166', customer: 'Sufain Subair M', amount: 1353, status: 'processing', time: '22:09' },
-                        { id: '000365165', customer: 'Arashpreet Sharma', amount: 2261, status: 'pending', time: '22:09' },
-                        { id: '000365164', customer: 'Dr Shubhra', amount: 2348, status: 'pending', time: '22:09' }
-                    ] : []
-                });
-            }
+            // Start with hungry cat
+            setTimeout(() => {
+                makeCatHungry();
+            }, 2000);
         }
-
-        function updateDashboard(data) {
-            document.getElementById('total-orders').textContent = data.totalOrders;
-            document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
-            document.getElementById('pending-orders').textContent = data.pendingOrders;
-            document.getElementById('processing-orders').textContent = data.processingOrders;
-            document.getElementById('completed-orders').textContent = data.completedOrders;
-            document.getElementById('cancelled-orders').textContent = data.cancelledOrders;
-            document.getElementById('cod-orders').textContent = data.codOrders;
-            document.getElementById('online-orders').textContent = data.onlineOrders;
-            document.getElementById('avg-order').textContent = '₹' + data.averageOrderValue.toLocaleString('en-IN');
-            document.getElementById('success-rate').textContent = data.successRate + '%';
-            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('en-IN');
-
-            if (data.recentOrders && data.recentOrders.length > 0) {
-                const ordersHtml = data.recentOrders.map(order => `
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h4>#${order.id}</h4>
-                            <p>${order.customer}</p>
-                            <small>${order.time}</small>
-                        </div>
-                        <div class="order-details">
-                            <div class="order-amount">₹${order.amount.toLocaleString('en-IN')}</div>
-                            <div class="order-status status-${order.status}">${order.status}</div>
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('recent-orders').innerHTML = ordersHtml;
-            } else {
-                document.getElementById('recent-orders').innerHTML = '<div class="order-item"><div class="order-info"><h4>No orders found for this date</h4></div></div>';
-            }
-
-            document.querySelectorAll('.card-value').forEach(el => {
-                el.classList.remove('loading', 'error');
-            });
-
-            console.log('✅ Dashboard updated with REAL data');
-        }
-
-        function initDashboard() {
-            console.log('🚀 Initializing Dashboard with Particle Animation...');
-            resizeCanvas();
-            createParticles();
-            updateSelectedDateDisplay();
-            fetchRealData();
-            animate();
-        }
-
-        // Auto-refresh every 5 minutes
-        setInterval(() => {
-            if (sessionStorage.getItem('pinkblue_authenticated')) {
-                fetchRealData();
-            }
-        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>
