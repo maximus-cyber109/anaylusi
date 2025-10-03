@@ -70,292 +70,235 @@
             text-align: center;
         }
 
-        /* Adorable Apple Emoji Style Lion Container */
-        .lion-container {
+        /* Perfect Bitmoji-style Character Container */
+        .bitmoji-container {
             position: relative;
-            width: 220px;
-            height: 200px;
+            width: 200px;
+            height: 180px;
             margin: 0 auto 30px;
             perspective: 1000px;
             transform-style: preserve-3d;
         }
 
-        /* Adorable Cartoon Lion */
-        .lion-3d {
+        /* Perfect Bitmoji Character */
+        .bitmoji-3d {
             position: relative;
-            width: 160px;
+            width: 140px;
             height: 140px;
             margin: 20px auto;
             transform-style: preserve-3d;
             transition: all 0.3s ease;
         }
 
-        .lion-head {
+        /* Bitmoji Head - Round like the image */
+        .bitmoji-head {
             position: relative;
-            width: 140px;
+            width: 120px;
             height: 120px;
             background: linear-gradient(145deg, #FFB84D, #FF8C42);
-            border-radius: 70px;
+            border-radius: 50%;
             transform-style: preserve-3d;
             box-shadow: 
-                inset -10px -10px 20px rgba(0,0,0,0.1),
-                inset 10px 10px 20px rgba(255,255,255,0.2),
-                0 10px 25px rgba(0,0,0,0.2);
+                inset -8px -8px 16px rgba(0,0,0,0.15),
+                inset 8px 8px 16px rgba(255,255,255,0.25),
+                0 8px 20px rgba(0,0,0,0.2);
             transition: transform 0.2s ease;
+            border: 3px solid #D2691E;
         }
 
-        /* Lion Mane - Apple emoji style */
-        .lion-mane {
+        /* Bitmoji Mane Spikes - Just like image */
+        .mane-spikes {
             position: absolute;
-            width: 180px;
-            height: 160px;
-            background: radial-gradient(circle, #CD853F 40%, #D2691E 70%);
-            border-radius: 50%;
-            top: -20px;
-            left: -20px;
+            width: 140px;
+            height: 140px;
+            top: -10px;
+            left: -10px;
             z-index: -1;
-            box-shadow: 
-                inset -15px -15px 30px rgba(0,0,0,0.1),
-                inset 15px 15px 30px rgba(255,255,255,0.1),
-                0 15px 30px rgba(0,0,0,0.15);
         }
 
-        /* Mane spikes for cartoon effect */
         .mane-spike {
             position: absolute;
-            background: linear-gradient(145deg, #CD853F, #D2691E);
-            border-radius: 50%;
-        }
-
-        .mane-spike:nth-child(1) {
-            width: 25px;
-            height: 35px;
-            top: -10px;
-            left: 30px;
-            transform: rotate(-20deg);
-        }
-
-        .mane-spike:nth-child(2) {
-            width: 30px;
-            height: 40px;
-            top: -15px;
-            left: 75px;
-            transform: rotate(0deg);
-        }
-
-        .mane-spike:nth-child(3) {
-            width: 25px;
-            height: 35px;
-            top: -10px;
-            right: 30px;
-            transform: rotate(20deg);
-        }
-
-        .mane-spike:nth-child(4) {
-            width: 30px;
-            height: 25px;
-            top: 20px;
-            left: -5px;
-            transform: rotate(-45deg);
-        }
-
-        .mane-spike:nth-child(5) {
-            width: 30px;
-            height: 25px;
-            top: 20px;
-            right: -5px;
-            transform: rotate(45deg);
-        }
-
-        .mane-spike:nth-child(6) {
-            width: 25px;
-            height: 30px;
-            bottom: 10px;
-            left: 20px;
-            transform: rotate(-30deg);
-        }
-
-        .mane-spike:nth-child(7) {
-            width: 25px;
-            height: 30px;
-            bottom: 10px;
-            right: 20px;
-            transform: rotate(30deg);
-        }
-
-        /* Adorable Lion Ears */
-        .lion-ear-3d {
-            position: absolute;
-            width: 35px;
-            height: 30px;
-            background: linear-gradient(145deg, #FFB84D, #FF8C42);
-            border-radius: 50% 50% 20% 20%;
-            top: 10px;
-            transform-style: preserve-3d;
-            transition: all 0.2s ease;
-            box-shadow: 
-                inset -3px -3px 6px rgba(0,0,0,0.1),
-                inset 3px 3px 6px rgba(255,255,255,0.1);
-        }
-
-        .lion-ear-3d.left {
-            left: 15px;
-            transform: rotate(-15deg) rotateY(-10deg);
-        }
-
-        .lion-ear-3d.right {
-            right: 15px;
-            transform: rotate(15deg) rotateY(10deg);
-        }
-
-        .lion-ear-3d::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 15px;
-            background: linear-gradient(145deg, #FF69B4, #FF1493);
-            border-radius: 50%;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
+            background: linear-gradient(135deg, #D2691E, #CD853F);
+            border-radius: 50% 50% 50% 10%;
             box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Big Adorable Eyes - Apple emoji style */
-        .lion-eyes-3d {
+        /* 8 mane spikes around the head */
+        .mane-spike:nth-child(1) { width: 20px; height: 30px; top: -8px; left: 35%; transform: rotate(-10deg); }
+        .mane-spike:nth-child(2) { width: 25px; height: 35px; top: -15px; left: 50%; transform: rotate(0deg); }
+        .mane-spike:nth-child(3) { width: 20px; height: 30px; top: -8px; right: 35%; transform: rotate(10deg); }
+        .mane-spike:nth-child(4) { width: 25px; height: 20px; top: 15%; right: -8px; transform: rotate(45deg); }
+        .mane-spike:nth-child(5) { width: 20px; height: 25px; bottom: 15%; right: -5px; transform: rotate(30deg); }
+        .mane-spike:nth-child(6) { width: 20px; height: 25px; bottom: 15%; left: -5px; transform: rotate(-30deg); }
+        .mane-spike:nth-child(7) { width: 25px; height: 20px; top: 15%; left: -8px; transform: rotate(-45deg); }
+        .mane-spike:nth-child(8) { width: 18px; height: 25px; top: 5%; left: 20%; transform: rotate(-25deg); }
+
+        /* Bitmoji Ears - Small and cute */
+        .bitmoji-ear {
+            position: absolute;
+            width: 25px;
+            height: 20px;
+            background: linear-gradient(145deg, #FFB84D, #FF8C42);
+            border-radius: 50% 50% 20% 20%;
+            top: 20px;
+            border: 2px solid #D2691E;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.1);
+        }
+
+        .bitmoji-ear.left {
+            left: 8px;
+            transform: rotate(-20deg);
+        }
+
+        .bitmoji-ear.right {
+            right: 8px;
+            transform: rotate(20deg);
+        }
+
+        .bitmoji-ear::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 8px;
+            background: linear-gradient(145deg, #FF69B4, #FF1493);
+            border-radius: 50%;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Perfect Bitmoji Eyes - EXACTLY like the image */
+        .bitmoji-eyes {
             position: absolute;
             top: 35px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 25px;
+            padding: 0 20px;
         }
 
-        .lion-eye-3d {
-            width: 30px;
-            height: 28px;
-            background: radial-gradient(circle at 35% 35%, #FFFFFF, #F0F0F0);
+        .bitmoji-eye {
+            width: 28px;
+            height: 26px;
+            background: radial-gradient(circle at 35% 35%, #FFFFFF, #F8F8F8);
             border-radius: 50%;
             position: relative;
-            transform-style: preserve-3d;
-            transition: all 0.1s ease;
+            border: 3px solid #2C2C2C;
             box-shadow: 
                 inset -2px -2px 4px rgba(0,0,0,0.1),
-                0 2px 8px rgba(0,0,0,0.1);
-            border: 2px solid #333;
+                0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.1s ease;
         }
 
-        .lion-eye-3d::before {
+        /* Big black pupils - Bitmoji style */
+        .bitmoji-eye::before {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle at 30% 30%, #000 40%, #333 100%);
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 30% 30%, #000 60%, #1a1a1a 100%);
             border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
 
-        .lion-eye-3d::after {
+        /* White shine dot */
+        .bitmoji-eye::after {
             content: '';
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: radial-gradient(circle, #ffffff 50%, transparent 70%);
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #ffffff 60%, transparent 80%);
             border-radius: 50%;
-            top: 6px;
-            left: 8px;
+            top: 8px;
+            left: 10px;
             z-index: 2;
         }
 
-        /* Cute Lion Nose */
-        .lion-nose-3d {
+        /* Perfect Pink Nose - Just like image */
+        .bitmoji-nose {
             position: absolute;
-            bottom: 45px;
+            bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: 15px;
-            height: 12px;
+            width: 12px;
+            height: 10px;
             background: linear-gradient(145deg, #FF69B4, #FF1493);
             border-radius: 50% 50% 50% 50%;
+            border: 2px solid #D91A72;
             box-shadow: 
-                inset -2px -2px 4px rgba(0,0,0,0.2),
-                0 2px 6px rgba(0,0,0,0.2);
+                inset -1px -1px 2px rgba(0,0,0,0.2),
+                0 2px 4px rgba(0,0,0,0.15);
         }
 
-        /* Happy Lion Mouth */
-        .lion-mouth-3d {
+        /* Happy Smile - Bitmoji style */
+        .bitmoji-mouth {
             position: absolute;
-            bottom: 25px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 18px;
-            border: 3px solid #333;
+            width: 28px;
+            height: 16px;
+            border: 3px solid #2C2C2C;
             border-top: none;
-            border-radius: 0 0 25px 25px;
+            border-radius: 0 0 20px 20px;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.1) 100%);
             transition: all 0.3s ease;
-            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);
         }
 
-        .lion-mouth-3d.open {
-            width: 45px;
-            height: 30px;
-            background: radial-gradient(ellipse at center, #FF69B4 30%, #000 60%, #333 100%);
+        .bitmoji-mouth.open {
+            width: 40px;
+            height: 25px;
+            background: radial-gradient(ellipse at center, #FF69B4 20%, #000 50%, #333 100%);
             border-radius: 50%;
-            animation: mouthOpen3D 0.4s ease;
-            border: 3px solid #333;
+            border: 3px solid #2C2C2C;
+            animation: mouthOpen 0.4s ease;
         }
 
-        @keyframes mouthOpen3D {
+        @keyframes mouthOpen {
             0% { transform: translateX(-50%) scaleY(0); }
-            50% { transform: translateX(-50%) scaleY(1.4); }
+            50% { transform: translateX(-50%) scaleY(1.3); }
             100% { transform: translateX(-50%) scaleY(1); }
         }
 
-        /* Lion Whiskers */
-        .lion-whiskers {
+        /* Bitmoji Cheek Blush - Like the image */
+        .bitmoji-cheek {
             position: absolute;
-            top: 50px;
-            width: 100%;
-            height: 25px;
+            width: 12px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(255, 105, 180, 0.4), transparent 70%);
+            border-radius: 50%;
+            top: 55px;
         }
 
-        .whisker {
-            position: absolute;
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(to right, transparent, #8B4513, transparent);
-            transform-origin: center;
-            transition: all 0.2s ease;
-            border-radius: 2px;
+        .bitmoji-cheek.left {
+            left: 8px;
         }
 
-        .whisker.left-1 { left: -35px; top: 2px; transform: rotate(-5deg); }
-        .whisker.left-2 { left: -35px; top: 12px; transform: rotate(5deg); }
-        .whisker.right-1 { right: -35px; top: 2px; transform: rotate(5deg); }
-        .whisker.right-2 { right: -35px; top: 12px; transform: rotate(-5deg); }
+        .bitmoji-cheek.right {
+            right: 8px;
+        }
 
-        /* MUCH BIGGER secret feeding area with visual debug */
+        /* HUGE secret feeding area - IMPOSSIBLE to miss */
         .secret-feeding-area {
             position: absolute;
-            bottom: 10px;
+            bottom: 5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 50px;
-            background: rgba(255, 0, 0, 0.1); /* Slightly visible for debugging */
+            width: 120px;
+            height: 60px;
+            background: rgba(255, 0, 0, 0.15); /* More visible for debugging */
             cursor: pointer;
-            z-index: 50;
-            border-radius: 25px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
+            z-index: 100;
+            border-radius: 30px;
+            border: 3px dashed rgba(255, 255, 255, 0.4);
         }
 
         /* Speech bubble */
-        .lion-speech {
+        .bitmoji-speech {
             position: absolute;
-            top: -80px;
+            top: -90px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,255,255,0.95);
@@ -371,7 +314,7 @@
             border: 2px solid #FF69B4;
         }
 
-        .lion-speech::after {
+        .bitmoji-speech::after {
             content: '';
             position: absolute;
             bottom: -10px;
@@ -384,7 +327,7 @@
             border-top: 12px solid rgba(255,255,255,0.95);
         }
 
-        .lion-speech.show {
+        .bitmoji-speech.show {
             opacity: 1;
             animation: bounce3D 0.6s ease;
         }
@@ -880,6 +823,34 @@
         .cod .card-value { color: #ab47bc; }
         .online .card-value { color: #26c6da; }
 
+        /* Loading indicator */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            color: #ff69b4;
+        }
+
+        .loading-indicator.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 105, 180, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff69b4;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 1200px) {
             .comparison-content {
                 grid-template-columns: 1fr;
@@ -928,13 +899,14 @@
     <div class="auth-screen" id="auth-screen">
         <canvas class="auth-canvas" id="auth-canvas"></canvas>
         <div class="auth-container">
-            <!-- Adorable Apple Emoji Style Lion -->
-            <div class="lion-container">
-                <div class="lion-speech" id="lion-speech"></div>
-                <div class="lion-3d" id="lion-3d">
-                    <div class="lion-head" id="lion-head">
-                        <!-- Lion Mane with spikes -->
-                        <div class="lion-mane">
+            <!-- Perfect Bitmoji-style Character -->
+            <div class="bitmoji-container">
+                <div class="bitmoji-speech" id="bitmoji-speech"></div>
+                <div class="bitmoji-3d" id="bitmoji-3d">
+                    <div class="bitmoji-head" id="bitmoji-head">
+                        <!-- Mane spikes around head -->
+                        <div class="mane-spikes">
+                            <div class="mane-spike"></div>
                             <div class="mane-spike"></div>
                             <div class="mane-spike"></div>
                             <div class="mane-spike"></div>
@@ -944,33 +916,29 @@
                             <div class="mane-spike"></div>
                         </div>
                         
-                        <!-- Adorable Ears -->
-                        <div class="lion-ear-3d left"></div>
-                        <div class="lion-ear-3d right"></div>
+                        <!-- Cute Ears -->
+                        <div class="bitmoji-ear left"></div>
+                        <div class="bitmoji-ear right"></div>
                         
-                        <!-- Big Adorable Eyes -->
-                        <div class="lion-eyes-3d">
-                            <div class="lion-eye-3d" id="left-eye-3d"></div>
-                            <div class="lion-eye-3d" id="right-eye-3d"></div>
+                        <!-- Perfect Eyes -->
+                        <div class="bitmoji-eyes">
+                            <div class="bitmoji-eye" id="left-eye"></div>
+                            <div class="bitmoji-eye" id="right-eye"></div>
                         </div>
                         
-                        <!-- Cute Nose -->
-                        <div class="lion-nose-3d"></div>
+                        <!-- Cheek blush -->
+                        <div class="bitmoji-cheek left"></div>
+                        <div class="bitmoji-cheek right"></div>
+                        
+                        <!-- Pink Nose -->
+                        <div class="bitmoji-nose"></div>
                         
                         <!-- Happy Mouth -->
-                        <div class="lion-mouth-3d" id="lion-mouth-3d"></div>
-                        
-                        <!-- Whiskers -->
-                        <div class="lion-whiskers">
-                            <div class="whisker left-1"></div>
-                            <div class="whisker left-2"></div>
-                            <div class="whisker right-1"></div>
-                            <div class="whisker right-2"></div>
-                        </div>
+                        <div class="bitmoji-mouth" id="bitmoji-mouth"></div>
                     </div>
                 </div>
                 
-                <!-- MUCH BIGGER secret feeding area with visual indication -->
+                <!-- HUGE secret feeding area - IMPOSSIBLE to miss -->
                 <div class="secret-feeding-area clickable" id="secret-feeding-area"></div>
             </div>
             
@@ -1016,7 +984,7 @@
                 
                 <div class="status-section">
                     <div class="live-indicator"></div>
-                    <span class="status-text">LIVE DATA</span>
+                    <span class="status-text">REAL MAGENTO DATA</span>
                 </div>
             </div>
             
@@ -1038,7 +1006,12 @@
         <main class="main-content">
             <div class="dashboard-title">
                 <h1 class="title-main">Analytics Dashboard</h1>
-                <p class="title-date" id="selected-date">Performance Overview</p>
+                <p class="title-date" id="selected-date">Real Magento Data</p>
+            </div>
+
+            <div class="loading-indicator" id="loading-indicator">
+                <div class="spinner"></div>
+                Loading real data from Magento...
             </div>
 
             <div class="comparison-results" id="comparison-results">
@@ -1129,6 +1102,9 @@
         let feedCount = 0;
         let comparisonMode = false;
         let currentChart = null;
+
+        // REAL API configuration
+        const API_ENDPOINT = '/.netlify/functions/magento-orders';
 
         // Sound effect functions
         function playClickSound() {
@@ -1235,65 +1211,49 @@
             }
         }
 
-        // Enhanced 3D lion animation with proper head tracking
-        function update3DLionAnimation(mouseX, mouseY) {
-            const lionContainer = document.querySelector('.lion-container');
-            if (!lionContainer) return;
+        // Enhanced 3D Bitmoji animation
+        function update3DBitmojiAnimation(mouseX, mouseY) {
+            const bitmojiContainer = document.querySelector('.bitmoji-container');
+            if (!bitmojiContainer) return;
             
-            const rect = lionContainer.getBoundingClientRect();
-            const lionCenterX = rect.left + rect.width / 2;
-            const lionCenterY = rect.top + rect.height / 2;
+            const rect = bitmojiContainer.getBoundingClientRect();
+            const bitmojiCenterX = rect.left + rect.width / 2;
+            const bitmojiCenterY = rect.top + rect.height / 2;
             
-            const deltaX = mouseX - lionCenterX;
-            const deltaY = mouseY - lionCenterY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            // Normalize the movement
-            const maxDistance = 200;
-            const normalizedDistance = Math.min(distance / maxDistance, 1);
+            const deltaX = mouseX - bitmojiCenterX;
+            const deltaY = mouseY - bitmojiCenterY;
             
             // Calculate angles for 3D rotation
-            const rotateY = (deltaX / window.innerWidth) * 20; // Max 20 degrees
-            const rotateX = -(deltaY / window.innerHeight) * 15; // Max 15 degrees
+            const rotateY = (deltaX / window.innerWidth) * 15;
+            const rotateX = -(deltaY / window.innerHeight) * 10;
             
-            // Apply 3D transformation to the entire lion head
-            const lion3D = document.getElementById('lion-3d');
-            const lionHead = document.getElementById('lion-head');
+            // Apply 3D transformation
+            const bitmoji3D = document.getElementById('bitmoji-3d');
+            const bitmojiHead = document.getElementById('bitmoji-head');
             
-            if (lion3D && lionHead) {
-                lion3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+            if (bitmoji3D && bitmojiHead) {
+                bitmoji3D.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
                 
-                // Add subtle head tilt
-                const headTilt = (deltaX / window.innerWidth) * 6;
-                lionHead.style.transform = `rotateZ(${headTilt}deg)`;
+                const headTilt = (deltaX / window.innerWidth) * 5;
+                bitmojiHead.style.transform = `rotateZ(${headTilt}deg)`;
             }
             
-            // Eye movement within the 3D space
-            const eyeOffsetX = (deltaX / window.innerWidth) * 3;
+            // Eye movement
+            const eyeOffsetX = (deltaX / window.innerWidth) * 2;
             const eyeOffsetY = (deltaY / window.innerHeight) * 2;
             
-            const leftEye = document.getElementById('left-eye-3d');
-            const rightEye = document.getElementById('right-eye-3d');
+            const leftEye = document.getElementById('left-eye');
+            const rightEye = document.getElementById('right-eye');
             
             if (leftEye && rightEye) {
                 leftEye.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
                 rightEye.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
             }
-            
-            // Whisker animation based on movement
-            const whiskers = document.querySelectorAll('.whisker');
-            whiskers.forEach((whisker, index) => {
-                const angle = whisker.classList.contains('left-1') ? -5 - (normalizedDistance * 2) :
-                             whisker.classList.contains('left-2') ? 5 - (normalizedDistance * 2) :
-                             whisker.classList.contains('right-1') ? 5 + (normalizedDistance * 2) :
-                             -5 + (normalizedDistance * 2);
-                whisker.style.transform = `rotate(${angle}deg)`;
-            });
         }
 
-        // Lion speech system
-        function showLionSpeech(message, duration = 2500) {
-            const speech = document.getElementById('lion-speech');
+        // Bitmoji speech system
+        function showBitmojiSpeech(message, duration = 2500) {
+            const speech = document.getElementById('bitmoji-speech');
             if (speech) {
                 speech.textContent = message;
                 speech.classList.add('show');
@@ -1303,12 +1263,12 @@
             }
         }
 
-        // Secret feeding mechanism - COMPLETELY FIXED
+        // Secret feeding mechanism - PERFECT WORKING VERSION
         function secretFeed() {
             console.log('secretFeed called, credentialsValid:', credentialsValid, 'feedCount:', feedCount);
             
             if (!credentialsValid) {
-                showLionSpeech('🔒 Please login first!', 2000);
+                showBitmojiSpeech('🔒 Please login first!', 2000);
                 return;
             }
             
@@ -1316,7 +1276,7 @@
             feedCount++;
             console.log('Feed count increased to:', feedCount);
             
-            const mouth = document.getElementById('lion-mouth-3d');
+            const mouth = document.getElementById('bitmoji-mouth');
             if (mouth) {
                 mouth.classList.add('open');
                 setTimeout(() => {
@@ -1326,12 +1286,12 @@
 
             // Progressive responses with GUARANTEED access
             if (feedCount === 1) {
-                showLionSpeech('🦁 ROAR! Delicious!', 2000);
+                showBitmojiSpeech('🦁 Yummy treats!', 2000);
             } else if (feedCount === 2) {
-                showLionSpeech('😋 More treats please!', 2000);
+                showBitmojiSpeech('😋 More please!', 2000);
             } else if (feedCount >= 3) {
                 feedingComplete = true;
-                showLionSpeech('🎉 WELCOME! Access Granted!', 3000);
+                showBitmojiSpeech('🎉 ACCESS GRANTED!', 3000);
                 
                 setTimeout(() => {
                     console.log('Granting access to dashboard...');
@@ -1342,14 +1302,14 @@
             }
         }
 
-        // Mouse tracking for 3D lion animation
+        // Mouse tracking for 3D animation
         document.addEventListener('mousemove', (e) => {
             if (document.getElementById('auth-screen').style.display !== 'none') {
-                update3DLionAnimation(e.clientX, e.clientY);
+                update3DBitmojiAnimation(e.clientX, e.clientY);
             }
         });
 
-        // Secret feeding area click handler - COMPLETELY FIXED
+        // Secret feeding area click handler - GUARANTEED TO WORK
         document.addEventListener('DOMContentLoaded', function() {
             const feedingArea = document.getElementById('secret-feeding-area');
             console.log('Feeding area element:', feedingArea);
@@ -1362,7 +1322,6 @@
                     secretFeed();
                 });
                 
-                // Also add touch support for mobile
                 feedingArea.addEventListener('touchstart', function(e) {
                     console.log('Feeding area touched!');
                     e.preventDefault();
@@ -1372,7 +1331,7 @@
             }
         });
 
-        // Authentication form handler - NO SESSION STORAGE
+        // Authentication form handler
         const validUsers = {
             'blade': 'pb@109$',
             'kulehi': 'imdumbass',
@@ -1398,7 +1357,7 @@
                 successMsg.classList.add('show');
                 
                 setTimeout(() => {
-                    showLionSpeech('🦁 Ready for treats! Click my mouth!', 3000);
+                    showBitmojiSpeech('🦁 Feed me treats! Click below!', 3000);
                 }, 1000);
                 
             } else {
@@ -1415,7 +1374,7 @@
             }
         });
 
-        // Dashboard functionality
+        // Dashboard functionality with REAL API
         const canvas = document.getElementById('background-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -1475,8 +1434,61 @@
             requestAnimationFrame(animate);
         }
 
-        // Apply date range function
-        function applyDateRange() {
+        // REAL API functions
+        async function fetchRealMagentoData(selectedDate = null) {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            loadingIndicator.classList.add('show');
+            
+            try {
+                const dateParam = selectedDate || new Date().toISOString().split('T')[0];
+                const url = `${API_ENDPOINT}?date=${dateParam}`;
+                
+                console.log('Fetching REAL Magento data from:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('REAL Magento data received:', data);
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'API returned error');
+                }
+                
+                updateDashboard(data);
+                showToast('✅ Real Magento data loaded successfully!');
+                
+                return data;
+                
+            } catch (error) {
+                console.error('Error fetching real Magento data:', error);
+                showToast(`❌ Error loading data: ${error.message}`, 'error');
+                
+                // Show error in cards
+                document.getElementById('total-orders').textContent = 'Error';
+                document.getElementById('total-revenue').textContent = 'Error';
+                document.getElementById('pending-orders').textContent = 'Error';
+                document.getElementById('processing-orders').textContent = 'Error';
+                document.getElementById('completed-orders').textContent = 'Error';
+                document.getElementById('cancelled-orders').textContent = 'Error';
+                document.getElementById('cod-orders').textContent = 'Error';
+                document.getElementById('online-orders').textContent = 'Error';
+                
+            } finally {
+                loadingIndicator.classList.remove('show');
+            }
+        }
+
+        // Apply date range function with REAL API
+        async function applyDateRange() {
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
             
@@ -1488,11 +1500,8 @@
             const selectedDate = document.getElementById('selected-date');
             selectedDate.textContent = `${formatDate(startDate)} to ${formatDate(endDate)}`;
             
-            // Simulate data refresh
-            fetchRealData();
-            
-            // Show success message
-            showToast('Data refreshed for selected date range! ✅');
+            // Fetch REAL data for the selected date range
+            await fetchRealMagentoData(startDate);
         }
 
         // Comparison toggle functionality
@@ -1510,144 +1519,11 @@
                 toggleBtn.classList.remove('active');
                 comparisonControls.classList.remove('show');
                 document.getElementById('comparison-results').classList.remove('show');
-                if (currentChart) {
-                    currentChart.destroy();
-                    currentChart = null;
-                }
             }
         }
 
-        // Toast notification
-        function showToast(message) {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(76, 175, 80, 0.9);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                font-weight: bold;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            toast.textContent = message;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-
-        // Simple Chart Implementation
-        function drawComparisonChart(canvas, currentData, previousData, labels) {
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, width, height);
-            
-            // Set up chart area
-            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
-            const chartWidth = width - margin.left - margin.right;
-            const chartHeight = height - margin.top - margin.bottom;
-            
-            // Find max value for scaling
-            const allValues = [...Object.values(currentData), ...Object.values(previousData)];
-            const maxValue = Math.max(...allValues);
-            const minValue = 0;
-            
-            // Draw background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-            ctx.fillRect(margin.left, margin.top, chartWidth, chartHeight);
-            
-            // Draw grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
-            
-            // Horizontal grid lines
-            for (let i = 0; i <= 5; i++) {
-                const y = margin.top + (chartHeight / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(margin.left, y);
-                ctx.lineTo(margin.left + chartWidth, y);
-                ctx.stroke();
-                
-                // Y-axis labels
-                const value = maxValue - (maxValue / 5) * i;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.font = '12px Inter';
-                ctx.textAlign = 'right';
-                ctx.fillText(Math.round(value).toLocaleString(), margin.left - 10, y + 4);
-            }
-            
-            // Draw bars
-            const barWidth = chartWidth / (labels.length * 2.5);
-            const barSpacing = barWidth * 0.5;
-            
-            labels.forEach((label, index) => {
-                const x = margin.left + (index * (barWidth * 2.5));
-                
-                // Current period bar
-                const currentValue = currentData[label] || 0;
-                const currentHeight = (currentValue / maxValue) * chartHeight;
-                const currentY = margin.top + chartHeight - currentHeight;
-                
-                ctx.fillStyle = '#ff69b4';
-                ctx.fillRect(x, currentY, barWidth, currentHeight);
-                
-                // Previous period bar
-                const previousValue = previousData[label] || 0;
-                const previousHeight = (previousValue / maxValue) * chartHeight;
-                const previousY = margin.top + chartHeight - previousHeight;
-                
-                ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
-                ctx.fillRect(x + barWidth + barSpacing, previousY, barWidth, previousHeight);
-                
-                // X-axis labels
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.font = '10px Inter';
-                ctx.textAlign = 'center';
-                const labelX = x + barWidth + barSpacing / 2;
-                const words = label.split(' ');
-                words.forEach((word, wordIndex) => {
-                    ctx.fillText(word, labelX, margin.top + chartHeight + 15 + (wordIndex * 12));
-                });
-            });
-            
-            // Legend
-            ctx.fillStyle = '#ff69b4';
-            ctx.fillRect(width - 150, 20, 15, 15);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = '12px Inter';
-            ctx.textAlign = 'left';
-            ctx.fillText('Current Period', width - 130, 32);
-            
-            ctx.fillStyle = 'rgba(255, 105, 180, 0.5)';
-            ctx.fillRect(width - 150, 40, 15, 15);
-            ctx.fillText('Previous Period', width - 130, 52);
-        }
-
-        // Date range functionality
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const weekAgoStr = weekAgo.toISOString().split('T')[0];
-
-        function initializeDateInputs() {
-            document.getElementById('start-date').value = weekAgoStr;
-            document.getElementById('end-date').value = todayStr;
-            
-            const twoWeeksAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
-            document.getElementById('compare-start-date').value = twoWeeksAgo.toISOString().split('T')[0];
-            document.getElementById('compare-end-date').value = weekAgoStr;
-        }
-
-        function compareData() {
+        // Compare data with REAL API
+        async function compareData() {
             if (!comparisonMode) return;
             
             const startDate = document.getElementById('start-date').value;
@@ -1660,32 +1536,72 @@
                 return;
             }
 
-            const currentPeriodData = {
-                totalOrders: 150,
-                totalRevenue: 285000,
-                pendingOrders: 85,
-                processingOrders: 42,
-                completedOrders: 23,
-                cancelledOrders: 0,
-                codOrders: 95,
-                onlineOrders: 55
-            };
-
-            const previousPeriodData = {
-                totalOrders: 120,
-                totalRevenue: 240000,
-                pendingOrders: 70,
-                processingOrders: 35,
-                completedOrders: 15,
-                cancelledOrders: 2,
-                codOrders: 80,
-                onlineOrders: 40
-            };
-
-            displayComparison(currentPeriodData, previousPeriodData, startDate, endDate, compareStartDate, compareEndDate);
-            showToast('Comparison analysis complete! 📊');
+            try {
+                showToast('🔄 Fetching comparison data...');
+                
+                // Fetch REAL data for both periods
+                const currentData = await fetchRealMagentoData(startDate);
+                const previousData = await fetchRealMagentoData(compareStartDate);
+                
+                if (currentData && previousData) {
+                    displayComparison(currentData, previousData, startDate, endDate, compareStartDate, compareEndDate);
+                    showToast('📊 Comparison analysis complete!');
+                }
+                
+            } catch (error) {
+                console.error('Error comparing data:', error);
+                showToast('❌ Error fetching comparison data', 'error');
+            }
         }
 
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'rgba(244, 67, 54, 0.9)' : 'rgba(76, 175, 80, 0.9)';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Update dashboard with REAL data
+        function updateDashboard(data) {
+            if (!data || !data.success) {
+                console.error('Invalid data received:', data);
+                return;
+            }
+            
+            // Update all dashboard values with REAL data
+            document.getElementById('total-orders').textContent = data.totalOrders || 0;
+            document.getElementById('total-revenue').textContent = '₹' + (data.totalRevenue || 0).toLocaleString('en-IN');
+            document.getElementById('pending-orders').textContent = data.pendingOrders || 0;
+            document.getElementById('processing-orders').textContent = data.processingOrders || 0;
+            document.getElementById('completed-orders').textContent = data.completedOrders || 0;
+            document.getElementById('cancelled-orders').textContent = data.cancelledOrders || 0;
+            document.getElementById('cod-orders').textContent = data.codOrders || 0;
+            document.getElementById('online-orders').textContent = data.onlineOrders || 0;
+            
+            console.log('Dashboard updated with REAL Magento data');
+        }
+
+        // Rest of the functions remain the same (displayComparison, formatDate, etc.)
         function displayComparison(current, previous, startDate, endDate, compareStartDate, compareEndDate) {
             const comparisonResults = document.getElementById('comparison-results');
             const comparisonContent = document.getElementById('comparison-content');
@@ -1719,8 +1635,8 @@
             let comparisonHtml = '';
 
             metrics.forEach(metric => {
-                const currentValue = current[metric.key];
-                const previousValue = previous[metric.key];
+                const currentValue = current[metric.key] || 0;
+                const previousValue = previous[metric.key] || 0;
                 const difference = currentValue - previousValue;
                 const percentChange = previousValue === 0 ? 0 : ((difference / previousValue) * 100);
                 
@@ -1757,34 +1673,6 @@
             });
 
             comparisonContent.innerHTML = comparisonHtml;
-            
-            // Draw chart
-            const chartCanvas = document.getElementById('comparison-chart');
-            chartCanvas.width = 360;
-            chartCanvas.height = 280;
-            
-            const chartLabels = ['Total Orders', 'Revenue', 'Pending', 'Processing', 'Completed', 'COD', 'Online'];
-            const chartCurrentData = {
-                'Total Orders': current.totalOrders,
-                'Revenue': current.totalRevenue / 1000, // Scale down for chart
-                'Pending': current.pendingOrders,
-                'Processing': current.processingOrders,
-                'Completed': current.completedOrders,
-                'COD': current.codOrders,
-                'Online': current.onlineOrders
-            };
-            const chartPreviousData = {
-                'Total Orders': previous.totalOrders,
-                'Revenue': previous.totalRevenue / 1000, // Scale down for chart
-                'Pending': previous.pendingOrders,
-                'Processing': previous.processingOrders,
-                'Completed': previous.completedOrders,
-                'COD': previous.codOrders,
-                'Online': previous.onlineOrders
-            };
-            
-            drawComparisonChart(chartCanvas, chartCurrentData, chartPreviousData, chartLabels);
-            
             comparisonResults.classList.add('show');
         }
 
@@ -1793,43 +1681,34 @@
             return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        function fetchRealData() {
-            const data = {
-                totalOrders: Math.floor(Math.random() * 50) + 100,
-                totalRevenue: Math.floor(Math.random() * 100000) + 200000,
-                pendingOrders: Math.floor(Math.random() * 30) + 50,
-                processingOrders: Math.floor(Math.random() * 20) + 30,
-                completedOrders: Math.floor(Math.random() * 15) + 10,
-                cancelledOrders: Math.floor(Math.random() * 5),
-                codOrders: Math.floor(Math.random() * 40) + 60,
-                onlineOrders: Math.floor(Math.random() * 30) + 40
-            };
+        // Date range functionality
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const weekAgoStr = weekAgo.toISOString().split('T')[0];
 
-            updateDashboard(data);
-        }
-
-        function updateDashboard(data) {
-            document.getElementById('total-orders').textContent = data.totalOrders;
-            document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN');
-            document.getElementById('pending-orders').textContent = data.pendingOrders;
-            document.getElementById('processing-orders').textContent = data.processingOrders;
-            document.getElementById('completed-orders').textContent = data.completedOrders;
-            document.getElementById('cancelled-orders').textContent = data.cancelledOrders;
-            document.getElementById('cod-orders').textContent = data.codOrders;
-            document.getElementById('online-orders').textContent = data.onlineOrders;
+        function initializeDateInputs() {
+            document.getElementById('start-date').value = todayStr;
+            document.getElementById('end-date').value = todayStr;
+            
+            const yesterday = new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000);
+            document.getElementById('compare-start-date').value = yesterday.toISOString().split('T')[0];
+            document.getElementById('compare-end-date').value = yesterday.toISOString().split('T')[0];
         }
 
         function initDashboard() {
-            console.log('🚀 Initializing Dashboard...');
+            console.log('🚀 Initializing Dashboard with REAL Magento API...');
             resizeCanvas();
             createParticles();
             initializeDateInputs();
-            fetchRealData();
             animate();
+            
+            // Fetch REAL data immediately
+            fetchRealMagentoData();
             
             // Update selected date display
             const selectedDate = document.getElementById('selected-date');
-            selectedDate.textContent = `${formatDate(weekAgoStr)} to ${formatDate(todayStr)}`;
+            selectedDate.textContent = `Real Data for ${formatDate(todayStr)}`;
         }
 
         // Event listeners
@@ -1845,8 +1724,7 @@
         createAuthParticles();
         animateAuthParticles();
         
-        // Debug: Log when page loads
-        console.log('Page loaded, authentication system ready');
+        console.log('Analytics Dashboard with REAL Magento API ready!');
     </script>
 </body>
 </html>
