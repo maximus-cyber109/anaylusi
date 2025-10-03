@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Analytics - Advanced Dashboard</title>
+    <title>PinkBlue Analytics - Final Merged Dashboard</title>
     <!-- Chart.js for the comparison chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -145,7 +145,6 @@
         .metric-change.negative { background: rgba(244, 67, 54, 0.2); color: #f44336; }
         .metric-change.neutral { background: rgba(158, 158, 158, 0.2); color: #9e9e9e; }
         .chart-container { background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
-
     </style>
 </head>
 <body>
@@ -169,7 +168,7 @@
             <form class="auth-form" id="auth-form">
                 <input type="text" id="username" class="auth-input" placeholder="Username" required>
                 <input type="password" id="password" class="auth-input" placeholder="Password" required>
-                <button type="submit" class="auth-btn">Login</button>
+                <button type="submit" class="auth-btn clickable">Login</button>
                 <div class="error-message" id="error-message">Invalid credentials!</div>
             </form>
         </div>
@@ -189,8 +188,8 @@
                         <label class="control-label">To:</label>
                         <input type="date" id="end-date" class="control-input" />
                     </div>
-                    <button class="apply-btn" id="apply-btn">Apply</button>
-                    <button class="toggle-comparison" id="toggle-comparison">Enable Comparison</button>
+                    <button class="apply-btn clickable" id="apply-btn">Apply</button>
+                    <button class="toggle-comparison clickable" id="toggle-comparison">Enable Comparison</button>
                 </div>
             </div>
             <div class="comparison-controls" id="comparison-controls">
@@ -202,7 +201,7 @@
                     <label class="control-label">To:</label>
                     <input type="date" id="compare-end-date" class="control-input" />
                 </div>
-                <button class="compare-btn" id="compare-btn">Compare</button>
+                <button class="compare-btn clickable" id="compare-btn">Compare</button>
             </div>
         </header>
 
@@ -239,7 +238,8 @@
         });
 
         // --- DASHBOARD UI & API LOGIC ---
-        const API_ENDPOINT = '/.netlify/functions/magento-api';
+        // CORRECTED API PATH
+        const API_ENDPOINT = '/.netlify/functions/magento-orders';
         let comparisonChart = null;
 
         function toggleComparison() {
@@ -249,6 +249,7 @@
             btn.textContent = isActive ? 'Disable Comparison' : 'Enable Comparison';
         }
 
+        // FIXED: Re-added event listeners for dashboard buttons
         document.getElementById('toggle-comparison').addEventListener('click', toggleComparison);
         document.getElementById('apply-btn').addEventListener('click', applyDateRange);
         document.getElementById('compare-btn').addEventListener('click', compareData);
@@ -257,7 +258,7 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('start-date').value = today;
             document.getElementById('end-date').value = today;
-            initDashboardParticles(); // Start dashboard particle animation
+            setupParticleCanvas('background-canvas'); // Start dashboard particle animation
             applyDateRange();
         }
         
@@ -265,7 +266,7 @@
             const loadingIndicator = document.getElementById('loading-indicator');
             loadingIndicator.classList.add('show');
             try {
-                // IMPORTANT: Your Netlify function must accept startDate and endDate
+                // IMPORTANT: Your Netlify function must be updated to handle startDate and endDate
                 const response = await fetch(`${API_ENDPOINT}?startDate=${startDate}&endDate=${endDate}`);
                 if (!response.ok) throw new Error(`API Error: ${response.status}`);
                 const data = await response.json();
@@ -360,7 +361,6 @@
             container.innerHTML = contentHTML;
             container.classList.add('show');
 
-            // Render Chart
             const ctx = document.getElementById('comparisonChart').getContext('2d');
             if (comparisonChart) comparisonChart.destroy();
             comparisonChart = new Chart(ctx, {
@@ -376,9 +376,10 @@
             });
         }
 
-        // --- PARTICLE ANIMATIONS ---
+        // --- PARTICLE ANIMATION CODE (from paste-2.txt) ---
         function setupParticleCanvas(canvasId) {
             const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let particles = [];
             
@@ -397,6 +398,7 @@
                     this.size = Math.random() * 2 + 1;
                     this.speedX = (Math.random() - 0.5) * 0.3;
                     this.speedY = (Math.random() - 0.5) * 0.3;
+                    this.opacity = Math.random() * 0.5 + 0.2;
                 }
                 update() {
                     this.x += this.speedX;
@@ -405,16 +407,37 @@
                     if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
                 }
                 draw() {
-                    ctx.fillStyle = 'rgba(255, 105, 180, 0.4)';
+                    ctx.fillStyle = `rgba(255, 105, 180, ${this.opacity})`;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
 
+            function connectParticles() {
+                const maxDistance = 120;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < maxDistance) {
+                            const opacity = (1 - distance / maxDistance) * 0.3;
+                            ctx.strokeStyle = `rgba(255, 105, 180, ${opacity})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
             const animate = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 particles.forEach(p => { p.update(); p.draw(); });
+                connectParticles(); // This creates the connecting lines effect
                 requestAnimationFrame(animate);
             };
 
@@ -423,11 +446,8 @@
             animate();
         }
         
-        // Initialize particle backgrounds
+        // Initialize particle backgrounds for both screens
         setupParticleCanvas('auth-canvas');
-        function initDashboardParticles() {
-            setupParticleCanvas('background-canvas');
-        }
 
         // Cat Eye Tracking for Login Screen
         document.addEventListener('mousemove', (e) => {
