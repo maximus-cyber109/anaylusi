@@ -411,131 +411,102 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
-        .date-range-section {
+        .dashboard-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
-        .date-label {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #ffffff;
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .date-input {
+        .control-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .control-input {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            padding: 10px 15px;
+            padding: 8px 12px;
             color: #ffffff;
-            font-size: 1em;
+            font-size: 0.9em;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 150px;
+            min-width: 130px;
         }
 
-        .date-input:focus {
+        .control-input:focus {
             outline: none;
             border-color: #ff69b4;
             background: rgba(255, 255, 255, 0.15);
             box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
         }
 
-        .comparison-section {
-            margin-top: 10px;
-            display: flex;
+        .toggle-comparison {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-comparison:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .toggle-comparison.active {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+        }
+
+        .comparison-controls {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            gap: 20px;
             align-items: center;
-            gap: 15px;
             flex-wrap: wrap;
+        }
+
+        .comparison-controls.show {
+            display: flex;
         }
 
         .compare-btn {
             background: linear-gradient(135deg, #ff69b4, #ff1493);
             border: none;
             color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9em;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.85em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .compare-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255,105,180,0.4);
-        }
-
-        .comparison-results {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            display: none;
-        }
-
-        .comparison-results.show {
-            display: block;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .comparison-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
-        }
-
-        .metric-name {
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .metric-comparison {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .metric-change {
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .metric-change.positive {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-        }
-
-        .metric-change.negative {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-        }
-
-        .metric-change.neutral {
-            background: rgba(158, 158, 158, 0.2);
-            color: #9e9e9e;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255,105,180,0.4);
         }
 
         .status-section {
@@ -543,8 +514,8 @@
             align-items: center;
             gap: 12px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -564,7 +535,7 @@
         .status-text {
             font-weight: 600;
             color: #00ff00;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
 
         .main-content {
@@ -595,10 +566,97 @@
             font-weight: 500;
         }
 
+        .comparison-results {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .comparison-results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .comparison-header {
+            color: #ff69b4;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-period-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border-left: 3px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1em;
+        }
+
+        .metric-comparison {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .metric-values {
+            font-size: 0.9em;
+            color: #cccccc;
+        }
+
+        .metric-change {
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .metric-change.positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .metric-change.negative {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .metric-change.neutral {
+            background: rgba(158, 158, 158, 0.2);
+            color: #9e9e9e;
+        }
+
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
         }
 
@@ -607,7 +665,7 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             transition: all 0.4s ease;
             position: relative;
@@ -622,28 +680,28 @@
         }
 
         .card-icon {
-            font-size: 2.2em;
-            margin-bottom: 15px;
+            font-size: 2em;
+            margin-bottom: 10px;
             display: block;
         }
 
         .card-title {
-            font-size: 1em;
+            font-size: 0.9em;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 600;
             line-height: 1.4;
         }
 
         .card-value {
-            font-size: 2.8em;
+            font-size: 2.2em;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             line-height: 1;
         }
 
         .card-label {
-            font-size: 0.85em;
+            font-size: 0.8em;
             color: #aaaaaa;
             font-weight: 500;
         }
@@ -664,6 +722,10 @@
                 padding: 15px 20px;
             }
             
+            .dashboard-controls {
+                justify-content: center;
+            }
+            
             .main-content {
                 padding: 15px 20px;
             }
@@ -678,7 +740,7 @@
             }
             
             .card-value {
-                font-size: 2.2em;
+                font-size: 1.8em;
             }
             
             .title-main {
@@ -730,7 +792,7 @@
             <h1 class="auth-title">🔐 PinkBlue Analytics</h1>
             <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Secure Access Portal</p>
             
-            <!-- Authentication form -->
+            <!-- Authentication form - Always visible now -->
             <form class="auth-form" id="auth-form">
                 <input type="text" id="username" class="auth-input" placeholder="👤 Username" required>
                 <input type="password" id="password" class="auth-input" placeholder="🔒 Password" required>
@@ -746,24 +808,39 @@
     <!-- Dashboard -->
     <div class="dashboard-container" id="dashboard" style="display: none;">
         <header class="header">
-            <div class="date-range-section">
-                <label class="date-label">From:</label>
-                <input type="date" id="start-date" class="date-input" />
-                <label class="date-label">To:</label>
-                <input type="date" id="end-date" class="date-input" />
+            <div class="dashboard-controls">
+                <div class="control-group">
+                    <label class="control-label">From:</label>
+                    <input type="date" id="start-date" class="control-input" />
+                </div>
                 
-                <div class="comparison-section">
-                    <label class="date-label">Compare with:</label>
-                    <input type="date" id="compare-start-date" class="date-input" />
-                    <label class="date-label">to:</label>
-                    <input type="date" id="compare-end-date" class="date-input" />
+                <div class="control-group">
+                    <label class="control-label">To:</label>
+                    <input type="date" id="end-date" class="control-input" />
+                </div>
+                
+                <button class="toggle-comparison clickable" id="toggle-comparison" onclick="toggleComparison()">
+                    📊 Enable Comparison
+                </button>
+                
+                <div class="comparison-controls" id="comparison-controls">
+                    <div class="control-group">
+                        <label class="control-label">Compare From:</label>
+                        <input type="date" id="compare-start-date" class="control-input" />
+                    </div>
+                    
+                    <div class="control-group">
+                        <label class="control-label">To:</label>
+                        <input type="date" id="compare-end-date" class="control-input" />
+                    </div>
+                    
                     <button class="compare-btn clickable" onclick="compareData()">🔄 Compare</button>
                 </div>
             </div>
             
             <div class="status-section">
                 <div class="live-indicator"></div>
-                <span class="status-text">REAL DATA</span>
+                <span class="status-text">LIVE DATA</span>
             </div>
         </header>
 
@@ -774,7 +851,8 @@
             </div>
 
             <div class="comparison-results" id="comparison-results">
-                <h3 style="color: #ff69b4; margin-bottom: 20px;">📊 Comparison Results</h3>
+                <div class="comparison-header">📊 Period Comparison Results</div>
+                <div class="comparison-period-info" id="comparison-period-info"></div>
                 <div id="comparison-content"></div>
             </div>
 
@@ -851,6 +929,7 @@
         let credentialsValid = false;
         let feedingComplete = false;
         let feedCount = 0;
+        let comparisonMode = false;
 
         // Sound effect functions
         function playClickSound() {
@@ -1101,10 +1180,6 @@
                     showCatSpeech('Ready...', 1500);
                 }, 1000);
                 
-                // Disable form after valid credentials
-                const inputs = this.querySelectorAll('input, button');
-                inputs.forEach(input => input.disabled = true);
-                
             } else {
                 credentialsValid = false;
                 feedCount = 0;
@@ -1179,6 +1254,24 @@
             requestAnimationFrame(animate);
         }
 
+        // Comparison toggle functionality
+        function toggleComparison() {
+            comparisonMode = !comparisonMode;
+            const toggleBtn = document.getElementById('toggle-comparison');
+            const comparisonControls = document.getElementById('comparison-controls');
+            
+            if (comparisonMode) {
+                toggleBtn.textContent = '📊 Disable Comparison';
+                toggleBtn.classList.add('active');
+                comparisonControls.classList.add('show');
+            } else {
+                toggleBtn.textContent = '📊 Enable Comparison';
+                toggleBtn.classList.remove('active');
+                comparisonControls.classList.remove('show');
+                document.getElementById('comparison-results').classList.remove('show');
+            }
+        }
+
         // Date range functionality
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
@@ -1195,6 +1288,8 @@
         }
 
         function compareData() {
+            if (!comparisonMode) return;
+            
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
             const compareStartDate = document.getElementById('compare-start-date').value;
@@ -1228,6 +1323,7 @@
         function displayComparison(current, previous, startDate, endDate, compareStartDate, compareEndDate) {
             const comparisonResults = document.getElementById('comparison-results');
             const comparisonContent = document.getElementById('comparison-content');
+            const comparisonPeriodInfo = document.getElementById('comparison-period-info');
 
             const metrics = [
                 { key: 'totalOrders', name: 'Total Orders' },
@@ -1240,13 +1336,13 @@
                 { key: 'onlineOrders', name: 'Online Orders' }
             ];
 
-            let comparisonHtml = `
-                <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                    <h4 style="color: #ff69b4; margin-bottom: 10px;">📅 Period Comparison</h4>
-                    <p><strong>Current:</strong> ${formatDate(startDate)} to ${formatDate(endDate)}</p>
-                    <p><strong>Previous:</strong> ${formatDate(compareStartDate)} to ${formatDate(compareEndDate)}</p>
-                </div>
+            comparisonPeriodInfo.innerHTML = `
+                <h4 style="color: #ff69b4; margin-bottom: 10px;">📅 Comparison Periods</h4>
+                <p><strong>Current Period:</strong> ${formatDate(startDate)} to ${formatDate(endDate)}</p>
+                <p><strong>Previous Period:</strong> ${formatDate(compareStartDate)} to ${formatDate(compareEndDate)}</p>
             `;
+
+            let comparisonHtml = '';
 
             metrics.forEach(metric => {
                 const currentValue = current[metric.key];
@@ -1273,7 +1369,7 @@
                     <div class="comparison-metric">
                         <div class="metric-name">${metric.name}</div>
                         <div class="metric-comparison">
-                            <span>${formattedCurrent} vs ${formattedPrevious}</span>
+                            <div class="metric-values">${formattedCurrent} vs ${formattedPrevious}</div>
                             <div class="metric-change ${changeClass}">
                                 ${changeIcon} ${percentChange.toFixed(1)}% (${difference >= 0 ? '+' : '-'}${formattedDifference})
                             </div>
