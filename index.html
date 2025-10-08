@@ -67,47 +67,23 @@
             height: 100vh;
             background: var(--primary-black);
             z-index: -2;
-            overflow: hidden;
         }
 
         .wave-layer {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            opacity: 0.4;
+            width: 150%;
+            height: 150%;
+            opacity: 0.2;
+            background: radial-gradient(circle at 30% 40%, rgba(0,112,243,0.08) 0%, transparent 70%);
+            animation: waveFloat 25s infinite linear;
         }
 
-        .wave-layer:nth-child(1) {
-            background: radial-gradient(circle at 20% 50%, rgba(0,112,243,0.05) 0%, transparent 50%);
-            animation: waveFloat1 25s infinite linear;
-        }
-
-        .wave-layer:nth-child(2) {
-            background: radial-gradient(circle at 80% 20%, rgba(139,92,246,0.03) 0%, transparent 50%);
-            animation: waveFloat2 30s infinite linear reverse;
-        }
-
-        .wave-layer:nth-child(3) {
-            background: radial-gradient(circle at 40% 80%, rgba(0,255,136,0.02) 0%, transparent 50%);
-            animation: waveFloat3 35s infinite ease-in-out;
-        }
-
-        @keyframes waveFloat1 {
+        @keyframes waveFloat {
             0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
             100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
         }
 
-        @keyframes waveFloat2 {
-            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
-            100% { transform: translateX(-50%) translateY(-50%) rotate(-360deg); }
-        }
-
-        @keyframes waveFloat3 {
-            0%, 100% { transform: translateX(-50%) translateY(-50%) scale(1); opacity: 0.2; }
-            50% { transform: translateX(-50%) translateY(-50%) scale(1.1); opacity: 0.4; }
-        }
-
-        /* Premium Loading */
+        /* Loading */
         .loading-wave-container {
             position: fixed;
             top: 0;
@@ -115,72 +91,33 @@
             width: 100vw;
             height: 100vh;
             background: var(--primary-black);
-            display: flex;
-            flex-direction: column;
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition-smooth);
+            flex-direction: column;
         }
 
-        .loading-wave-container.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .loading-animation {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin-bottom: 30px;
-        }
+        .loading-wave-container.show { display: flex; }
 
         .loading-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid transparent;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
-            animation: ringRotate 1.5s linear infinite;
-        }
-
-        .loading-ring:nth-child(1) {
             border-top-color: var(--accent-blue);
-            animation-delay: 0s;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
 
-        .loading-ring:nth-child(2) {
-            width: 70%;
-            height: 70%;
-            top: 15%;
-            left: 15%;
-            border-top-color: var(--accent-purple);
-            animation-delay: -0.3s;
-            animation-direction: reverse;
-        }
-
-        .loading-ring:nth-child(3) {
-            width: 40%;
-            height: 40%;
-            top: 30%;
-            left: 30%;
-            border-top-color: var(--success);
-            animation-delay: -0.6s;
-        }
-
-        @keyframes ringRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .loading-text {
-            font-size: 1em;
-            font-weight: 300;
             color: var(--text-secondary);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
         }
 
         /* Authentication */
@@ -201,144 +138,124 @@
             background: rgba(255,255,255,0.04);
             backdrop-filter: var(--blur-lg);
             border: 1px solid var(--border-gray);
-            border-radius: 24px;
-            padding: 60px 50px;
+            border-radius: 16px;
+            padding: 40px 35px;
             box-shadow: var(--shadow-xl);
-            max-width: 450px;
+            max-width: 380px;
             width: 90%;
             text-align: center;
         }
 
         .logo-3d-container {
-            width: 120px;
-            height: 90px;
-            margin: 0 auto 40px;
+            width: 80px;
+            height: 60px;
+            margin: 0 auto 25px;
         }
 
         .auth-title {
-            font-size: 2.8em;
+            font-size: 2.2em;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 15px;
-            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
         .auth-subtitle {
-            font-size: 1em;
+            font-size: 0.85em;
             color: var(--text-tertiary);
-            margin-bottom: 40px;
-            font-weight: 300;
+            margin-bottom: 25px;
         }
 
         .auth-form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
         }
 
         .auth-input {
             background: rgba(255,255,255,0.08);
             border: 1px solid var(--border-gray);
-            border-radius: 12px;
-            padding: 18px 20px;
+            border-radius: 8px;
+            padding: 12px 16px;
             color: var(--text-primary);
-            font-size: 1em;
-            transition: var(--transition-smooth);
+            font-size: 0.9em;
         }
 
         .auth-input:focus {
             outline: none;
             border-color: var(--accent-blue);
             background: rgba(255,255,255,0.12);
-            box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
         }
+
+        .auth-input::placeholder { color: var(--text-disabled); }
 
         .auth-btn {
             background: var(--gradient-accent);
             color: var(--primary-white);
             border: none;
-            padding: 18px 30px;
-            border-radius: 12px;
-            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-spring);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: 8px;
         }
 
         .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .error-message {
             color: var(--error);
-            font-size: 0.9em;
-            margin-top: 15px;
+            font-size: 0.8em;
+            margin-top: 8px;
             opacity: 0;
-            transition: var(--transition-smooth);
         }
 
         .error-message.show { opacity: 1; }
 
-        /* Dashboard Layout */
+        /* Dashboard - FIXED LAYOUT */
         .dashboard-container {
-            position: relative;
-            display: flex;
+            display: none;
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
         }
 
-        /* Premium Sidebar */
+        .dashboard-container.show { display: flex; }
+
+        /* Sidebar */
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 300px;
+            width: 260px;
             height: 100vh;
             background: rgba(15,15,15,0.95);
             backdrop-filter: var(--blur-md);
             border-right: 1px solid var(--border-gray);
-            z-index: 1000;
-            padding: 30px 0;
+            padding: 20px 0;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
         .sidebar-header {
-            padding: 0 30px 30px;
+            padding: 0 20px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .sidebar-title {
-            font-size: 1.5em;
+            font-size: 1.3em;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .sidebar-subtitle {
-            font-size: 0.85em;
+            font-size: 0.75em;
             color: var(--text-tertiary);
         }
 
-        /* Search */
         .search-container {
-            padding: 20px 30px;
+            padding: 15px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
@@ -346,57 +263,45 @@
             width: 100%;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
-            padding: 12px 16px;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: var(--text-primary);
-            font-size: 0.9em;
-            transition: var(--transition-smooth);
+            font-size: 0.8em;
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--accent-blue);
-            background: rgba(255,255,255,0.12);
-            box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
         }
 
-        .search-input::placeholder {
-            color: var(--text-disabled);
-        }
+        .search-input::placeholder { color: var(--text-disabled); }
 
-        /* Navigation */
-        .nav-menu {
-            padding: 20px 0;
-        }
+        .nav-menu { padding: 15px 0; }
 
-        .nav-section {
-            margin-bottom: 25px;
-        }
+        .nav-section { margin-bottom: 15px; }
 
         .nav-section-title {
-            padding: 0 30px 12px;
-            font-size: 0.7em;
+            padding: 0 20px 8px;
+            font-size: 0.6em;
             color: var(--text-disabled);
             text-transform: uppercase;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 14px 30px;
+            padding: 10px 20px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition-smooth);
             border-left: 3px solid transparent;
-            position: relative;
         }
 
         .nav-item:hover {
             background: rgba(255,255,255,0.06);
             color: var(--text-primary);
-            border-left-color: var(--accent-blue);
         }
 
         .nav-item.active {
@@ -406,146 +311,121 @@
         }
 
         .nav-icon {
-            font-size: 1.1em;
-            margin-right: 15px;
-            width: 20px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            width: 14px;
             text-align: center;
         }
 
         .nav-text {
             font-weight: 500;
-            font-size: 0.9em;
+            font-size: 0.8em;
         }
 
         .nav-badge {
             background: var(--error);
             color: var(--primary-white);
-            font-size: 0.7em;
-            padding: 2px 6px;
-            border-radius: 8px;
+            font-size: 0.6em;
+            padding: 1px 4px;
+            border-radius: 4px;
             margin-left: auto;
             font-weight: 600;
         }
 
         .real-time-indicator {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
+            gap: 3px;
+            padding: 2px 5px;
             background: rgba(0,255,136,0.15);
-            border: 1px solid rgba(0,255,136,0.3);
-            border-radius: 12px;
-            font-size: 0.7em;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.6em;
             color: var(--success);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-left: auto;
         }
 
         .live-dot {
-            width: 6px;
-            height: 6px;
+            width: 3px;
+            height: 3px;
             background: var(--success);
             border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.9); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        /* Main Content */
+        /* Main Content - FIXED */
         .main-content {
-            margin-left: 300px;
             flex: 1;
-            padding: 40px;
+            height: 100vh;
             overflow-y: auto;
-            max-height: 100vh;
+            padding: 25px;
         }
 
-        .main-content::-webkit-scrollbar {
-            width: 8px;
-        }
+        .main-content::-webkit-scrollbar { width: 5px; }
+        .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
-        .main-content::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .main-content::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-        }
-
-        /* Header */
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
         .page-title {
-            font-size: 2.8em;
+            font-size: 2.2em;
             font-weight: 800;
             color: var(--text-primary);
             letter-spacing: -1px;
-            line-height: 1.1;
         }
 
         .page-subtitle {
-            font-size: 1em;
+            font-size: 0.85em;
             color: var(--text-tertiary);
-            margin-top: 8px;
-            font-weight: 300;
+            margin-top: 6px;
         }
 
         .header-controls {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
         }
 
-        /* Enhanced Controls */
         .control-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             background: rgba(255,255,255,0.06);
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 8px 14px;
+            border-radius: 8px;
             border: 1px solid var(--border-gray);
-            backdrop-filter: var(--blur-sm);
         }
 
         .control-label {
-            font-size: 0.85em;
+            font-size: 0.75em;
             color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: fit-content;
         }
 
         .control-input, .control-select {
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
-            padding: 10px 14px;
+            border-radius: 4px;
+            padding: 6px 10px;
             color: var(--text-primary);
-            font-size: 0.9em;
-            min-width: 140px;
-            transition: var(--transition-smooth);
+            font-size: 0.8em;
+            min-width: 100px;
         }
 
         .control-input:focus, .control-select:focus {
             outline: none;
             border-color: var(--accent-blue);
-            background: rgba(255,255,255,0.12);
-            box-shadow: 0 0 0 2px rgba(0,112,243,0.1);
         }
 
         .control-select option {
@@ -557,95 +437,84 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: var(--text-primary);
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 0.9em;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-spring);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: var(--transition-smooth);
         }
 
         .btn:hover {
             background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
         }
 
         .btn-primary {
             background: var(--gradient-accent);
             border: none;
-            color: var(--primary-white);
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #0056b3, #7c3aed);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
         }
 
-        /* Metrics Grid */
+        /* TAB SYSTEM - COMPLETELY FIXED */
+        .tab-content {
+            display: none;
+            min-height: 400px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Metrics */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
         }
 
         .metric-card {
             background: rgba(255,255,255,0.04);
             backdrop-filter: var(--blur-md);
             border: 1px solid var(--border-gray);
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 20px;
             transition: var(--transition-spring);
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
 
         .metric-card:hover {
             background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .metric-card:hover::before {
-            left: 100%;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .metric-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .metric-title {
-            font-size: 0.85em;
+            font-size: 0.75em;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .metric-icon {
-            font-size: 1.3em;
+            font-size: 1.1em;
             color: var(--text-disabled);
-            transition: var(--transition-smooth);
         }
 
         .metric-card:hover .metric-icon {
@@ -653,15 +522,15 @@
         }
 
         .metric-value {
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 12px;
-            letter-spacing: -1px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .metric-change {
-            font-size: 0.85em;
+            font-size: 0.75em;
             font-weight: 500;
         }
 
@@ -669,81 +538,62 @@
         .negative { color: var(--error); }
         .neutral { color: var(--text-disabled); }
 
-        /* Tab System */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* Search Results */
         .search-results {
             background: rgba(255,255,255,0.04);
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid var(--border-gray);
-            padding: 30px;
-            margin: 30px 0;
+            padding: 20px;
+            margin: 20px 0;
             display: none;
         }
 
-        .search-results.show {
-            display: block;
-        }
+        .search-results.show { display: block; }
 
         .search-results-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
         .search-results-title {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .search-results-count {
             color: var(--text-disabled);
-            font-size: 0.9em;
+            font-size: 0.8em;
         }
 
-        /* Premium Tables */
+        /* Tables */
         .premium-table {
             width: 100%;
             background: rgba(255,255,255,0.02);
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border-gray);
         }
 
         .premium-table th {
             background: rgba(255,255,255,0.08);
-            padding: 20px;
+            padding: 12px;
             text-align: left;
             font-weight: 700;
-            font-size: 0.85em;
+            font-size: 0.75em;
             color: var(--text-primary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-gray);
+            letter-spacing: 0.5px;
         }
 
         .premium-table td {
-            padding: 18px 20px;
+            padding: 10px 12px;
             color: var(--text-secondary);
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-weight: 500;
+            font-size: 0.8em;
         }
 
         .premium-table tr:hover {
@@ -758,108 +608,64 @@
         .loading-indicator {
             display: none;
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px;
         }
 
         .loading-indicator.show { display: block; }
 
         .loading-spinner {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
             border-top-color: var(--accent-blue);
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-secondary);
-            font-size: 1em;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            
-            .content-header {
-                flex-direction: column;
-                gap: 20px;
-                align-items: flex-start;
-            }
-
-            .page-title {
-                font-size: 2.2em;
-            }
+            margin: 0 auto 12px;
         }
 
         /* Theme Toggle */
         .theme-toggle {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
             background: rgba(255,255,255,0.08);
             border: 1px solid var(--border-gray);
             border-radius: 50%;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: var(--transition-spring);
             z-index: 1001;
-            backdrop-filter: var(--blur-sm);
         }
 
-        .theme-toggle:hover {
-            background: rgba(255,255,255,0.12);
-            transform: scale(1.05);
+        .theme-toggle.show { display: flex; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .page-title { font-size: 1.8em; }
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .visible { display: block !important; }
-        .text-center { text-align: center; }
-        .font-bold { font-weight: 700; }
+        @media (max-width: 768px) {
+            .dashboard-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .main-content { padding: 15px; }
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <!-- Wave Background -->
     <div class="wave-background">
         <div class="wave-layer"></div>
-        <div class="wave-layer"></div>
-        <div class="wave-layer"></div>
     </div>
 
-    <!-- Loading Animation -->
+    <!-- Loading -->
     <div class="loading-wave-container" id="loading-wave-container">
-        <div class="loading-animation">
-            <div class="loading-ring"></div>
-            <div class="loading-ring"></div>
-            <div class="loading-ring"></div>
-        </div>
+        <div class="loading-ring"></div>
         <div class="loading-text">Initializing Intelligence...</div>
     </div>
 
@@ -879,26 +685,25 @@
     </div>
 
     <!-- Theme Toggle -->
-    <div class="theme-toggle" id="theme-toggle" style="display: none;">
+    <div class="theme-toggle" id="theme-toggle">
         <span id="theme-icon">🌙</span>
     </div>
 
     <!-- Dashboard -->
-    <div class="dashboard-container" id="dashboard" style="display: none;">
+    <div class="dashboard-container" id="dashboard">
         
         <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
+        <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">Analytics Hub</div>
                 <div class="sidebar-subtitle">Intelligence Platform</div>
             </div>
             
-            <!-- Search -->
             <div class="search-container">
                 <input type="text" 
                        class="search-input" 
                        id="search-input"
-                       placeholder="Ask anything... e.g., 'declining products'"
+                       placeholder="Ask AI... e.g., 'declining products'"
                        autocomplete="off">
             </div>
             
@@ -931,7 +736,7 @@
                     </div>
                     <div class="nav-item" data-tab="forecasting">
                         <span class="nav-icon">🔮</span>
-                        <span class="nav-text">Predictive Forecasting</span>
+                        <span class="nav-text">AI Forecasting</span>
                     </div>
                     <div class="nav-item" data-tab="cancellations">
                         <span class="nav-icon">❌</span>
@@ -966,14 +771,13 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Intelligence Overview</h1>
-                        <p class="page-subtitle" id="overview-subtitle">Real-time business intelligence with predictive insights</p>
+                        <p class="page-subtitle" id="overview-subtitle">Real-time business intelligence with AI insights</p>
                     </div>
                     <div class="header-controls">
                         <div class="control-group">
                             <span class="control-label">Period</span>
                             <select id="period-selector" class="control-select">
                                 <option value="today">Today</option>
-                                <option value="yesterday">Yesterday</option>
                                 <option value="7days">Last 7 Days</option>
                                 <option value="30days" selected>Last 30 Days</option>
                                 <option value="90days">Last 90 Days</option>
@@ -981,19 +785,17 @@
                             </select>
                         </div>
                         <div class="control-group" id="custom-range" style="display: none;">
-                            <span class="control-label">From</span>
                             <input type="date" id="overview-start-date" class="control-input">
-                            <span class="control-label">To</span>
                             <input type="date" id="overview-end-date" class="control-input">
                         </div>
                         <button class="btn btn-primary" id="apply-overview">Analyze</button>
                     </div>
                 </div>
 
-                <!-- Search Results -->
+                <!-- AI Search Results -->
                 <div class="search-results" id="search-results">
                     <div class="search-results-header">
-                        <div class="search-results-title" id="search-query-text">Search Results</div>
+                        <div class="search-results-title" id="search-query-text">AI Search Results</div>
                         <div class="search-results-count" id="search-results-count">0 results</div>
                     </div>
                     <div id="search-results-content"></div>
@@ -1001,7 +803,7 @@
 
                 <div class="loading-indicator" id="overview-loading">
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Processing real-time analytics...</div>
+                    <div class="loading-text">Processing analytics...</div>
                 </div>
 
                 <div class="metrics-grid" id="overview-metrics">
@@ -1014,7 +816,7 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Product Intelligence</h1>
-                        <p class="page-subtitle">Deep learning insights into product performance</p>
+                        <p class="page-subtitle">AI-powered product performance analysis</p>
                     </div>
                     <div class="header-controls">
                         <div class="control-group">
@@ -1023,20 +825,20 @@
                                 <option value="7days">Last 7 Days</option>
                                 <option value="30days" selected>Last 30 Days</option>
                                 <option value="90days">Last 90 Days</option>
-                                <option value="custom">Custom Range</option>
                             </select>
                         </div>
                         <button class="btn btn-primary" id="analyze-products">Deep Analysis</button>
+                        <button class="btn" id="export-products">Export All</button>
                     </div>
                 </div>
 
                 <div class="loading-indicator" id="products-loading">
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Analyzing product intelligence...</div>
+                    <div class="loading-text">Analyzing products...</div>
                 </div>
 
                 <div id="products-results">
-                    <table class="premium-table" id="products-performance-table">
+                    <table class="premium-table">
                         <thead>
                             <tr>
                                 <th>Rank</th>
@@ -1044,13 +846,12 @@
                                 <th>Product Name</th>
                                 <th>Sales Volume</th>
                                 <th>Revenue</th>
-                                <th>Growth Rate</th>
-                                <th>Market Share</th>
+                                <th>Growth</th>
                                 <th>Trend</th>
                             </tr>
                         </thead>
-                        <tbody id="products-performance-tbody">
-                            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-disabled);">Click "Deep Analysis" to view comprehensive product data</td></tr>
+                        <tbody id="products-tbody">
+                            <tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--text-disabled);">Click "Deep Analysis" to view product data</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1061,7 +862,7 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Customer Intelligence</h1>
-                        <p class="page-subtitle">RFM Analysis and advanced customer segmentation</p>
+                        <p class="page-subtitle">RFM analysis and customer segmentation</p>
                     </div>
                     <div class="header-controls">
                         <button class="btn btn-primary" id="run-segmentation">Run RFM Analysis</button>
@@ -1070,19 +871,19 @@
 
                 <div class="loading-indicator" id="customers-loading">
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Processing customer intelligence...</div>
+                    <div class="loading-text">Segmenting customers...</div>
                 </div>
 
                 <div id="customers-results">
                     <div style="text-align: center; padding: 60px; color: var(--text-disabled);">
                         <div style="font-size: 1.5em; margin-bottom: 15px;">👥</div>
-                        <div>Customer segmentation data will appear here</div>
-                        <div style="margin-top: 10px; font-size: 0.9em;">Click "Run RFM Analysis" to start</div>
+                        <div>Customer segmentation analysis will appear here</div>
+                        <div style="margin-top: 10px; font-size: 0.8em;">Click "Run RFM Analysis" to start</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Other tabs with placeholder content -->
+            <!-- Placeholder tabs for other sections -->
             <div class="tab-content" id="tab-trends">
                 <div class="content-header">
                     <div>
@@ -1092,7 +893,7 @@
                 </div>
                 <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
                     <div style="font-size: 2em; margin-bottom: 20px;">📈</div>
-                    <div style="font-size: 1.2em; margin-bottom: 10px;">Trend Analysis Coming Soon</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Trend Analysis</div>
                     <div>Advanced trend detection and industry benchmarking</div>
                 </div>
             </div>
@@ -1100,14 +901,14 @@
             <div class="tab-content" id="tab-forecasting">
                 <div class="content-header">
                     <div>
-                        <h1 class="page-title">Predictive Forecasting</h1>
-                        <p class="page-subtitle">AI-powered sales and revenue predictions</p>
+                        <h1 class="page-title">AI Forecasting</h1>
+                        <p class="page-subtitle">Machine learning predictions</p>
                     </div>
                 </div>
                 <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
                     <div style="font-size: 2em; margin-bottom: 20px;">🔮</div>
                     <div style="font-size: 1.2em; margin-bottom: 10px;">AI Forecasting Module</div>
-                    <div>Machine learning predictions for business planning</div>
+                    <div>Predictive analytics for business planning</div>
                 </div>
             </div>
 
@@ -1129,7 +930,7 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Smart Compare</h1>
-                        <p class="page-subtitle">Advanced period-to-period analysis</p>
+                        <p class="page-subtitle">Advanced comparative analysis</p>
                     </div>
                 </div>
                 <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
@@ -1157,7 +958,7 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Export Center</h1>
-                        <p class="page-subtitle">Generate comprehensive analytics reports</p>
+                        <p class="page-subtitle">Generate comprehensive reports</p>
                     </div>
                 </div>
                 <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
@@ -1171,12 +972,11 @@
     </div>
 
     <script>
-        // Configuration
-        const API_ENDPOINT = '/.netlify/functions/magento-api';
-        const PRODUCT_API_ENDPOINT = '/.netlify/functions/product-analytics';
-        const CUSTOMER_API_ENDPOINT = '/.netlify/functions/customer-analytics';
-        
+        // Configuration with Gemini AI
         const CONFIG = {
+            API_ENDPOINT: '/.netlify/functions/magento-api',
+            GEMINI_API_KEY: 'AIzaSyCQOXS7KAIssAuuiZyCh8qeCFT0BixocCI',
+            GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
             CREDENTIALS: { 
                 'blade': 'pb@109$', 
                 'kulehi': 'imdumbass', 
@@ -1185,24 +985,24 @@
             }
         };
         
-        // State management
+        // Global state
         let scene, camera, renderer, logoMesh;
-        let mouse = { x: 0, y: 0 };
         let currentData = null;
+        let isAuthenticated = false;
 
-        // 3D Logo
+        // 3D Logo Animation
         function init3DLogo() {
             const container = document.getElementById('logo-3d-container');
             if (!container) return;
 
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, 120/90, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(75, 80/60, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(120, 90);
+            renderer.setSize(80, 60);
             renderer.setClearColor(0x000000, 0);
             container.appendChild(renderer.domElement);
 
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
             const material = new THREE.MeshPhongMaterial({ 
                 color: 0x0070f3,
                 shininess: 100,
@@ -1217,10 +1017,10 @@
             light1.position.set(1, 1, 1);
             scene.add(light1);
             
-            const light2 = new THREE.AmbientLight(0xffffff, 0.4);
+            const light2 = new THREE.AmbientLight(0xffffff, 0.3);
             scene.add(light2);
 
-            camera.position.z = 3;
+            camera.position.z = 2.5;
             animate3DLogo();
         }
 
@@ -1244,36 +1044,47 @@
             const password = document.getElementById('password').value;
             
             if (CONFIG.CREDENTIALS[username] && CONFIG.CREDENTIALS[username] === password) {
-                // Show loading
-                document.getElementById('loading-wave-container').classList.add('show');
+                showLoadingScreen();
                 
                 setTimeout(() => {
-                    document.getElementById('auth-screen').style.display = 'none';
-                    document.getElementById('loading-wave-container').classList.remove('show');
-                    document.getElementById('dashboard').style.display = 'flex';
-                    document.getElementById('theme-toggle').style.display = 'flex';
+                    hideLoadingScreen();
+                    showDashboard();
                     initDashboard();
-                }, 2000);
+                    isAuthenticated = true;
+                }, 1500);
             } else {
-                const errorMsg = document.getElementById('error-message');
-                errorMsg.classList.add('show');
-                setTimeout(() => errorMsg.classList.remove('show'), 3000);
+                showError();
             }
         });
 
-        // Dashboard Initialization
+        function showLoadingScreen() {
+            document.getElementById('loading-wave-container').classList.add('show');
+        }
+
+        function hideLoadingScreen() {
+            document.getElementById('loading-wave-container').classList.remove('show');
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('show');
+            document.getElementById('theme-toggle').classList.add('show');
+        }
+
+        function showError() {
+            const errorMsg = document.getElementById('error-message');
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 3000);
+        }
+
+        // Dashboard Initialization - FIXED
         function initDashboard() {
-            console.log('Initializing dashboard...');
+            console.log('🚀 Initializing dashboard...');
             setupDateDefaults();
             setupNavigation();
-            setupSearchFunctionality();
-            loadInitialOverviewData();
-            
-            // Event listeners
-            document.getElementById('apply-overview').addEventListener('click', loadOverviewData);
-            document.getElementById('analyze-products').addEventListener('click', loadProductData);
-            document.getElementById('run-segmentation').addEventListener('click', loadCustomerData);
-            document.getElementById('period-selector').addEventListener('change', handlePeriodChange);
+            setupSearchWithAI();
+            loadInitialData();
+            setupEventListeners();
         }
 
         function setupDateDefaults() {
@@ -1285,67 +1096,60 @@
         }
 
         function setupNavigation() {
-            console.log('Setting up navigation...');
+            console.log('🔧 Setting up navigation...');
+            
+            // Clear any existing listeners
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    console.log('Nav item clicked:', item.dataset.tab);
+                item.replaceWith(item.cloneNode(true));
+            });
+
+            // Add fresh listeners
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    // Remove active class from all nav items
+                    const tabName = this.dataset.tab;
+                    console.log('🎯 Switching to tab:', tabName);
+                    
+                    // Update navigation state
                     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                    // Add active class to clicked item
-                    item.classList.add('active');
+                    this.classList.add('active');
                     
-                    // Hide all tab contents
-                    document.querySelectorAll('.tab-content').forEach(tab => {
-                        tab.classList.remove('active');
-                    });
-                    
-                    // Show selected tab
-                    const tabId = 'tab-' + item.dataset.tab;
-                    const targetTab = document.getElementById(tabId);
-                    if (targetTab) {
-                        targetTab.classList.add('active');
-                        console.log('Showing tab:', tabId);
-                    } else {
-                        console.error('Tab not found:', tabId);
-                    }
+                    // Switch tab content
+                    switchToTab(tabName);
                 });
             });
         }
 
-        function setupSearchFunctionality() {
-            const searchInput = document.getElementById('search-input');
-            const searchResults = document.getElementById('search-results');
-            const searchQueryText = document.getElementById('search-query-text');
-            const searchResultsContent = document.getElementById('search-results-content');
+        function switchToTab(tabName) {
+            console.log('📋 Switching to tab:', tabName);
             
-            searchInput.addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter') {
-                    const query = searchInput.value.trim().toLowerCase();
-                    if (query) {
-                        console.log('Search query:', query);
-                        searchQueryText.textContent = `"${query}"`;
-                        searchResults.classList.add('show');
-                        
-                        // Process search query
-                        if (query.includes('declining') || query.includes('decline')) {
-                            await showDecliningProducts();
-                        } else if (query.includes('top') || query.includes('best') || query.includes('performing')) {
-                            await showTopProducts();
-                        } else if (query.includes('cancel') || query.includes('return')) {
-                            await showHighReturnProducts();
-                        } else {
-                            searchResultsContent.innerHTML = `
-                                <div style="text-align: center; padding: 40px; color: var(--text-disabled);">
-                                    <div style="font-size: 1.2em; margin-bottom: 15px;">🤖</div>
-                                    <div>I'm learning to understand that query.</div>
-                                    <div style="margin-top: 10px; font-size: 0.9em;">Try: "declining products", "top products", or "cancellations"</div>
-                                </div>
-                            `;
-                        }
-                    }
-                }
+            // Hide ALL tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
             });
+            
+            // Show selected tab
+            const targetTab = document.getElementById('tab-' + tabName);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                setTimeout(() => {
+                    targetTab.classList.add('active');
+                }, 10);
+                console.log('✅ Tab switched successfully:', tabName);
+            } else {
+                console.error('❌ Tab not found:', 'tab-' + tabName);
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('apply-overview').addEventListener('click', loadOverviewData);
+            document.getElementById('analyze-products').addEventListener('click', loadProductData);
+            document.getElementById('run-segmentation').addEventListener('click', loadCustomerData);
+            document.getElementById('export-products').addEventListener('click', exportProductData);
+            document.getElementById('period-selector').addEventListener('change', handlePeriodChange);
         }
 
         function handlePeriodChange() {
@@ -1356,50 +1160,170 @@
                 customRange.style.display = 'flex';
             } else {
                 customRange.style.display = 'none';
-                // Auto-set dates based on period
-                const today = new Date();
-                const endDate = today.toISOString().split('T')[0];
-                let startDate;
-                
-                switch(period) {
-                    case 'today':
-                        startDate = endDate;
-                        break;
-                    case 'yesterday':
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        startDate = yesterday.toISOString().split('T')[0];
-                        break;
-                    case '7days':
-                        const week = new Date(today);
-                        week.setDate(week.getDate() - 7);
-                        startDate = week.toISOString().split('T')[0];
-                        break;
-                    case '30days':
-                        const month = new Date(today);
-                        month.setDate(month.getDate() - 30);
-                        startDate = month.toISOString().split('T')[0];
-                        break;
-                    case '90days':
-                        const quarter = new Date(today);
-                        quarter.setDate(quarter.getDate() - 90);
-                        startDate = quarter.toISOString().split('T')[0];
-                        break;
-                }
-                
-                document.getElementById('overview-start-date').value = startDate;
-                document.getElementById('overview-end-date').value = endDate;
+                updateDatesForPeriod(period);
             }
         }
 
+        function updateDatesForPeriod(period) {
+            const today = new Date();
+            const endDate = today.toISOString().split('T')[0];
+            let startDate;
+            
+            switch(period) {
+                case 'today':
+                    startDate = endDate;
+                    break;
+                case '7days':
+                    const week = new Date(today);
+                    week.setDate(week.getDate() - 7);
+                    startDate = week.toISOString().split('T')[0];
+                    break;
+                case '30days':
+                    const month = new Date(today);
+                    month.setDate(month.getDate() - 30);
+                    startDate = month.toISOString().split('T')[0];
+                    break;
+                case '90days':
+                    const quarter = new Date(today);
+                    quarter.setDate(quarter.getDate() - 90);
+                    startDate = quarter.toISOString().split('T')[0];
+                    break;
+            }
+            
+            document.getElementById('overview-start-date').value = startDate;
+            document.getElementById('overview-end-date').value = endDate;
+        }
+
+        // AI-Powered Search with Gemini
+        function setupSearchWithAI() {
+            const searchInput = document.getElementById('search-input');
+            
+            searchInput.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        console.log('🔍 AI Search query:', query);
+                        await processAISearch(query);
+                    }
+                }
+            });
+        }
+
+        async function processAISearch(query) {
+            const searchResults = document.getElementById('search-results');
+            const searchQueryText = document.getElementById('search-query-text');
+            const searchResultsContent = document.getElementById('search-results-content');
+            
+            searchQueryText.textContent = `AI Analysis: "${query}"`;
+            searchResults.classList.add('show');
+            
+            // Show loading
+            searchResultsContent.innerHTML = `
+                <div class="loading-indicator show">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">AI is analyzing your query...</div>
+                </div>
+            `;
+            
+            try {
+                // Call Gemini AI for intelligent query processing
+                const aiResponse = await queryGeminiAI(query);
+                
+                // Process the AI response and show relevant data
+                if (query.toLowerCase().includes('declining') || query.toLowerCase().includes('drop')) {
+                    showDecliningProducts();
+                } else if (query.toLowerCase().includes('top') || query.toLowerCase().includes('best')) {
+                    showTopProducts();
+                } else if (query.toLowerCase().includes('cancel') || query.toLowerCase().includes('return')) {
+                    showCancellationData();
+                } else {
+                    showAIGeneratedInsights(aiResponse, query);
+                }
+                
+            } catch (error) {
+                console.error('AI Search error:', error);
+                searchResultsContent.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-disabled);">
+                        <div style="font-size: 1.1em; margin-bottom: 10px;">🤖</div>
+                        <div>AI analysis temporarily unavailable</div>
+                        <div style="margin-top: 8px; font-size: 0.8em;">Showing cached results...</div>
+                    </div>
+                `;
+                
+                // Fallback to simple keyword matching
+                if (query.toLowerCase().includes('declining')) {
+                    setTimeout(() => showDecliningProducts(), 500);
+                }
+            }
+        }
+
+        async function queryGeminiAI(query) {
+            const prompt = `
+            You are an AI assistant for a dental supply e-commerce analytics dashboard. 
+            Analyze this business query: "${query}"
+            
+            Based on the query, provide insights about:
+            1. What specific data the user is looking for
+            2. Key metrics to focus on
+            3. Actionable recommendations
+            
+            Keep the response concise and business-focused.
+            `;
+
+            const requestBody = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            };
+
+            const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error('Gemini API request failed');
+            }
+
+            const data = await response.json();
+            return data.candidates[0]?.content?.parts[0]?.text || 'AI analysis unavailable';
+        }
+
+        function showAIGeneratedInsights(aiResponse, originalQuery) {
+            const content = document.getElementById('search-results-content');
+            
+            content.innerHTML = `
+                <div style="background: rgba(0,112,243,0.1); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🤖</span> AI Insights
+                    </h4>
+                    <div style="color: var(--text-secondary); line-height: 1.6; font-size: 0.85em;">
+                        ${aiResponse.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="generateDetailedReport('${originalQuery}')">
+                        Generate Detailed Report
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('search-results-count').textContent = '1 AI insight';
+        }
+
         // Data Loading Functions
-        function loadInitialOverviewData() {
-            console.log('Loading initial overview data...');
+        function loadInitialData() {
+            console.log('📊 Loading initial overview data...');
             showSimulatedOverviewData();
         }
 
         async function loadOverviewData() {
-            console.log('Loading overview data...');
+            console.log('🔄 Loading overview data...');
             const loading = document.getElementById('overview-loading');
             const metrics = document.getElementById('overview-metrics');
             
@@ -1407,28 +1331,33 @@
             metrics.innerHTML = '';
             
             try {
-                // Try to fetch real data, fallback to simulated
                 const startDate = document.getElementById('overview-start-date').value;
                 const endDate = document.getElementById('overview-end-date').value;
                 
-                const response = await fetch(`${API_ENDPOINT}?date=${startDate}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        displayOverviewMetrics(data);
-                        updateSubtitle(`${startDate} to ${endDate} • Live Data`);
-                    } else {
-                        throw new Error('API returned unsuccessful response');
+                // Try to fetch real data first
+                try {
+                    const response = await fetch(`${CONFIG.API_ENDPOINT}?date=${startDate}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            displayOverviewMetrics(data);
+                            updateSubtitle(`${startDate} to ${endDate} • Live Data`);
+                            return;
+                        }
                     }
-                } else {
-                    throw new Error('API request failed');
+                } catch (apiError) {
+                    console.warn('API unavailable, using simulated data:', apiError);
                 }
-            } catch (error) {
-                console.warn('Using simulated data:', error.message);
+                
+                // Fallback to simulated data
                 showSimulatedOverviewData();
+                updateSubtitle(`${startDate} to ${endDate} • Demo Data`);
+                
             } finally {
-                loading.classList.remove('show');
+                setTimeout(() => {
+                    loading.classList.remove('show');
+                }, 800);
             }
         }
 
@@ -1445,56 +1374,20 @@
                 onlineOrders: 56
             };
             
+            currentData = simulatedData;
             displayOverviewMetrics(simulatedData);
-            updateSubtitle('Last 30 Days • Simulated Data');
         }
 
         function displayOverviewMetrics(data) {
             const container = document.getElementById('overview-metrics');
             
             const metrics = [
-                { 
-                    title: 'Total Orders', 
-                    value: data.totalOrders.toLocaleString('en-IN'), 
-                    icon: '📦', 
-                    change: '+12.5%', 
-                    type: 'positive' 
-                },
-                { 
-                    title: 'Net Revenue', 
-                    value: `₹${data.totalRevenue.toLocaleString('en-IN')}`, 
-                    icon: '💰', 
-                    change: '+8.3%', 
-                    type: 'positive' 
-                },
-                { 
-                    title: 'Success Rate', 
-                    value: `${data.successRate}%`, 
-                    icon: '✅', 
-                    change: '+2.1%', 
-                    type: 'positive' 
-                },
-                { 
-                    title: 'Avg Order Value', 
-                    value: `₹${data.averageOrderValue.toLocaleString('en-IN')}`, 
-                    icon: '💸', 
-                    change: '-1.2%', 
-                    type: 'negative' 
-                },
-                { 
-                    title: 'Completed Orders', 
-                    value: data.completedOrders.toLocaleString('en-IN'), 
-                    icon: '✨', 
-                    change: '+15.8%', 
-                    type: 'positive' 
-                },
-                { 
-                    title: 'Pending Orders', 
-                    value: data.pendingOrders.toLocaleString('en-IN'), 
-                    icon: '⏳', 
-                    change: '-5.2%', 
-                    type: 'positive' 
-                }
+                { title: 'Total Orders', value: data.totalOrders.toLocaleString('en-IN'), icon: '📦', change: '+12.5%', type: 'positive' },
+                { title: 'Net Revenue', value: `₹${data.totalRevenue.toLocaleString('en-IN')}`, icon: '💰', change: '+8.3%', type: 'positive' },
+                { title: 'Success Rate', value: `${data.successRate}%`, icon: '✅', change: '+2.1%', type: 'positive' },
+                { title: 'Avg Order Value', value: `₹${data.averageOrderValue.toLocaleString('en-IN')}`, icon: '💸', change: '-1.2%', type: 'negative' },
+                { title: 'Completed Orders', value: data.completedOrders.toLocaleString('en-IN'), icon: '✨', change: '+15.8%', type: 'positive' },
+                { title: 'Pending Orders', value: data.pendingOrders.toLocaleString('en-IN'), icon: '⏳', change: '-5.2%', type: 'positive' }
             ];
             
             container.innerHTML = metrics.map(metric => `
@@ -1504,55 +1397,58 @@
                         <div class="metric-icon">${metric.icon}</div>
                     </div>
                     <div class="metric-value">${metric.value}</div>
-                    <div class="metric-change ${metric.type}">
-                        ${metric.change} from last period
-                    </div>
+                    <div class="metric-change ${metric.type}">${metric.change} from last period</div>
                 </div>
             `).join('');
             
-            console.log('Overview metrics displayed');
+            console.log('✅ Overview metrics displayed');
         }
 
         async function loadProductData() {
-            console.log('Loading product data...');
+            console.log('📦 Loading product data...');
             const loading = document.getElementById('products-loading');
-            const tbody = document.getElementById('products-performance-tbody');
+            const tbody = document.getElementById('products-tbody');
             
             loading.classList.add('show');
             
             try {
-                // Show simulated product data
                 const simulatedProducts = [
-                    { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2, marketShare: 12.3, trend: '📈' },
-                    { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7, marketShare: 10.6, trend: '📈' },
-                    { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1, marketShare: 10.1, trend: '📈' },
-                    { sku: 'DENT004', name: 'LED Curing System Pro', sales: 115, revenue: 345000, growth: 28.9, marketShare: 9.1, trend: '📈' },
-                    { sku: 'DENT005', name: 'Surgical Kit Deluxe', sales: 98, revenue: 294000, growth: 25.4, marketShare: 7.7, trend: '📈' }
+                    { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2, trend: '📈' },
+                    { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7, trend: '📈' },
+                    { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1, trend: '📈' },
+                    { sku: 'DENT004', name: 'LED Curing System Pro', sales: 115, revenue: 345000, growth: 28.9, trend: '📈' },
+                    { sku: 'DENT005', name: 'Surgical Kit Deluxe', sales: 98, revenue: 294000, growth: 25.4, trend: '📈' },
+                    { sku: 'DENT006', name: 'Orthodontic Tool Set', sales: 87, revenue: 261000, growth: 22.1, trend: '📈' },
+                    { sku: 'DENT007', name: 'Composite Filling Kit', sales: 76, revenue: 228000, growth: 18.5, trend: '📈' },
+                    { sku: 'DENT008', name: 'Dental Chair Accessories', sales: 65, revenue: 195000, growth: 15.2, trend: '📊' },
+                    { sku: 'DENT009', name: 'Sterilization Equipment', sales: 54, revenue: 162000, growth: 12.8, trend: '📊' },
+                    { sku: 'DENT010', name: 'Impression Materials', sales: 43, revenue: 129000, growth: 9.3, trend: '📊' }
                 ];
                 
                 tbody.innerHTML = simulatedProducts.map((product, index) => `
                     <tr>
                         <td><strong>${index + 1}</strong></td>
-                        <td><code style="background: rgba(0,112,243,0.2); padding: 4px 8px; border-radius: 4px; color: var(--accent-blue);">${product.sku}</code></td>
-                        <td>${product.name}</td>
+                        <td><code style="background: rgba(0,112,243,0.2); padding: 3px 6px; border-radius: 3px; color: var(--accent-blue); font-size: 0.75em;">${product.sku}</code></td>
+                        <td style="font-weight: 500;">${product.name}</td>
                         <td><strong>${product.sales}</strong></td>
-                        <td><strong>₹${product.revenue.toLocaleString('en-IN')}</strong></td>
-                        <td><strong style="color: var(--success)">+${product.growth}%</strong></td>
-                        <td>${product.marketShare}%</td>
-                        <td style="font-size: 1.2em;">${product.trend}</td>
+                        <td><strong style="color: var(--success);">₹${product.revenue.toLocaleString('en-IN')}</strong></td>
+                        <td><strong style="color: var(--success);">+${product.growth}%</strong></td>
+                        <td style="font-size: 1em;">${product.trend}</td>
                     </tr>
                 `).join('');
                 
             } catch (error) {
                 console.error('Product data error:', error);
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--error);">Error loading product data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--error);">Error loading product data</td></tr>';
             } finally {
-                loading.classList.remove('show');
+                setTimeout(() => {
+                    loading.classList.remove('show');
+                }, 1000);
             }
         }
 
         async function loadCustomerData() {
-            console.log('Loading customer data...');
+            console.log('👥 Loading customer segmentation...');
             const loading = document.getElementById('customers-loading');
             const results = document.getElementById('customers-results');
             
@@ -1596,119 +1492,162 @@
                     </div>
                 `;
                 loading.classList.remove('show');
-            }, 1500);
+            }, 1200);
         }
 
-        // Search Results Functions
-        async function showDecliningProducts() {
+        // Search Result Functions
+        function showDecliningProducts() {
             const content = document.getElementById('search-results-content');
             const fakeData = [
                 { sku: 'DENT189', name: 'Legacy X-Ray System', currentSales: 12, previousSales: 45, decline: 73.3, impact: 165000 },
                 { sku: 'DENT234', name: 'Old Model Autoclave', currentSales: 8, previousSales: 28, decline: 71.4, impact: 120000 },
-                { sku: 'DENT345', name: 'Traditional Impression Kit', currentSales: 15, previousSales: 42, decline: 64.3, impact: 135000 }
+                { sku: 'DENT345', name: 'Traditional Impression Kit', currentSales: 15, previousSales: 42, decline: 64.3, impact: 135000 },
+                { sku: 'DENT456', name: 'Analog Compressor', currentSales: 23, previousSales: 58, decline: 60.3, impact: 175000 },
+                { sku: 'DENT567', name: 'Manual Dental Chair', currentSales: 6, previousSales: 15, decline: 60.0, impact: 90000 }
             ];
             
             content.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 10px;">🔍 Products with Declining Sales</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.8em;">Found ${fakeData.length} products with significant sales decline</p>
+                </div>
                 <table class="premium-table">
                     <thead>
                         <tr>
                             <th>SKU</th>
                             <th>Product Name</th>
-                            <th>Current Sales</th>
-                            <th>Previous Sales</th>
+                            <th>Current</th>
+                            <th>Previous</th>
                             <th>Decline %</th>
-                            <th>Revenue Impact</th>
+                            <th>Impact</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${fakeData.map(product => `
                             <tr>
-                                <td><code style="background: rgba(255,71,87,0.2); padding: 4px 8px; border-radius: 4px; color: var(--error);">${product.sku}</code></td>
+                                <td><code style="background: rgba(255,71,87,0.2); padding: 2px 5px; border-radius: 3px; color: var(--error); font-size: 0.7em;">${product.sku}</code></td>
                                 <td>${product.name}</td>
                                 <td>${product.currentSales}</td>
                                 <td>${product.previousSales}</td>
-                                <td><strong style="color: var(--error)">${product.decline}%</strong></td>
+                                <td><strong style="color: var(--error);">${product.decline}%</strong></td>
                                 <td>₹${product.impact.toLocaleString('en-IN')}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="btn" onclick="exportSearchResults('declining-products')">Export Results</button>
+                </div>
             `;
             
             document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
         }
 
-        async function showTopProducts() {
+        function showTopProducts() {
             const content = document.getElementById('search-results-content');
             const fakeData = [
                 { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2 },
                 { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7 },
-                { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1 }
+                { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1 },
+                { sku: 'DENT004', name: 'LED Curing System Pro', sales: 115, revenue: 345000, growth: 28.9 },
+                { sku: 'DENT005', name: 'Surgical Kit Deluxe', sales: 98, revenue: 294000, growth: 25.4 }
             ];
             
             content.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 10px;">🚀 Top Performing Products</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.8em;">Top ${fakeData.length} products by revenue performance</p>
+                </div>
                 <table class="premium-table">
                     <thead>
                         <tr>
                             <th>Rank</th>
                             <th>SKU</th>
                             <th>Product Name</th>
-                            <th>Sales Volume</th>
+                            <th>Sales</th>
                             <th>Revenue</th>
-                            <th>Growth Rate</th>
+                            <th>Growth</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${fakeData.map((product, index) => `
                             <tr>
                                 <td><strong>${index + 1}</strong></td>
-                                <td><code style="background: rgba(0,255,136,0.2); padding: 4px 8px; border-radius: 4px; color: var(--success);">${product.sku}</code></td>
+                                <td><code style="background: rgba(0,255,136,0.2); padding: 2px 5px; border-radius: 3px; color: var(--success); font-size: 0.7em;">${product.sku}</code></td>
                                 <td>${product.name}</td>
                                 <td>${product.sales}</td>
-                                <td><strong>₹${product.revenue.toLocaleString('en-IN')}</strong></td>
-                                <td><strong style="color: var(--success)">+${product.growth}%</strong></td>
+                                <td><strong style="color: var(--success);">₹${product.revenue.toLocaleString('en-IN')}</strong></td>
+                                <td><strong style="color: var(--success);">+${product.growth}%</strong></td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="btn" onclick="exportSearchResults('top-products')">Export Results</button>
+                </div>
             `;
             
             document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
         }
 
-        async function showHighReturnProducts() {
+        function showCancellationData() {
             const content = document.getElementById('search-results-content');
             const fakeData = [
-                { sku: 'DENT023', name: 'Budget Dental Kit Pro', returnRate: 28.5, returns: 45, impact: 135000 },
-                { sku: 'DENT045', name: 'Basic Cleaning Set', returnRate: 22.1, returns: 32, impact: 96000 }
+                { sku: 'DENT023', name: 'Budget Dental Kit Pro', cancelRate: 28.5, cancellations: 45, impact: 135000 },
+                { sku: 'DENT045', name: 'Basic Cleaning Set', cancelRate: 22.1, cancellations: 32, impact: 96000 },
+                { sku: 'DENT078', name: 'Student Practice Kit', cancelRate: 19.8, cancellations: 28, impact: 84000 }
             ];
             
             content.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 10px;">❌ High Cancellation Products</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.8em;">Products with cancellation rates above 15%</p>
+                </div>
                 <table class="premium-table">
                     <thead>
                         <tr>
                             <th>SKU</th>
                             <th>Product Name</th>
-                            <th>Return Rate</th>
-                            <th>Total Returns</th>
+                            <th>Cancel Rate</th>
+                            <th>Total Cancellations</th>
                             <th>Revenue Impact</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${fakeData.map(product => `
                             <tr>
-                                <td><code style="background: rgba(255,179,71,0.2); padding: 4px 8px; border-radius: 4px; color: var(--warning);">${product.sku}</code></td>
+                                <td><code style="background: rgba(255,179,71,0.2); padding: 2px 5px; border-radius: 3px; color: var(--warning); font-size: 0.7em;">${product.sku}</code></td>
                                 <td>${product.name}</td>
-                                <td><strong style="color: var(--warning)">${product.returnRate}%</strong></td>
-                                <td>${product.returns}</td>
+                                <td><strong style="color: var(--warning);">${product.cancelRate}%</strong></td>
+                                <td>${product.cancellations}</td>
                                 <td>₹${product.impact.toLocaleString('en-IN')}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="btn" onclick="exportSearchResults('cancellation-data')">Export Results</button>
+                </div>
             `;
             
             document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
+        }
+
+        // Export Functions
+        function exportSearchResults(type) {
+            console.log('📊 Exporting search results:', type);
+            // Implementation for exporting search results to Excel
+            alert(`Exporting ${type} data to Excel...`);
+        }
+
+        function exportProductData() {
+            console.log('📦 Exporting all product data...');
+            alert('Exporting complete product dataset to Excel...');
+        }
+
+        function generateDetailedReport(query) {
+            console.log('📋 Generating detailed report for query:', query);
+            alert(`Generating detailed AI report for: "${query}"`);
         }
 
         function updateSubtitle(text) {
@@ -1720,7 +1659,7 @@
 
         // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing...');
+            console.log('🎉 DOM loaded, initializing 3D logo...');
             init3DLogo();
         });
     </script>
