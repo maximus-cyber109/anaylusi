@@ -7,32 +7,37 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-    <script src="https://unpkg.com/ml-matrix@6.10.4/lib/matrix.min.js"></script>
     <style>
-        /* Enhanced Premium Design System */
+        /* Premium Color System */
         :root {
             --primary-black: #000000;
-            --secondary-black: #0a0a0a;
+            --secondary-black: #0f0f0f;
+            --accent-black: #1a1a1a;
             --primary-white: #ffffff;
-            --secondary-white: #f8f8f8;
-            --accent-gray: #1a1a1a;
-            --border-gray: rgba(255,255,255,0.08);
+            --secondary-white: #f5f5f5;
+            --accent-gray: #2a2a2a;
+            --border-gray: rgba(255,255,255,0.12);
             --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.7);
-            --text-tertiary: rgba(255,255,255,0.4);
-            --success: #34C759;
-            --warning: #FF9F0A;
-            --error: #FF3B30;
-            --info: #007AFF;
+            --text-secondary: #e5e5e5;
+            --text-tertiary: #b3b3b3;
+            --text-disabled: #666666;
+            --success: #00ff88;
+            --warning: #ffb347;
+            --error: #ff4757;
+            --info: #3742fa;
+            --accent-blue: #0070f3;
+            --accent-purple: #8b5cf6;
             --gradient-primary: linear-gradient(135deg, #000000, #1a1a1a);
-            --shadow-lg: 0 25px 50px rgba(0,0,0,0.4);
-            --shadow-xl: 0 35px 70px rgba(0,0,0,0.6);
-            --blur-sm: blur(10px);
-            --blur-md: blur(20px);
-            --blur-lg: blur(40px);
-            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-spring: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --gradient-accent: linear-gradient(135deg, #0070f3, #8b5cf6);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.25);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.35);
+            --shadow-xl: 0 25px 50px rgba(0,0,0,0.5);
+            --blur-sm: blur(8px);
+            --blur-md: blur(16px);
+            --blur-lg: blur(32px);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         * { 
@@ -53,7 +58,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Advanced Wave Background System */
+        /* Wave Background */
         .wave-background {
             position: fixed;
             top: 0;
@@ -69,50 +74,40 @@
             position: absolute;
             width: 200%;
             height: 200%;
-            opacity: 0.6;
+            opacity: 0.4;
         }
 
         .wave-layer:nth-child(1) {
-            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.02) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.015) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.01) 0%, transparent 50%);
-            animation: waveFloat1 30s infinite linear;
+            background: radial-gradient(circle at 20% 50%, rgba(0,112,243,0.05) 0%, transparent 50%);
+            animation: waveFloat1 25s infinite linear;
         }
 
         .wave-layer:nth-child(2) {
-            background: conic-gradient(from 0deg at 50% 50%, 
-                        transparent 0deg, 
-                        rgba(255,255,255,0.008) 90deg, 
-                        transparent 180deg, 
-                        rgba(255,255,255,0.012) 270deg, 
-                        transparent 360deg);
-            animation: waveFloat2 40s infinite linear reverse;
+            background: radial-gradient(circle at 80% 20%, rgba(139,92,246,0.03) 0%, transparent 50%);
+            animation: waveFloat2 30s infinite linear reverse;
         }
 
         .wave-layer:nth-child(3) {
-            background: linear-gradient(45deg, 
-                        transparent 40%, 
-                        rgba(255,255,255,0.005) 50%, 
-                        transparent 60%);
-            animation: waveFloat3 25s infinite ease-in-out;
+            background: radial-gradient(circle at 40% 80%, rgba(0,255,136,0.02) 0%, transparent 50%);
+            animation: waveFloat3 35s infinite ease-in-out;
         }
 
         @keyframes waveFloat1 {
-            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1); }
-            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg) scale(1.1); }
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
         }
 
         @keyframes waveFloat2 {
-            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1.1); }
-            100% { transform: translateX(-50%) translateY(-50%) rotate(-360deg) scale(1); }
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(-360deg); }
         }
 
         @keyframes waveFloat3 {
-            0%, 100% { transform: translateX(-50%) translateY(-50%) scale(1) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateX(-50%) translateY(-50%) scale(1.2) rotate(180deg); opacity: 0.6; }
+            0%, 100% { transform: translateX(-50%) translateY(-50%) scale(1); opacity: 0.2; }
+            50% { transform: translateX(-50%) translateY(-50%) scale(1.1); opacity: 0.4; }
         }
 
-        /* Ultra-Premium Loading Animation */
+        /* Premium Loading */
         .loading-wave-container {
             position: fixed;
             top: 0;
@@ -137,9 +132,9 @@
 
         .loading-animation {
             position: relative;
-            width: 120px;
-            height: 120px;
-            margin-bottom: 40px;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
         }
 
         .loading-ring {
@@ -148,31 +143,31 @@
             height: 100%;
             border: 2px solid transparent;
             border-radius: 50%;
-            animation: ringRotate 2s linear infinite;
+            animation: ringRotate 1.5s linear infinite;
         }
 
         .loading-ring:nth-child(1) {
-            border-top-color: var(--primary-white);
+            border-top-color: var(--accent-blue);
             animation-delay: 0s;
         }
 
         .loading-ring:nth-child(2) {
-            width: 80%;
-            height: 80%;
-            top: 10%;
-            left: 10%;
-            border-top-color: rgba(255,255,255,0.6);
-            animation-delay: -0.5s;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top-color: var(--accent-purple);
+            animation-delay: -0.3s;
             animation-direction: reverse;
         }
 
         .loading-ring:nth-child(3) {
-            width: 60%;
-            height: 60%;
-            top: 20%;
-            left: 20%;
-            border-top-color: rgba(255,255,255,0.3);
-            animation-delay: -1s;
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            border-top-color: var(--success);
+            animation-delay: -0.6s;
         }
 
         @keyframes ringRotate {
@@ -181,20 +176,14 @@
         }
 
         .loading-text {
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: 300;
-            color: var(--text-primary);
-            letter-spacing: 3px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
             text-transform: uppercase;
-            animation: textPulse 2s ease-in-out infinite;
         }
 
-        @keyframes textPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        /* Advanced Authentication Screen */
+        /* Authentication */
         .auth-screen {
             position: fixed;
             top: 0;
@@ -209,129 +198,91 @@
         }
 
         .auth-container {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.04);
             backdrop-filter: var(--blur-lg);
             border: 1px solid var(--border-gray);
-            border-radius: 32px;
-            padding: 80px 60px;
+            border-radius: 24px;
+            padding: 60px 50px;
             box-shadow: var(--shadow-xl);
-            max-width: 500px;
+            max-width: 450px;
             width: 90%;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 70%);
-            pointer-events: none;
         }
 
         .logo-3d-container {
-            width: 140px;
-            height: 105px;
-            margin: 0 auto 50px;
-            position: relative;
-            z-index: 1;
+            width: 120px;
+            height: 90px;
+            margin: 0 auto 40px;
         }
 
         .auth-title {
-            font-size: 3em;
+            font-size: 2.8em;
             font-weight: 800;
             color: var(--text-primary);
             margin-bottom: 15px;
-            letter-spacing: -2px;
-            position: relative;
-            z-index: 1;
+            letter-spacing: -1px;
         }
 
         .auth-subtitle {
-            font-size: 1.1em;
+            font-size: 1em;
+            color: var(--text-tertiary);
+            margin-bottom: 40px;
             font-weight: 300;
-            color: var(--text-secondary);
-            margin-bottom: 50px;
-            position: relative;
-            z-index: 1;
         }
 
         .auth-form {
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            position: relative;
-            z-index: 1;
+            gap: 20px;
         }
 
         .auth-input {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 16px;
-            padding: 22px 24px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 18px 20px;
             color: var(--text-primary);
-            font-size: 1.1em;
-            font-weight: 400;
+            font-size: 1em;
             transition: var(--transition-smooth);
-            backdrop-filter: var(--blur-sm);
         }
 
         .auth-input:focus {
             outline: none;
-            border-color: rgba(255,255,255,0.4);
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .auth-input::placeholder {
-            color: var(--text-tertiary);
+            border-color: var(--accent-blue);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
         }
 
         .auth-btn {
-            background: var(--primary-white);
-            color: var(--primary-black);
+            background: var(--gradient-accent);
+            color: var(--primary-white);
             border: none;
-            padding: 22px 40px;
-            border-radius: 16px;
-            font-size: 1.1em;
-            font-weight: 700;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition-spring);
-            margin-top: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .auth-btn:hover {
-            background: rgba(255,255,255,0.95);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
-        }
-
-        .auth-btn:active {
-            transform: translateY(0px);
         }
 
         .error-message {
             color: var(--error);
-            font-size: 1em;
-            margin-top: 20px;
+            font-size: 0.9em;
+            margin-top: 15px;
             opacity: 0;
             transition: var(--transition-smooth);
-            font-weight: 500;
         }
 
-        .error-message.show { 
-            opacity: 1; 
-            transform: translateY(-5px);
-        }
+        .error-message.show { opacity: 1; }
 
-        /* Advanced Dashboard Layout */
+        /* Dashboard Layout */
         .dashboard-container {
             position: relative;
             display: flex;
@@ -340,124 +291,92 @@
             overflow: hidden;
         }
 
-        /* Ultra-Premium Sidebar */
+        /* Premium Sidebar */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 320px;
+            width: 300px;
             height: 100vh;
-            background: rgba(255,255,255,0.02);
+            background: rgba(15,15,15,0.95);
             backdrop-filter: var(--blur-md);
             border-right: 1px solid var(--border-gray);
             z-index: 1000;
-            padding: 40px 0;
-            transition: var(--transition-smooth);
+            padding: 30px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
         }
 
         .sidebar-header {
-            padding: 0 40px 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            position: relative;
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .sidebar-title {
-            font-size: 1.6em;
+            font-size: 1.5em;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            margin-bottom: 5px;
         }
 
         .sidebar-subtitle {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: var(--text-tertiary);
-            font-weight: 300;
         }
 
-        /* Advanced Natural Language Search */
+        /* Search */
         .search-container {
-            padding: 30px 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .search-input {
             width: 100%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 12px 16px;
             color: var(--text-primary);
             font-size: 0.9em;
             transition: var(--transition-smooth);
-            backdrop-filter: var(--blur-sm);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--accent-blue);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
         }
 
         .search-input::placeholder {
-            color: var(--text-tertiary);
-            font-style: italic;
+            color: var(--text-disabled);
         }
 
-        .search-suggestions {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .search-suggestions.show {
-            display: block;
-        }
-
-        .suggestion-item {
-            padding: 10px 15px;
-            background: rgba(255,255,255,0.04);
-            margin: 5px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            transition: var(--transition-smooth);
-        }
-
-        .suggestion-item:hover {
-            background: rgba(255,255,255,0.08);
-            color: var(--text-primary);
-        }
-
-        /* Enhanced Navigation */
+        /* Navigation */
         .nav-menu {
-            padding: 30px 0;
-            max-height: calc(100vh - 300px);
-            overflow-y: auto;
-        }
-
-        .nav-menu::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .nav-menu::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .nav-menu::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
+            padding: 20px 0;
         }
 
         .nav-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .nav-section-title {
-            padding: 0 40px 15px;
-            font-size: 0.75em;
-            color: var(--text-tertiary);
+            padding: 0 30px 12px;
+            font-size: 0.7em;
+            color: var(--text-disabled);
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 2px;
@@ -466,76 +385,84 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 18px 40px;
+            padding: 14px 30px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition-smooth);
             border-left: 3px solid transparent;
             position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 0;
-            background: rgba(255,255,255,0.05);
-            transition: var(--transition-smooth);
-        }
-
-        .nav-item:hover::before {
-            width: 100%;
         }
 
         .nav-item:hover {
+            background: rgba(255,255,255,0.06);
             color: var(--text-primary);
-            background: rgba(255,255,255,0.03);
+            border-left-color: var(--accent-blue);
         }
 
         .nav-item.active {
-            background: rgba(255,255,255,0.06);
+            background: rgba(0,112,243,0.15);
             color: var(--text-primary);
-            border-left-color: var(--primary-white);
-            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+            border-left-color: var(--accent-blue);
         }
 
         .nav-icon {
-            font-size: 1.2em;
-            margin-right: 18px;
-            width: 24px;
+            font-size: 1.1em;
+            margin-right: 15px;
+            width: 20px;
             text-align: center;
-            position: relative;
-            z-index: 1;
         }
 
         .nav-text {
-            font-weight: 600;
-            font-size: 0.95em;
-            position: relative;
-            z-index: 1;
+            font-weight: 500;
+            font-size: 0.9em;
         }
 
         .nav-badge {
             background: var(--error);
-            color: white;
+            color: var(--primary-white);
             font-size: 0.7em;
             padding: 2px 6px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-left: auto;
             font-weight: 600;
         }
 
-        /* Advanced Main Content */
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: rgba(0,255,136,0.15);
+            border: 1px solid rgba(0,255,136,0.3);
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--success);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        /* Main Content */
         .main-content {
-            margin-left: 320px;
+            margin-left: 300px;
             flex: 1;
-            padding: 50px;
+            padding: 40px;
             overflow-y: auto;
             max-height: 100vh;
-            position: relative;
         }
 
         .main-content::-webkit-scrollbar {
@@ -543,152 +470,146 @@
         }
 
         .main-content::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.05);
         }
 
         .main-content::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             border-radius: 4px;
         }
 
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.25);
-        }
-
-        /* Ultra-Premium Header */
+        /* Header */
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 50px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
         .page-title {
-            font-size: 3.2em;
+            font-size: 2.8em;
             font-weight: 800;
             color: var(--text-primary);
-            letter-spacing: -2px;
+            letter-spacing: -1px;
             line-height: 1.1;
-            margin-bottom: 8px;
         }
 
         .page-subtitle {
-            font-size: 1.1em;
-            color: var(--text-secondary);
-            margin-top: 10px;
+            font-size: 1em;
+            color: var(--text-tertiary);
+            margin-top: 8px;
             font-weight: 300;
         }
 
         .header-controls {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
-            flex-wrap: wrap;
         }
 
-        /* Advanced Controls */
+        /* Enhanced Controls */
         .control-group {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: rgba(255,255,255,0.04);
-            padding: 16px 24px;
-            border-radius: 16px;
+            gap: 12px;
+            background: rgba(255,255,255,0.06);
+            padding: 12px 20px;
+            border-radius: 12px;
             border: 1px solid var(--border-gray);
             backdrop-filter: var(--blur-sm);
-            transition: var(--transition-smooth);
-        }
-
-        .control-group:hover {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.15);
-            transform: translateY(-1px);
         }
 
         .control-label {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
+            min-width: fit-content;
         }
 
-        .control-input {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 12px 16px;
+        .control-input, .control-select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 10px 14px;
             color: var(--text-primary);
-            font-size: 0.95em;
-            min-width: 160px;
+            font-size: 0.9em;
+            min-width: 140px;
             transition: var(--transition-smooth);
         }
 
-        .control-input:focus {
+        .control-input:focus, .control-select:focus {
             outline: none;
-            border-color: rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--accent-blue);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 0 2px rgba(0,112,243,0.1);
+        }
+
+        .control-select option {
+            background: var(--secondary-black);
+            color: var(--text-primary);
         }
 
         .btn {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: var(--text-primary);
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 0.95em;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.9em;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition-spring);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
-            background: rgba(255,255,255,0.12);
-            border-color: rgba(255,255,255,0.25);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
         }
 
         .btn-primary {
-            background: var(--primary-white);
-            color: var(--primary-black);
+            background: var(--gradient-accent);
+            border: none;
+            color: var(--primary-white);
         }
 
         .btn-primary:hover {
-            background: rgba(255,255,255,0.95);
-            color: var(--primary-black);
+            background: linear-gradient(135deg, #0056b3, #7c3aed);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
-        /* Advanced Metrics Grid */
+        /* Metrics Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
         }
 
         .metric-card {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.04);
             backdrop-filter: var(--blur-md);
             border: 1px solid var(--border-gray);
-            border-radius: 24px;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
+            border-radius: 16px;
+            padding: 30px;
             transition: var(--transition-spring);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .metric-card:hover {
-            background: rgba(255,255,255,0.04);
-            border-color: rgba(255,255,255,0.12);
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-xl);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .metric-card::before {
@@ -698,11 +619,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.03), 
-                transparent);
-            transition: left 0.8s ease;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.6s ease;
         }
 
         .metric-card:hover::before {
@@ -713,306 +631,62 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 20px;
         }
 
         .metric-title {
-            font-size: 0.95em;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .metric-icon {
-            font-size: 1.4em;
-            color: var(--text-tertiary);
-            transition: var(--transition-smooth);
-        }
-
-        .metric-card:hover .metric-icon {
-            color: var(--text-primary);
-            transform: scale(1.1);
-        }
-
-        .metric-value {
-            font-size: 3.2em;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            letter-spacing: -2px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .metric-change {
-            font-size: 0.9em;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-
-        .positive { 
-            color: var(--success);
-        }
-        
-        .negative { 
-            color: var(--error);
-        }
-        
-        .neutral { 
-            color: var(--text-tertiary);
-        }
-
-        .metric-trend {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            width: 60px;
-            height: 30px;
-            opacity: 0.3;
-        }
-
-        /* Advanced Tab System */
-        .tab-container {
-            background: rgba(255,255,255,0.015);
-            border-radius: 24px;
-            border: 1px solid var(--border-gray);
-            overflow: hidden;
-            backdrop-filter: var(--blur-sm);
-        }
-
-        .tab-header {
-            display: flex;
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border-gray);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 25px 40px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            border-bottom: 3px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tab-btn::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: var(--primary-white);
-            transition: var(--transition-spring);
-            transform: translateX(-50%);
-        }
-
-        .tab-btn.active::before {
-            width: 100%;
-        }
-
-        .tab-btn.active {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.04);
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 50px;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Ultra-Premium Tables */
-        .premium-table {
-            width: 100%;
-            background: rgba(255,255,255,0.015);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border-gray);
-            backdrop-filter: var(--blur-sm);
-        }
-
-        .premium-table th {
-            background: rgba(255,255,255,0.08);
-            padding: 25px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid var(--border-gray);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .premium-table td {
-            padding: 20px 25px;
-            color: var(--text-secondary);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-weight: 500;
-            transition: var(--transition-smooth);
-        }
-
-        .premium-table tr:hover {
-            background: rgba(255,255,255,0.025);
-        }
-
-        .premium-table tr:hover td {
-            color: var(--text-primary);
-        }
-
-        /* Advanced Charts */
-        .chart-container {
-            background: rgba(255,255,255,0.015);
-            border-radius: 24px;
-            border: 1px solid var(--border-gray);
-            padding: 40px;
-            margin: 40px 0;
-            backdrop-filter: var(--blur-sm);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        }
-
-        .chart-title {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .chart-control {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 8px 16px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition-smooth);
             font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .chart-control.active,
-        .chart-control:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        /* Advanced Loading States */
-        .loading-indicator {
-            display: none;
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .loading-indicator.show { 
-            display: block; 
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,0.08);
-            border-radius: 50%;
-            border-top-color: var(--primary-white);
-            animation: spin 1.2s linear infinite;
-            margin: 0 auto 30px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-secondary);
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-
-        /* Real-time Indicators */
-        .real-time-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: rgba(52, 199, 89, 0.1);
-            border: 1px solid rgba(52, 199, 89, 0.3);
-            border-radius: 20px;
-            font-size: 0.8em;
             font-weight: 600;
-            color: var(--success);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
+        .metric-icon {
+            font-size: 1.3em;
+            color: var(--text-disabled);
+            transition: var(--transition-smooth);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .metric-card:hover .metric-icon {
+            color: var(--accent-blue);
         }
 
-        /* Advanced Search Results */
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .metric-change {
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--error); }
+        .neutral { color: var(--text-disabled); }
+
+        /* Tab System */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Search Results */
         .search-results {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.04);
             border-radius: 16px;
             border: 1px solid var(--border-gray);
             padding: 30px;
@@ -1022,7 +696,6 @@
 
         .search-results.show {
             display: block;
-            animation: fadeInUp 0.4s ease;
         }
 
         .search-results-header {
@@ -1031,18 +704,114 @@
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
         .search-results-title {
-            font-size: 1.2em;
+            font-size: 1.3em;
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .search-results-count {
-            color: var(--text-tertiary);
+            color: var(--text-disabled);
             font-size: 0.9em;
+        }
+
+        /* Premium Tables */
+        .premium-table {
+            width: 100%;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-gray);
+        }
+
+        .premium-table th {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85em;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .premium-table td {
+            padding: 18px 20px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 500;
+        }
+
+        .premium-table tr:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .premium-table tr:hover td {
+            color: var(--text-primary);
+        }
+
+        /* Loading */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-indicator.show { display: block; }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-blue);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1em;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 2.2em;
+            }
         }
 
         /* Theme Toggle */
@@ -1052,7 +821,7 @@
             right: 30px;
             width: 50px;
             height: 50px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
             border: 1px solid var(--border-gray);
             border-radius: 50%;
             display: flex;
@@ -1065,183 +834,26 @@
         }
 
         .theme-toggle:hover {
-            background: rgba(255,255,255,0.1);
-            transform: scale(1.1);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Customer Segmentation */
-        .segmentation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .segment-card {
-            background: rgba(255,255,255,0.02);
-            border-radius: 16px;
-            border: 1px solid var(--border-gray);
-            padding: 25px;
-            text-align: center;
-            transition: var(--transition-smooth);
-        }
-
-        .segment-card:hover {
-            background: rgba(255,255,255,0.04);
-            transform: translateY(-3px);
-        }
-
-        .segment-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-        }
-
-        .segment-count {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--success);
-            margin-bottom: 10px;
-        }
-
-        .segment-description {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        /* Advanced Filters */
-        .advanced-filters {
-            background: rgba(255,255,255,0.02);
-            border-radius: 16px;
-            border: 1px solid var(--border-gray);
-            padding: 30px;
-            margin-bottom: 30px;
-            display: none;
-        }
-
-        .advanced-filters.show {
-            display: block;
-            animation: fadeInUp 0.4s ease;
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .filter-label {
-            font-size: 0.85em;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .filter-input {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: var(--text-primary);
-            font-size: 0.9em;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: var(--transition-smooth);
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 30px 20px;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .content-header {
-                flex-direction: column;
-                gap: 25px;
-                align-items: flex-start;
-            }
-
-            .page-title {
-                font-size: 2.5em;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 20px 15px;
-            }
-
-            .page-title {
-                font-size: 2em;
-            }
-
-            .metric-card {
-                padding: 25px;
-            }
-
-            .metric-value {
-                font-size: 2.5em;
-            }
-
-            .tab-content {
-                padding: 30px 20px;
-            }
-
-            .chart-container {
-                padding: 25px;
-            }
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.05);
         }
 
         /* Utility Classes */
         .hidden { display: none !important; }
         .visible { display: block !important; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-4 { gap: 1rem; }
         .text-center { text-align: center; }
         .font-bold { font-weight: 700; }
-        .opacity-50 { opacity: 0.5; }
-        
-        /* Print Styles */
-        @media print {
-            .sidebar, .theme-toggle { display: none; }
-            .main-content { margin-left: 0; }
-            * { color: black !important; background: white !important; }
-        }
     </style>
 </head>
 <body>
-    <!-- Advanced Wave Background -->
+    <!-- Wave Background -->
     <div class="wave-background">
         <div class="wave-layer"></div>
         <div class="wave-layer"></div>
         <div class="wave-layer"></div>
     </div>
 
-    <!-- Premium Loading Animation -->
+    <!-- Loading Animation -->
     <div class="loading-wave-container" id="loading-wave-container">
         <div class="loading-animation">
             <div class="loading-ring"></div>
@@ -1251,7 +863,7 @@
         <div class="loading-text">Initializing Intelligence...</div>
     </div>
 
-    <!-- Authentication Screen -->
+    <!-- Authentication -->
     <div class="auth-screen" id="auth-screen">
         <div class="auth-container">
             <div class="logo-3d-container" id="logo-3d-container"></div>
@@ -1271,30 +883,23 @@
         <span id="theme-icon">🌙</span>
     </div>
 
-    <!-- Main Dashboard -->
+    <!-- Dashboard -->
     <div class="dashboard-container" id="dashboard" style="display: none;">
         
-        <!-- Ultra-Premium Sidebar -->
+        <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">Analytics Hub</div>
                 <div class="sidebar-subtitle">Intelligence Platform</div>
             </div>
             
-            <!-- Advanced Natural Language Search -->
+            <!-- Search -->
             <div class="search-container">
                 <input type="text" 
                        class="search-input" 
                        id="search-input"
-                       placeholder="Ask anything... e.g., 'Show me products with high returns'"
+                       placeholder="Ask anything... e.g., 'declining products'"
                        autocomplete="off">
-                <div class="search-suggestions" id="search-suggestions">
-                    <div class="suggestion-item">Show me top performing products</div>
-                    <div class="suggestion-item">Which products have high cancellation rates?</div>
-                    <div class="suggestion-item">Revenue trend for last month</div>
-                    <div class="suggestion-item">Customer segmentation analysis</div>
-                    <div class="suggestion-item">Products with declining sales</div>
-                </div>
             </div>
             
             <nav class="nav-menu">
@@ -1303,7 +908,10 @@
                     <div class="nav-item active" data-tab="overview">
                         <span class="nav-icon">📊</span>
                         <span class="nav-text">Dashboard Overview</span>
-                        <span class="real-time-indicator"><span class="live-dot"></span>Live</span>
+                        <span class="real-time-indicator">
+                            <span class="live-dot"></span>
+                            Live
+                        </span>
                     </div>
                     <div class="nav-item" data-tab="products">
                         <span class="nav-icon">📦</span>
@@ -1363,7 +971,7 @@
                     <div class="header-controls">
                         <div class="control-group">
                             <span class="control-label">Period</span>
-                            <select id="period-selector" class="control-input">
+                            <select id="period-selector" class="control-select">
                                 <option value="today">Today</option>
                                 <option value="yesterday">Yesterday</option>
                                 <option value="7days">Last 7 Days</option>
@@ -1378,14 +986,11 @@
                             <span class="control-label">To</span>
                             <input type="date" id="overview-end-date" class="control-input">
                         </div>
-                        <button class="btn btn-primary" id="apply-overview">
-                            <span id="overview-btn-text">Analyze</span>
-                            <span id="overview-btn-loading" style="display: none;">⟳</span>
-                        </button>
+                        <button class="btn btn-primary" id="apply-overview">Analyze</button>
                     </div>
                 </div>
 
-                <!-- Advanced Search Results -->
+                <!-- Search Results -->
                 <div class="search-results" id="search-results">
                     <div class="search-results-header">
                         <div class="search-results-title" id="search-query-text">Search Results</div>
@@ -1399,58 +1004,8 @@
                     <div class="loading-text">Processing real-time analytics...</div>
                 </div>
 
-                <div class="metrics-grid" id="overview-metrics"></div>
-
-                <!-- Advanced Filters -->
-                <div class="advanced-filters" id="advanced-filters">
-                    <h3 style="color: var(--text-primary); margin-bottom: 25px;">Advanced Filters</h3>
-                    <div class="filter-grid">
-                        <div class="filter-group">
-                            <label class="filter-label">Order Status</label>
-                            <select class="filter-input" id="filter-status">
-                                <option value="">All Status</option>
-                                <option value="completed">Completed</option>
-                                <option value="processing">Processing</option>
-                                <option value="pending">Pending</option>
-                                <option value="canceled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Order Type</label>
-                            <select class="filter-input" id="filter-type">
-                                <option value="">All Types</option>
-                                <option value="call">Call Order</option>
-                                <option value="tele">Tele-Sales</option>
-                                <option value="web">Web</option>
-                                <option value="online">Online</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Min Revenue</label>
-                            <input type="number" class="filter-input" id="filter-min-revenue" placeholder="₹0">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Max Revenue</label>
-                            <input type="number" class="filter-input" id="filter-max-revenue" placeholder="₹1000000">
-                        </div>
-                    </div>
-                    <div style="margin-top: 20px; text-align: right;">
-                        <button class="btn" id="apply-filters">Apply Filters</button>
-                        <button class="btn" id="clear-filters" style="margin-left: 10px;">Clear All</button>
-                    </div>
-                </div>
-
-                <div class="chart-container" id="overview-charts" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                        <h3 class="chart-title">Advanced Analytics Visualization</h3>
-                        <div class="chart-controls">
-                            <div class="chart-control active" data-chart="revenue">Revenue Trends</div>
-                            <div class="chart-control" data-chart="orders">Order Volume</div>
-                            <div class="chart-control" data-chart="products">Product Performance</div>
-                            <div class="chart-control" data-chart="customers">Customer Metrics</div>
-                        </div>
-                    </div>
-                    <canvas id="main-analytics-chart" width="800" height="400"></canvas>
+                <div class="metrics-grid" id="overview-metrics">
+                    <!-- Metrics will be populated here -->
                 </div>
             </div>
 
@@ -1459,98 +1014,45 @@
                 <div class="content-header">
                     <div>
                         <h1 class="page-title">Product Intelligence</h1>
-                        <p class="page-subtitle">Deep learning insights into product performance and trends</p>
+                        <p class="page-subtitle">Deep learning insights into product performance</p>
                     </div>
                     <div class="header-controls">
                         <div class="control-group">
-                            <span class="control-label">Analysis Period</span>
-                            <select id="products-period" class="control-input">
+                            <span class="control-label">Period</span>
+                            <select id="products-period" class="control-select">
                                 <option value="7days">Last 7 Days</option>
                                 <option value="30days" selected>Last 30 Days</option>
                                 <option value="90days">Last 90 Days</option>
                                 <option value="custom">Custom Range</option>
                             </select>
                         </div>
-                        <div class="control-group" id="products-custom-range" style="display: none;">
-                            <span class="control-label">From</span>
-                            <input type="date" id="products-start-date" class="control-input">
-                            <span class="control-label">To</span>
-                            <input type="date" id="products-end-date" class="control-input">
-                        </div>
                         <button class="btn btn-primary" id="analyze-products">Deep Analysis</button>
-                        <button class="btn" id="toggle-advanced-filters">Advanced Filters</button>
                     </div>
                 </div>
 
                 <div class="loading-indicator" id="products-loading">
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Processing product intelligence...</div>
+                    <div class="loading-text">Analyzing product intelligence...</div>
                 </div>
 
-                <div class="tab-container" id="products-results" style="display: none;">
-                    <div class="tab-header">
-                        <button class="tab-btn active" data-subtab="performance">Performance Matrix</button>
-                        <button class="tab-btn" data-subtab="trends">Trend Analysis</button>
-                        <button class="tab-btn" data-subtab="forecasting">Sales Forecasting</button>
-                        <button class="tab-btn" data-subtab="inventory">Inventory Intelligence</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="subtab-performance">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                            <h3>Product Performance Matrix</h3>
-                            <div class="flex gap-4">
-                                <button class="btn" id="export-all-products">Export All Data</button>
-                                <button class="btn" id="export-top-products">Export Top 100</button>
-                            </div>
-                        </div>
-                        <table class="premium-table" id="products-performance-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>SKU</th>
-                                    <th>Product Name</th>
-                                    <th>Sales Volume</th>
-                                    <th>Revenue</th>
-                                    <th>Growth Rate</th>
-                                    <th>Profit Margin</th>
-                                    <th>Market Share</th>
-                                    <th>Risk Score</th>
-                                    <th>Trend</th>
-                                </tr>
-                            </thead>
-                            <tbody id="products-performance-tbody">
-                                <tr><td colspan="10" style="text-align: center; padding: 60px;">Select analysis period to view comprehensive data</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="tab-content" id="subtab-trends">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Advanced Trend Analysis</h3>
-                            <canvas id="products-trend-chart" width="800" height="400"></canvas>
-                        </div>
-                        <div class="segmentation-grid" id="trend-insights"></div>
-                    </div>
-                    
-                    <div class="tab-content" id="subtab-forecasting">
-                        <div class="chart-container">
-                            <h3 class="chart-title">AI-Powered Sales Forecasting</h3>
-                            <div class="chart-controls">
-                                <div class="chart-control active" data-forecast="30days">30 Days</div>
-                                <div class="chart-control" data-forecast="90days">90 Days</div>
-                                <div class="chart-control" data-forecast="12months">12 Months</div>
-                            </div>
-                            <canvas id="forecasting-chart" width="800" height="400"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="subtab-inventory">
-                        <div class="metrics-grid" id="inventory-metrics"></div>
-                        <div class="chart-container">
-                            <h3 class="chart-title">Inventory Intelligence Dashboard</h3>
-                            <canvas id="inventory-chart" width="800" height="400"></canvas>
-                        </div>
-                    </div>
+                <div id="products-results">
+                    <table class="premium-table" id="products-performance-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>SKU</th>
+                                <th>Product Name</th>
+                                <th>Sales Volume</th>
+                                <th>Revenue</th>
+                                <th>Growth Rate</th>
+                                <th>Market Share</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-performance-tbody">
+                            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-disabled);">Click "Deep Analysis" to view comprehensive product data</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -1562,16 +1064,7 @@
                         <p class="page-subtitle">RFM Analysis and advanced customer segmentation</p>
                     </div>
                     <div class="header-controls">
-                        <div class="control-group">
-                            <span class="control-label">Segmentation Model</span>
-                            <select id="segmentation-model" class="control-input">
-                                <option value="rfm" selected>RFM Analysis</option>
-                                <option value="behavioral">Behavioral</option>
-                                <option value="geographic">Geographic</option>
-                                <option value="demographic">Demographic</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary" id="run-segmentation">Run Analysis</button>
+                        <button class="btn btn-primary" id="run-segmentation">Run RFM Analysis</button>
                     </div>
                 </div>
 
@@ -1580,72 +1073,110 @@
                     <div class="loading-text">Processing customer intelligence...</div>
                 </div>
 
-                <div id="customers-results" style="display: none;">
-                    <div class="segmentation-grid" id="rfm-segments">
-                        <div class="segment-card">
-                            <div class="segment-title">Champions</div>
-                            <div class="segment-count">247</div>
-                            <div class="segment-description">High value customers who purchase frequently and recently</div>
-                        </div>
-                        <div class="segment-card">
-                            <div class="segment-title">Loyal Customers</div>
-                            <div class="segment-count">89</div>
-                            <div class="segment-description">Regular customers with good purchase frequency</div>
-                        </div>
-                        <div class="segment-card">
-                            <div class="segment-title">Potential Loyalists</div>
-                            <div class="segment-count">156</div>
-                            <div class="segment-description">Recent customers with potential for growth</div>
-                        </div>
-                        <div class="segment-card">
-                            <div class="segment-title">At Risk</div>
-                            <div class="segment-count">67</div>
-                            <div class="segment-description">Previously high-value customers showing decline</div>
-                        </div>
-                        <div class="segment-card">
-                            <div class="segment-title">Hibernating</div>
-                            <div class="segment-count">23</div>
-                            <div class="segment-description">Inactive customers who haven't purchased recently</div>
-                        </div>
-                        <div class="segment-card">
-                            <div class="segment-title">Lost Customers</div>
-                            <div class="segment-count">45</div>
-                            <div class="segment-description">Customers who haven't engaged for long periods</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3 class="chart-title">Customer Lifecycle Analysis</h3>
-                        <canvas id="customer-lifecycle-chart" width="800" height="400"></canvas>
+                <div id="customers-results">
+                    <div style="text-align: center; padding: 60px; color: var(--text-disabled);">
+                        <div style="font-size: 1.5em; margin-bottom: 15px;">👥</div>
+                        <div>Customer segmentation data will appear here</div>
+                        <div style="margin-top: 10px; font-size: 0.9em;">Click "Run RFM Analysis" to start</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Other tabs continue with similar enhancements... -->
-            <!-- I'll continue with the remaining tabs in the next part -->
-            
+            <!-- Other tabs with placeholder content -->
+            <div class="tab-content" id="tab-trends">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Trend Analysis</h1>
+                        <p class="page-subtitle">Industry benchmarking and trend insights</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">📈</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Trend Analysis Coming Soon</div>
+                    <div>Advanced trend detection and industry benchmarking</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-forecasting">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Predictive Forecasting</h1>
+                        <p class="page-subtitle">AI-powered sales and revenue predictions</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">🔮</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">AI Forecasting Module</div>
+                    <div>Machine learning predictions for business planning</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-cancellations">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Risk Analysis</h1>
+                        <p class="page-subtitle">Cancellation patterns and risk assessment</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">❌</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Risk Analysis Dashboard</div>
+                    <div>Identify and mitigate business risks</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-comparison">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Smart Compare</h1>
+                        <p class="page-subtitle">Advanced period-to-period analysis</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">⚖️</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Smart Comparison Engine</div>
+                    <div>Comprehensive comparative analytics</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-realtime">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Real-time Monitor</h1>
+                        <p class="page-subtitle">Live business activity monitoring</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">⚡</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Real-time Dashboard</div>
+                    <div>Live monitoring of business activities</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-reports">
+                <div class="content-header">
+                    <div>
+                        <h1 class="page-title">Export Center</h1>
+                        <p class="page-subtitle">Generate comprehensive analytics reports</p>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 80px; color: var(--text-disabled);">
+                    <div style="font-size: 2em; margin-bottom: 20px;">📋</div>
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Report Generation Center</div>
+                    <div>Export detailed analytics and insights</div>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <script>
-        // Enhanced Configuration with Real-time Features
+        // Configuration
+        const API_ENDPOINT = '/.netlify/functions/magento-api';
+        const PRODUCT_API_ENDPOINT = '/.netlify/functions/product-analytics';
+        const CUSTOMER_API_ENDPOINT = '/.netlify/functions/customer-analytics';
+        
         const CONFIG = {
-            API_ENDPOINTS: {
-                primary: '/.netlify/functions/magento-api',
-                products: '/.netlify/functions/product-analytics',
-                customers: '/.netlify/functions/customer-analytics',
-                cancellations: '/.netlify/functions/cancellation-analytics',
-                trends: '/.netlify/functions/trend-analysis',
-                forecasting: '/.netlify/functions/ai-forecasting',
-                realtime: '/.netlify/functions/realtime-data'
-            },
-            WEBSOCKET_URL: 'wss://your-realtime-endpoint.com',
-            REFRESH_INTERVALS: {
-                overview: 30000,    // 30 seconds
-                products: 300000,   // 5 minutes
-                customers: 600000,  // 10 minutes
-                trends: 900000      // 15 minutes
-            },
             CREDENTIALS: { 
                 'blade': 'pb@109$', 
                 'kulehi': 'imdumbass', 
@@ -1654,181 +1185,51 @@
             }
         };
         
-        // Advanced State Management
-        class AnalyticsState {
-            constructor() {
-                this.data = {
-                    overview: null,
-                    products: null,
-                    customers: null,
-                    trends: null,
-                    realtime: null
-                };
-                this.cache = new Map();
-                this.subscribers = new Map();
-                this.websocket = null;
-            }
-            
-            subscribe(key, callback) {
-                if (!this.subscribers.has(key)) {
-                    this.subscribers.set(key, []);
-                }
-                this.subscribers.get(key).push(callback);
-            }
-            
-            notify(key, data) {
-                if (this.subscribers.has(key)) {
-                    this.subscribers.get(key).forEach(callback => callback(data));
-                }
-            }
-            
-            set(key, value) {
-                this.data[key] = value;
-                this.notify(key, value);
-            }
-            
-            get(key) {
-                return this.data[key];
-            }
-            
-            initWebSocket() {
-                if ('WebSocket' in window) {
-                    this.websocket = new WebSocket(CONFIG.WEBSOCKET_URL);
-                    this.websocket.onmessage = (event) => {
-                        const data = JSON.parse(event.data);
-                        this.handleRealtimeUpdate(data);
-                    };
-                }
-            }
-            
-            handleRealtimeUpdate(data) {
-                if (data.type === 'order_update') {
-                    this.updateRealtimeMetrics(data);
-                    this.showRealtimeNotification(data);
-                }
-            }
-            
-            updateRealtimeMetrics(data) {
-                const currentData = this.get('overview');
-                if (currentData) {
-                    // Update metrics in real-time
-                    if (data.action === 'new_order') {
-                        currentData.totalOrders++;
-                        currentData.totalRevenue += data.amount;
-                    }
-                    this.set('overview', currentData);
-                }
-            }
-            
-            showRealtimeNotification(data) {
-                const notification = document.createElement('div');
-                notification.className = 'realtime-notification';
-                notification.innerHTML = `
-                    <div class="notification-content">
-                        <span class="notification-icon">${data.action === 'new_order' ? '🛒' : '📦'}</span>
-                        <span class="notification-text">${data.message}</span>
-                        <span class="notification-amount">₹${data.amount.toLocaleString('en-IN')}</span>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                setTimeout(() => notification.classList.add('show'), 100);
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => document.body.removeChild(notification), 300);
-                }, 4000);
-            }
-        }
-        
-        // Initialize Advanced State
-        const state = new AnalyticsState();
-        
-        // Advanced 3D Logo with Real-time Animations
-        let scene, camera, renderer, logoMesh, particleSystem;
+        // State management
+        let scene, camera, renderer, logoMesh;
         let mouse = { x: 0, y: 0 };
-        
+        let currentData = null;
+
+        // 3D Logo
         function init3DLogo() {
             const container = document.getElementById('logo-3d-container');
             if (!container) return;
 
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, 140/105, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(75, 120/90, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(140, 105);
+            renderer.setSize(120, 90);
             renderer.setClearColor(0x000000, 0);
             container.appendChild(renderer.domElement);
 
-            // Create advanced geometric logo
-            const geometry = new THREE.IcosahedronGeometry(1, 1);
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
             const material = new THREE.MeshPhongMaterial({ 
-                color: 0xffffff,
+                color: 0x0070f3,
                 shininess: 100,
                 transparent: true,
-                opacity: 0.9,
-                wireframe: false
+                opacity: 0.8
             });
             
             logoMesh = new THREE.Mesh(geometry, material);
             scene.add(logoMesh);
 
-            // Add particle system
-            createParticleSystem();
-
-            // Enhanced lighting
             const light1 = new THREE.DirectionalLight(0xffffff, 1);
             light1.position.set(1, 1, 1);
             scene.add(light1);
             
             const light2 = new THREE.AmbientLight(0xffffff, 0.4);
             scene.add(light2);
-            
-            const light3 = new THREE.PointLight(0xffffff, 0.8, 100);
-            light3.position.set(-50, 50, 50);
-            scene.add(light3);
 
-            camera.position.z = 3.5;
+            camera.position.z = 3;
             animate3DLogo();
-        }
-
-        function createParticleSystem() {
-            const particleCount = 50;
-            const particles = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 10;
-            }
-            
-            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0xffffff,
-                size: 0.05,
-                transparent: true,
-                opacity: 0.6
-            });
-            
-            particleSystem = new THREE.Points(particles, particleMaterial);
-            scene.add(particleSystem);
         }
 
         function animate3DLogo() {
             requestAnimationFrame(animate3DLogo);
             
             if (logoMesh) {
-                const targetRotationX = (mouse.y - 0.5) * 0.4;
-                const targetRotationY = (mouse.x - 0.5) * 0.4;
-                
-                logoMesh.rotation.x += (targetRotationX - logoMesh.rotation.x) * 0.1;
-                logoMesh.rotation.y += (targetRotationY - logoMesh.rotation.y) * 0.1;
-                logoMesh.rotation.z += 0.005;
-                
-                logoMesh.position.y = Math.sin(Date.now() * 0.001) * 0.1;
-            }
-            
-            if (particleSystem) {
-                particleSystem.rotation.y += 0.001;
-                particleSystem.rotation.x += 0.0005;
+                logoMesh.rotation.x += 0.01;
+                logoMesh.rotation.y += 0.01;
             }
             
             if (renderer) {
@@ -1836,34 +1237,23 @@
             }
         }
 
-        // Enhanced Mouse Tracking
-        document.addEventListener('mousemove', (event) => {
-            if (document.getElementById('auth-screen').style.display !== 'none') {
-                mouse.x = event.clientX / window.innerWidth;
-                mouse.y = event.clientY / window.innerHeight;
-            }
-        });
-
-        // Advanced Authentication with Loading Animation
+        // Authentication
         document.getElementById('auth-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
             if (CONFIG.CREDENTIALS[username] && CONFIG.CREDENTIALS[username] === password) {
-                // Show advanced loading animation
+                // Show loading
                 document.getElementById('loading-wave-container').classList.add('show');
-                
-                // Simulate advanced initialization
-                await simulateAdvancedInit();
                 
                 setTimeout(() => {
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('loading-wave-container').classList.remove('show');
                     document.getElementById('dashboard').style.display = 'flex';
                     document.getElementById('theme-toggle').style.display = 'flex';
-                    initAdvancedDashboard();
-                }, 3000);
+                    initDashboard();
+                }, 2000);
             } else {
                 const errorMsg = document.getElementById('error-message');
                 errorMsg.classList.add('show');
@@ -1871,235 +1261,354 @@
             }
         });
 
-        async function simulateAdvancedInit() {
-            const steps = [
-                'Connecting to intelligence systems...',
-                'Loading predictive models...',
-                'Initializing real-time analytics...',
-                'Preparing advanced visualizations...',
-                'Finalizing dashboard components...'
-            ];
-            
-            const loadingText = document.querySelector('.loading-text');
-            
-            for (let i = 0; i < steps.length; i++) {
-                loadingText.textContent = steps[i];
-                await new Promise(resolve => setTimeout(resolve, 600));
-            }
-        }
-
-        // Advanced Dashboard Initialization
-        function initAdvancedDashboard() {
+        // Dashboard Initialization
+        function initDashboard() {
+            console.log('Initializing dashboard...');
             setupDateDefaults();
-            setupAdvancedNavigation();
-            setupNaturalLanguageSearch();
-            setupTabSwitching();
-            setupRealtimeUpdates();
-            setupAdvancedFilters();
-            loadInitialData();
+            setupNavigation();
+            setupSearchFunctionality();
+            loadInitialOverviewData();
             
-            // Initialize WebSocket for real-time updates
-            state.initWebSocket();
-            
-            // Set up periodic data refresh
-            setupPeriodicRefresh();
+            // Event listeners
+            document.getElementById('apply-overview').addEventListener('click', loadOverviewData);
+            document.getElementById('analyze-products').addEventListener('click', loadProductData);
+            document.getElementById('run-segmentation').addEventListener('click', loadCustomerData);
+            document.getElementById('period-selector').addEventListener('change', handlePeriodChange);
         }
 
         function setupDateDefaults() {
             const today = new Date().toISOString().split('T')[0];
             const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
             
-            // Set default dates for all sections
             document.getElementById('overview-start-date').value = firstOfMonth;
             document.getElementById('overview-end-date').value = today;
-            document.getElementById('products-start-date').value = firstOfMonth;
-            document.getElementById('products-end-date').value = today;
         }
 
-        function setupAdvancedNavigation() {
+        function setupNavigation() {
+            console.log('Setting up navigation...');
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    // Advanced navigation with smooth transitions
+                    console.log('Nav item clicked:', item.dataset.tab);
+                    
+                    // Remove active class from all nav items
                     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    // Add active class to clicked item
                     item.classList.add('active');
                     
+                    // Hide all tab contents
                     document.querySelectorAll('.tab-content').forEach(tab => {
                         tab.classList.remove('active');
-                        tab.style.opacity = '0';
-                        tab.style.transform = 'translateY(20px)';
                     });
                     
+                    // Show selected tab
                     const tabId = 'tab-' + item.dataset.tab;
                     const targetTab = document.getElementById(tabId);
-                    
-                    setTimeout(() => {
+                    if (targetTab) {
                         targetTab.classList.add('active');
-                        targetTab.style.opacity = '1';
-                        targetTab.style.transform = 'translateY(0)';
-                        
-                        // Load data for the selected tab
-                        loadTabData(item.dataset.tab);
-                    }, 150);
-                });
-            });
-        }
-
-        // Natural Language Search Implementation
-        function setupNaturalLanguageSearch() {
-            const searchInput = document.getElementById('search-input');
-            const searchSuggestions = document.getElementById('search-suggestions');
-            const searchResults = document.getElementById('search-results');
-            
-            // Advanced NLP patterns
-            const nlpPatterns = [
-                {
-                    pattern: /show.*products.*high.*return/i,
-                    action: () => showHighReturnProducts()
-                },
-                {
-                    pattern: /products.*declining.*sales/i,
-                    action: () => showDecliningProducts()
-                },
-                {
-                    pattern: /top.*performing.*products/i,
-                    action: () => showTopProducts()
-                },
-                {
-                    pattern: /cancellation.*rate/i,
-                    action: () => showCancellationAnalysis()
-                },
-                {
-                    pattern: /revenue.*trend/i,
-                    action: () => showRevenueTrends()
-                },
-                {
-                    pattern: /customer.*segmentation/i,
-                    action: () => showCustomerSegmentation()
-                }
-            ];
-            
-            searchInput.addEventListener('focus', () => {
-                searchSuggestions.classList.add('show');
-            });
-            
-            searchInput.addEventListener('blur', (e) => {
-                // Delay hiding to allow clicking suggestions
-                setTimeout(() => {
-                    searchSuggestions.classList.remove('show');
-                }, 200);
-            });
-            
-            searchInput.addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter') {
-                    const query = searchInput.value.trim();
-                    if (query) {
-                        await processNaturalLanguageQuery(query, nlpPatterns);
+                        console.log('Showing tab:', tabId);
+                    } else {
+                        console.error('Tab not found:', tabId);
                     }
-                }
-            });
-            
-            // Add click handlers for suggestions
-            document.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', async () => {
-                    searchInput.value = item.textContent;
-                    await processNaturalLanguageQuery(item.textContent, nlpPatterns);
                 });
             });
         }
 
-        async function processNaturalLanguageQuery(query, patterns) {
+        function setupSearchFunctionality() {
+            const searchInput = document.getElementById('search-input');
             const searchResults = document.getElementById('search-results');
             const searchQueryText = document.getElementById('search-query-text');
             const searchResultsContent = document.getElementById('search-results-content');
             
-            searchQueryText.textContent = `"${query}"`;
-            searchResults.classList.add('show');
-            
-            // Show loading state
-            searchResultsContent.innerHTML = `
-                <div class="loading-indicator show">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text">Processing your query...</div>
-                </div>
-            `;
-            
-            // Find matching pattern
-            let actionExecuted = false;
-            for (const patternObj of patterns) {
-                if (patternObj.pattern.test(query)) {
-                    await patternObj.action();
-                    actionExecuted = true;
-                    break;
+            searchInput.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim().toLowerCase();
+                    if (query) {
+                        console.log('Search query:', query);
+                        searchQueryText.textContent = `"${query}"`;
+                        searchResults.classList.add('show');
+                        
+                        // Process search query
+                        if (query.includes('declining') || query.includes('decline')) {
+                            await showDecliningProducts();
+                        } else if (query.includes('top') || query.includes('best') || query.includes('performing')) {
+                            await showTopProducts();
+                        } else if (query.includes('cancel') || query.includes('return')) {
+                            await showHighReturnProducts();
+                        } else {
+                            searchResultsContent.innerHTML = `
+                                <div style="text-align: center; padding: 40px; color: var(--text-disabled);">
+                                    <div style="font-size: 1.2em; margin-bottom: 15px;">🤖</div>
+                                    <div>I'm learning to understand that query.</div>
+                                    <div style="margin-top: 10px; font-size: 0.9em;">Try: "declining products", "top products", or "cancellations"</div>
+                                </div>
+                            `;
+                        }
+                    }
                 }
-            }
+            });
+        }
+
+        function handlePeriodChange() {
+            const period = document.getElementById('period-selector').value;
+            const customRange = document.getElementById('custom-range');
             
-            if (!actionExecuted) {
-                // Generic search fallback
-                searchResultsContent.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                        <div style="font-size: 1.2em; margin-bottom: 15px;">🤖</div>
-                        <div>I'm still learning to understand that query.</div>
-                        <div style="margin-top: 10px; font-size: 0.9em;">Try asking about products, revenue trends, or cancellations.</div>
+            if (period === 'custom') {
+                customRange.style.display = 'flex';
+            } else {
+                customRange.style.display = 'none';
+                // Auto-set dates based on period
+                const today = new Date();
+                const endDate = today.toISOString().split('T')[0];
+                let startDate;
+                
+                switch(period) {
+                    case 'today':
+                        startDate = endDate;
+                        break;
+                    case 'yesterday':
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        startDate = yesterday.toISOString().split('T')[0];
+                        break;
+                    case '7days':
+                        const week = new Date(today);
+                        week.setDate(week.getDate() - 7);
+                        startDate = week.toISOString().split('T')[0];
+                        break;
+                    case '30days':
+                        const month = new Date(today);
+                        month.setDate(month.getDate() - 30);
+                        startDate = month.toISOString().split('T')[0];
+                        break;
+                    case '90days':
+                        const quarter = new Date(today);
+                        quarter.setDate(quarter.getDate() - 90);
+                        startDate = quarter.toISOString().split('T')[0];
+                        break;
+                }
+                
+                document.getElementById('overview-start-date').value = startDate;
+                document.getElementById('overview-end-date').value = endDate;
+            }
+        }
+
+        // Data Loading Functions
+        function loadInitialOverviewData() {
+            console.log('Loading initial overview data...');
+            showSimulatedOverviewData();
+        }
+
+        async function loadOverviewData() {
+            console.log('Loading overview data...');
+            const loading = document.getElementById('overview-loading');
+            const metrics = document.getElementById('overview-metrics');
+            
+            loading.classList.add('show');
+            metrics.innerHTML = '';
+            
+            try {
+                // Try to fetch real data, fallback to simulated
+                const startDate = document.getElementById('overview-start-date').value;
+                const endDate = document.getElementById('overview-end-date').value;
+                
+                const response = await fetch(`${API_ENDPOINT}?date=${startDate}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        displayOverviewMetrics(data);
+                        updateSubtitle(`${startDate} to ${endDate} • Live Data`);
+                    } else {
+                        throw new Error('API returned unsuccessful response');
+                    }
+                } else {
+                    throw new Error('API request failed');
+                }
+            } catch (error) {
+                console.warn('Using simulated data:', error.message);
+                showSimulatedOverviewData();
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        function showSimulatedOverviewData() {
+            const simulatedData = {
+                totalOrders: 145,
+                totalRevenue: 485000,
+                completedOrders: 132,
+                pendingOrders: 8,
+                cancelledOrders: 5,
+                averageOrderValue: 3345,
+                successRate: 91.0,
+                codOrders: 89,
+                onlineOrders: 56
+            };
+            
+            displayOverviewMetrics(simulatedData);
+            updateSubtitle('Last 30 Days • Simulated Data');
+        }
+
+        function displayOverviewMetrics(data) {
+            const container = document.getElementById('overview-metrics');
+            
+            const metrics = [
+                { 
+                    title: 'Total Orders', 
+                    value: data.totalOrders.toLocaleString('en-IN'), 
+                    icon: '📦', 
+                    change: '+12.5%', 
+                    type: 'positive' 
+                },
+                { 
+                    title: 'Net Revenue', 
+                    value: `₹${data.totalRevenue.toLocaleString('en-IN')}`, 
+                    icon: '💰', 
+                    change: '+8.3%', 
+                    type: 'positive' 
+                },
+                { 
+                    title: 'Success Rate', 
+                    value: `${data.successRate}%`, 
+                    icon: '✅', 
+                    change: '+2.1%', 
+                    type: 'positive' 
+                },
+                { 
+                    title: 'Avg Order Value', 
+                    value: `₹${data.averageOrderValue.toLocaleString('en-IN')}`, 
+                    icon: '💸', 
+                    change: '-1.2%', 
+                    type: 'negative' 
+                },
+                { 
+                    title: 'Completed Orders', 
+                    value: data.completedOrders.toLocaleString('en-IN'), 
+                    icon: '✨', 
+                    change: '+15.8%', 
+                    type: 'positive' 
+                },
+                { 
+                    title: 'Pending Orders', 
+                    value: data.pendingOrders.toLocaleString('en-IN'), 
+                    icon: '⏳', 
+                    change: '-5.2%', 
+                    type: 'positive' 
+                }
+            ];
+            
+            container.innerHTML = metrics.map(metric => `
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">${metric.title}</div>
+                        <div class="metric-icon">${metric.icon}</div>
+                    </div>
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-change ${metric.type}">
+                        ${metric.change} from last period
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('Overview metrics displayed');
+        }
+
+        async function loadProductData() {
+            console.log('Loading product data...');
+            const loading = document.getElementById('products-loading');
+            const tbody = document.getElementById('products-performance-tbody');
+            
+            loading.classList.add('show');
+            
+            try {
+                // Show simulated product data
+                const simulatedProducts = [
+                    { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2, marketShare: 12.3, trend: '📈' },
+                    { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7, marketShare: 10.6, trend: '📈' },
+                    { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1, marketShare: 10.1, trend: '📈' },
+                    { sku: 'DENT004', name: 'LED Curing System Pro', sales: 115, revenue: 345000, growth: 28.9, marketShare: 9.1, trend: '📈' },
+                    { sku: 'DENT005', name: 'Surgical Kit Deluxe', sales: 98, revenue: 294000, growth: 25.4, marketShare: 7.7, trend: '📈' }
+                ];
+                
+                tbody.innerHTML = simulatedProducts.map((product, index) => `
+                    <tr>
+                        <td><strong>${index + 1}</strong></td>
+                        <td><code style="background: rgba(0,112,243,0.2); padding: 4px 8px; border-radius: 4px; color: var(--accent-blue);">${product.sku}</code></td>
+                        <td>${product.name}</td>
+                        <td><strong>${product.sales}</strong></td>
+                        <td><strong>₹${product.revenue.toLocaleString('en-IN')}</strong></td>
+                        <td><strong style="color: var(--success)">+${product.growth}%</strong></td>
+                        <td>${product.marketShare}%</td>
+                        <td style="font-size: 1.2em;">${product.trend}</td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Product data error:', error);
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--error);">Error loading product data</td></tr>';
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        async function loadCustomerData() {
+            console.log('Loading customer data...');
+            const loading = document.getElementById('customers-loading');
+            const results = document.getElementById('customers-results');
+            
+            loading.classList.add('show');
+            
+            setTimeout(() => {
+                results.innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Champions</div>
+                                <div class="metric-icon">👑</div>
+                            </div>
+                            <div class="metric-value">247</div>
+                            <div class="metric-change positive">High value customers</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Loyal Customers</div>
+                                <div class="metric-icon">❤️</div>
+                            </div>
+                            <div class="metric-value">89</div>
+                            <div class="metric-change positive">Regular purchasers</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">At Risk</div>
+                                <div class="metric-icon">⚠️</div>
+                            </div>
+                            <div class="metric-value">67</div>
+                            <div class="metric-change negative">Need attention</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">New Customers</div>
+                                <div class="metric-icon">🆕</div>
+                            </div>
+                            <div class="metric-value">156</div>
+                            <div class="metric-change positive">Recent acquisitions</div>
+                        </div>
                     </div>
                 `;
-            }
+                loading.classList.remove('show');
+            }, 1500);
         }
 
-        // NLP Action Functions
-        async function showHighReturnProducts() {
-            const content = document.getElementById('search-results-content');
-            const fakeData = generateHighReturnProductsData();
-            
-            content.innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <h4 style="color: var(--text-primary); margin-bottom: 15px;">Products with High Return Rates</h4>
-                    <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 20px;">
-                        Found ${fakeData.length} products with return rates above 15%
-                    </div>
-                </div>
-                <table class="premium-table">
-                    <thead>
-                        <tr>
-                            <th>SKU</th>
-                            <th>Product Name</th>
-                            <th>Return Rate</th>
-                            <th>Total Returns</th>
-                            <th>Revenue Impact</th>
-                            <th>Risk Level</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${fakeData.map(product => `
-                            <tr>
-                                <td><code style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">${product.sku}</code></td>
-                                <td>${product.name}</td>
-                                <td><strong style="color: ${product.returnRate > 25 ? 'var(--error)' : product.returnRate > 15 ? 'var(--warning)' : 'var(--success)'}">${product.returnRate}%</strong></td>
-                                <td>${product.returns}</td>
-                                <td>₹${product.impact.toLocaleString('en-IN')}</td>
-                                <td><span style="color: ${product.returnRate > 25 ? 'var(--error)' : product.returnRate > 15 ? 'var(--warning)' : 'var(--success)'}; font-weight: bold;">${product.returnRate > 25 ? 'High' : product.returnRate > 15 ? 'Medium' : 'Low'}</span></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn" onclick="exportSearchResults('high-return-products')">Export Results</button>
-                </div>
-            `;
-            
-            document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
-        }
-
+        // Search Results Functions
         async function showDecliningProducts() {
             const content = document.getElementById('search-results-content');
-            const fakeData = generateDecliningProductsData();
+            const fakeData = [
+                { sku: 'DENT189', name: 'Legacy X-Ray System', currentSales: 12, previousSales: 45, decline: 73.3, impact: 165000 },
+                { sku: 'DENT234', name: 'Old Model Autoclave', currentSales: 8, previousSales: 28, decline: 71.4, impact: 120000 },
+                { sku: 'DENT345', name: 'Traditional Impression Kit', currentSales: 15, previousSales: 42, decline: 64.3, impact: 135000 }
+            ];
             
             content.innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <h4 style="color: var(--text-primary); margin-bottom: 15px;">Products with Declining Sales</h4>
-                    <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 20px;">
-                        Identified ${fakeData.length} products showing negative growth trends
-                    </div>
-                </div>
                 <table class="premium-table">
                     <thead>
                         <tr>
@@ -2109,26 +1618,21 @@
                             <th>Previous Sales</th>
                             <th>Decline %</th>
                             <th>Revenue Impact</th>
-                            <th>Action Needed</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${fakeData.map(product => `
                             <tr>
-                                <td><code style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">${product.sku}</code></td>
+                                <td><code style="background: rgba(255,71,87,0.2); padding: 4px 8px; border-radius: 4px; color: var(--error);">${product.sku}</code></td>
                                 <td>${product.name}</td>
                                 <td>${product.currentSales}</td>
                                 <td>${product.previousSales}</td>
                                 <td><strong style="color: var(--error)">${product.decline}%</strong></td>
                                 <td>₹${product.impact.toLocaleString('en-IN')}</td>
-                                <td><span style="color: ${product.decline > 40 ? 'var(--error)' : 'var(--warning)'}; font-weight: bold;">${product.decline > 40 ? 'Critical' : 'Monitor'}</span></td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
-                <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn" onclick="exportSearchResults('declining-products')">Export Results</button>
-                </div>
             `;
             
             document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
@@ -2136,15 +1640,13 @@
 
         async function showTopProducts() {
             const content = document.getElementById('search-results-content');
-            const fakeData = generateTopProductsData();
+            const fakeData = [
+                { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2 },
+                { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7 },
+                { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1 }
+            ];
             
             content.innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <h4 style="color: var(--text-primary); margin-bottom: 15px;">Top Performing Products</h4>
-                    <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 20px;">
-                        Showing top ${fakeData.length} products by revenue performance
-                    </div>
-                </div>
                 <table class="premium-table">
                     <thead>
                         <tr>
@@ -2154,394 +1656,73 @@
                             <th>Sales Volume</th>
                             <th>Revenue</th>
                             <th>Growth Rate</th>
-                            <th>Market Share</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${fakeData.map((product, index) => `
                             <tr>
                                 <td><strong>${index + 1}</strong></td>
-                                <td><code style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">${product.sku}</code></td>
+                                <td><code style="background: rgba(0,255,136,0.2); padding: 4px 8px; border-radius: 4px; color: var(--success);">${product.sku}</code></td>
                                 <td>${product.name}</td>
                                 <td>${product.sales}</td>
                                 <td><strong>₹${product.revenue.toLocaleString('en-IN')}</strong></td>
                                 <td><strong style="color: var(--success)">+${product.growth}%</strong></td>
-                                <td>${product.marketShare}%</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
-                <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn" onclick="exportSearchResults('top-products')">Export Results</button>
-                </div>
             `;
             
             document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
         }
 
-        // Data Generation Functions for NLP Results
-        function generateHighReturnProductsData() {
-            return [
+        async function showHighReturnProducts() {
+            const content = document.getElementById('search-results-content');
+            const fakeData = [
                 { sku: 'DENT023', name: 'Budget Dental Kit Pro', returnRate: 28.5, returns: 45, impact: 135000 },
-                { sku: 'DENT045', name: 'Basic Cleaning Set', returnRate: 22.1, returns: 32, impact: 96000 },
-                { sku: 'DENT078', name: 'Student Practice Kit', returnRate: 19.8, returns: 28, impact: 84000 },
-                { sku: 'DENT092', name: 'Portable Scaler Unit', returnRate: 17.3, returns: 21, impact: 73500 },
-                { sku: 'DENT156', name: 'Entry Level Forceps', returnRate: 16.2, returns: 18, impact: 54000 }
-            ];
-        }
-
-        function generateDecliningProductsData() {
-            return [
-                { sku: 'DENT189', name: 'Legacy X-Ray System', currentSales: 12, previousSales: 45, decline: 73.3, impact: 165000 },
-                { sku: 'DENT234', name: 'Old Model Autoclave', currentSales: 8, previousSales: 28, decline: 71.4, impact: 120000 },
-                { sku: 'DENT345', name: 'Traditional Impression Kit', currentSales: 15, previousSales: 42, decline: 64.3, impact: 135000 },
-                { sku: 'DENT456', name: 'Analog Compressor', currentSales: 23, previousSales: 58, decline: 60.3, impact: 175000 },
-                { sku: 'DENT567', name: 'Manual Dental Chair', currentSales: 6, previousSales: 15, decline: 60.0, impact: 90000 }
-            ];
-        }
-
-        function generateTopProductsData() {
-            return [
-                { sku: 'DENT001', name: 'Premium Dental Suite Pro', sales: 156, revenue: 468000, growth: 45.2, marketShare: 12.3 },
-                { sku: 'DENT002', name: 'Digital X-Ray Advanced', sales: 134, revenue: 402000, growth: 38.7, marketShare: 10.6 },
-                { sku: 'DENT003', name: 'Ultrasonic Scaler Elite', sales: 128, revenue: 384000, growth: 32.1, marketShare: 10.1 },
-                { sku: 'DENT004', name: 'LED Curing System Pro', sales: 115, revenue: 345000, growth: 28.9, marketShare: 9.1 },
-                { sku: 'DENT005', name: 'Surgical Kit Deluxe', sales: 98, revenue: 294000, growth: 25.4, marketShare: 7.7 }
-            ];
-        }
-
-        // Setup Periodic Refresh for Real-time Data
-        function setupPeriodicRefresh() {
-            // Overview data refresh every 30 seconds
-            setInterval(() => {
-                if (document.querySelector('.nav-item[data-tab="overview"]').classList.contains('active')) {
-                    refreshOverviewData();
-                }
-            }, CONFIG.REFRESH_INTERVALS.overview);
-            
-            // Products data refresh every 5 minutes
-            setInterval(() => {
-                if (document.querySelector('.nav-item[data-tab="products"]').classList.contains('active')) {
-                    refreshProductData();
-                }
-            }, CONFIG.REFRESH_INTERVALS.products);
-        }
-
-        async function refreshOverviewData() {
-            // Silently update data in background
-            try {
-                const currentData = state.get('overview');
-                if (currentData) {
-                    // Add small random variations to simulate real-time changes
-                    currentData.totalOrders += Math.floor(Math.random() * 3);
-                    currentData.totalRevenue += Math.floor(Math.random() * 10000);
-                    
-                    updateMetricsDisplay(currentData);
-                    
-                    // Show subtle notification
-                    showDataUpdateNotification();
-                }
-            } catch (error) {
-                console.log('Silent refresh failed:', error);
-            }
-        }
-
-        function showDataUpdateNotification() {
-            const indicator = document.querySelector('.real-time-indicator');
-            if (indicator) {
-                indicator.style.animation = 'none';
-                setTimeout(() => {
-                    indicator.style.animation = 'pulse 1s ease-in-out 3';
-                }, 10);
-            }
-        }
-
-        // Advanced Export Functions with Full Data
-        function exportSearchResults(type) {
-            let data = [];
-            let fileName = '';
-            
-            switch(type) {
-                case 'high-return-products':
-                    data = generateCompleteHighReturnData();
-                    fileName = 'High_Return_Products_Complete';
-                    break;
-                case 'declining-products':
-                    data = generateCompleteDecliningData();
-                    fileName = 'Declining_Products_Complete';
-                    break;
-                case 'top-products':
-                    data = generateCompleteTopProductsData();
-                    fileName = 'Top_Products_Complete';
-                    break;
-            }
-            
-            exportToExcelAdvanced(data, fileName);
-        }
-
-        function generateCompleteHighReturnData() {
-            // Generate 200+ products with high return data
-            const products = [];
-            const baseProducts = [
-                'Dental Kit', 'Cleaning Set', 'Practice Kit', 'Scaler Unit', 'Forceps Set',
-                'X-Ray System', 'Autoclave', 'Impression Kit', 'Compressor', 'Dental Chair',
-                'Suction Unit', 'Light System', 'Handpiece', 'Bur Set', 'Matrix Band',
-                'Cement Kit', 'Bond Agent', 'Etch Gel', 'Polish Kit', 'Crown Set'
+                { sku: 'DENT045', name: 'Basic Cleaning Set', returnRate: 22.1, returns: 32, impact: 96000 }
             ];
             
-            for (let i = 0; i < 150; i++) {
-                const baseName = baseProducts[Math.floor(Math.random() * baseProducts.length)];
-                products.push({
-                    sku: `DENT${(i + 1).toString().padStart(3, '0')}`,
-                    name: `${baseName} ${['Pro', 'Elite', 'Standard', 'Basic', 'Premium'][Math.floor(Math.random() * 5)]}`,
-                    returnRate: (Math.random() * 15 + 15).toFixed(1), // 15-30%
-                    returns: Math.floor(Math.random() * 50 + 10),
-                    totalOrders: Math.floor(Math.random() * 200 + 50),
-                    impact: Math.floor(Math.random() * 200000 + 50000),
-                    category: ['Tools', 'Equipment', 'Supplies', 'Instruments'][Math.floor(Math.random() * 4)],
-                    supplier: ['Supplier A', 'Supplier B', 'Supplier C'][Math.floor(Math.random() * 3)],
-                    lastOrderDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                });
-            }
-            
-            return products;
-        }
-
-        function generateCompleteDecliningData() {
-            // Generate complete declining products data
-            const products = [];
-            const baseProducts = [
-                'Legacy System', 'Old Model', 'Traditional Kit', 'Manual Unit', 'Basic Set',
-                'Standard Tool', 'Entry Level', 'Classic Model', 'Vintage Equipment', 'Original Design'
-            ];
-            
-            for (let i = 0; i < 100; i++) {
-                const baseName = baseProducts[Math.floor(Math.random() * baseProducts.length)];
-                const previousSales = Math.floor(Math.random() * 100 + 50);
-                const currentSales = Math.floor(previousSales * (Math.random() * 0.6 + 0.1)); // 10-70% of previous
-                const decline = (((previousSales - currentSales) / previousSales) * 100).toFixed(1);
-                
-                products.push({
-                    sku: `DECL${(i + 1).toString().padStart(3, '0')}`,
-                    name: `${baseName} ${i + 1}`,
-                    currentSales,
-                    previousSales,
-                    decline,
-                    impact: Math.floor(Math.random() * 300000 + 100000),
-                    category: ['Equipment', 'Tools', 'Supplies', 'Accessories'][Math.floor(Math.random() * 4)],
-                    daysInDecline: Math.floor(Math.random() * 90 + 30),
-                    lastSaleDate: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    recommendedAction: ['Discontinue', 'Price Reduction', 'Marketing Push', 'Bundle Offer'][Math.floor(Math.random() * 4)]
-                });
-            }
-            
-            return products.sort((a, b) => parseFloat(b.decline) - parseFloat(a.decline));
-        }
-
-        function generateCompleteTopProductsData() {
-            // Generate complete top products data
-            const products = [];
-            const baseProducts = [
-                'Premium Suite', 'Advanced System', 'Elite Kit', 'Professional Set', 'Master Series',
-                'Pro Model', 'Expert Edition', 'Superior Unit', 'Deluxe Package', 'Ultimate Collection'
-            ];
-            
-            for (let i = 0; i < 200; i++) {
-                const baseName = baseProducts[Math.floor(Math.random() * baseProducts.length)];
-                const sales = Math.floor(Math.random() * 200 + 50);
-                const revenue = sales * (Math.random() * 5000 + 2000);
-                
-                products.push({
-                    sku: `TOP${(i + 1).toString().padStart(3, '0')}`,
-                    name: `${baseName} ${i + 1}`,
-                    sales,
-                    revenue: Math.floor(revenue),
-                    growth: (Math.random() * 50 + 10).toFixed(1),
-                    marketShare: (Math.random() * 15 + 1).toFixed(1),
-                    profitMargin: (Math.random() * 30 + 20).toFixed(1),
-                    avgOrderValue: Math.floor(revenue / sales),
-                    category: ['Equipment', 'Tools', 'Supplies', 'Instruments', 'Accessories'][Math.floor(Math.random() * 5)],
-                    supplier: ['Premium Supplier', 'Elite Partner', 'Top Vendor'][Math.floor(Math.random() * 3)],
-                    launchDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    stockLevel: Math.floor(Math.random() * 500 + 100),
-                    reorderPoint: Math.floor(Math.random() * 100 + 50)
-                });
-            }
-            
-            return products.sort((a, b) => b.revenue - a.revenue);
-        }
-
-        // Advanced Excel Export with Premium Styling
-        function exportToExcelAdvanced(data, fileName) {
-            if (!data || data.length === 0) {
-                alert('No data available for export');
-                return;
-            }
-            
-            const wb = XLSX.utils.book_new();
-            
-            // Create summary sheet
-            const summaryData = [
-                ['PinkBlue Analytics - Advanced Export Report', '', '', '', '', '', ''],
-                ['Generated:', new Date().toLocaleString('en-IN'), '', '', '', '', ''],
-                ['Export Type:', fileName.replace(/_/g, ' '), '', '', '', '', ''],
-                ['Total Records:', data.length, '', '', '', '', ''],
-                ['Export Date:', new Date().toISOString().split('T')[0], '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-                ['EXECUTIVE SUMMARY', '', '', '', '', '', ''],
-                ['Total Products Analyzed:', data.length, '', '', '', '', ''],
-                ['Data Quality Score:', '98.5%', '', '', '', '', ''],
-                ['Analysis Confidence:', 'High', '', '', '', '', ''],
-                ['Recommendations Generated:', Math.floor(data.length * 0.3), '', '', '', '', '']
-            ];
-            
-            // Add the main data
-            const headers = Object.keys(data[0]);
-            const mainData = [
-                ['DETAILED DATA ANALYSIS', ...Array(headers.length - 1).fill('')],
-                ['', ...Array(headers.length - 1).fill('')],
-                headers.map(h => h.toUpperCase().replace(/([A-Z])/g, ' $1').trim()),
-                ...data.map(row => headers.map(header => row[header]))
-            ];
-            
-            // Create worksheets
-            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-            const mainWs = XLSX.utils.aoa_to_sheet(mainData);
-            
-            // Apply advanced styling (simplified for compatibility)
-            const range = XLSX.utils.decode_range(summaryWs['!ref']);
-            summaryWs['!cols'] = Array(7).fill().map(() => ({ width: 20 }));
-            mainWs['!cols'] = headers.map(() => ({ width: 15 }));
-            
-            // Add sheets to workbook
-            XLSX.utils.book_append_sheet(wb, summaryWs, "Executive Summary");
-            XLSX.utils.book_append_sheet(wb, mainWs, "Detailed Data");
-            
-            // Export with current date
-            const exportFileName = `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, exportFileName);
-            
-            // Show success notification
-            showAdvancedExportNotification(exportFileName, data.length);
-        }
-
-        function showAdvancedExportNotification(fileName, recordCount) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: var(--primary-black);
-                border: 1px solid var(--border-gray);
-                color: var(--text-primary);
-                padding: 40px 50px;
-                border-radius: 24px;
-                z-index: 10001;
-                text-align: center;
-                backdrop-filter: var(--blur-lg);
-                box-shadow: var(--shadow-xl);
-                min-width: 400px;
+            content.innerHTML = `
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product Name</th>
+                            <th>Return Rate</th>
+                            <th>Total Returns</th>
+                            <th>Revenue Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${fakeData.map(product => `
+                            <tr>
+                                <td><code style="background: rgba(255,179,71,0.2); padding: 4px 8px; border-radius: 4px; color: var(--warning);">${product.sku}</code></td>
+                                <td>${product.name}</td>
+                                <td><strong style="color: var(--warning)">${product.returnRate}%</strong></td>
+                                <td>${product.returns}</td>
+                                <td>₹${product.impact.toLocaleString('en-IN')}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             `;
             
-            notification.innerHTML = `
-                <div style="font-size: 3em; margin-bottom: 20px; color: var(--success);">✅</div>
-                <div style="font-size: 1.3em; font-weight: 700; margin-bottom: 15px;">Export Successful</div>
-                <div style="color: var(--text-secondary); margin-bottom: 10px; font-size: 0.95em;">
-                    <strong>${recordCount.toLocaleString('en-IN')}</strong> records exported
-                </div>
-                <div style="background: rgba(255,255,255,0.06); padding: 12px 20px; border-radius: 12px; margin: 20px 0; font-family: monospace; font-size: 0.85em; color: var(--text-secondary);">
-                    ${fileName}
-                </div>
-                <div style="font-size: 0.8em; color: var(--text-tertiary); margin-top: 15px;">
-                    File saved to your Downloads folder
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                notification.style.transition = 'all 0.3s ease';
-            }, 10);
-            
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 20);
-            
-            // Auto remove after 4 seconds
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 4000);
+            document.getElementById('search-results-count').textContent = `${fakeData.length} results`;
         }
 
-        // Continue with remaining advanced functions...
-        // This is the foundation - the remaining implementation would continue with:
-        // - Advanced tab switching
-        // - Real-time data updates
-        // - Advanced filtering
-        // - Chart.js integrations
-        // - Customer segmentation
-        // - Trend analysis
-        // - And all other features mentioned
+        function updateSubtitle(text) {
+            const subtitle = document.getElementById('overview-subtitle');
+            if (subtitle) {
+                subtitle.textContent = text;
+            }
+        }
 
-        // Initialize everything when page loads
+        // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
             init3DLogo();
         });
     </script>
-
-    <!-- Notification Styles for Real-time Updates -->
-    <style>
-        .realtime-notification {
-            position: fixed;
-            top: 20px;
-            right: -400px;
-            background: var(--primary-black);
-            border: 1px solid var(--border-gray);
-            border-radius: 16px;
-            padding: 20px;
-            backdrop-filter: var(--blur-md);
-            box-shadow: var(--shadow-lg);
-            z-index: 10002;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 350px;
-        }
-
-        .realtime-notification.show {
-            right: 20px;
-        }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .notification-icon {
-            font-size: 1.5em;
-        }
-
-        .notification-text {
-            flex: 1;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .notification-amount {
-            font-weight: 700;
-            color: var(--success);
-            font-size: 1.1em;
-        }
-    </style>
 </body>
 </html>
