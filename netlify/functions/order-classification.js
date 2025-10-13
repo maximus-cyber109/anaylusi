@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -13,71 +15,46 @@ exports.handler = async (event, context) => {
   const BASE_URL = 'https://pinkblue.in/rest/V1';
   
   try {
-    const selectedDate = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
+    const date = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
     
-    // Fetch orders with custom attributes
-    const ordersUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${selectedDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=500`;
+    const ordersUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${date}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=500`;
     
-    const response = await fetch(ordersUrl, {
+    const ordersResponse = await fetch(ordersUrl, {
       headers: {
         'Authorization': `Bearer ${API_TOKEN}`,
         'Content-Type': 'application/json'
       }
     });
 
-    const data = await response.json();
+    const ordersData = await ordersResponse.json();
     
-    let callOrders = 0;
-    let teleSales = 0;
-    let webOrders = 0;
-    let onlineOrders = 0;
+    const classification = {
+      web: 0,
+      call: 0,
+      tele: 0,
+      cod: 0,
+      online: 0
+    };
     
-    if (data.items) {
-      data.items.forEach(order => {
-        // Classification logic based on order attributes
-        let orderType = 'Online'; // Default
-        
-        // Check for custom attributes that indicate order source
-        if (order.custom_attributes) {
-          const sourceAttr = order.custom_attributes.find(attr => 
-            attr.attribute_code === 'order_source' || 
-            attr.attribute_code === 'channel_source'
-          );
-          
-          if (sourceAttr) {
-            const source = sourceAttr.value.toLowerCase();
-            if (source.includes('call') || source.includes('replacement')) {
-              orderType = 'Call Order';
-            } else if (source.includes('tele') || source.includes('phone')) {
-              orderType = 'Tele-Sales';
-            } else if (source.includes('web') || source.includes('website')) {
-              orderType = 'Web';
-            }
+    if (ordersData.items) {
+      ordersData.items.forEach(order => {
+        // Classify by payment
+        if (order.payment && order.payment.method) {
+          if (order.payment.method.toLowerCase().includes('cod')) {
+            classification.cod++;
+          } else {
+            classification.online++;
           }
         }
         
-        // Fallback classification based on other order properties
-        if (orderType === 'Online') {
-          // Use payment method or other indicators
-          const paymentMethod = order.payment?.method || '';
-          if (paymentMethod.includes('phone') || order.customer_note?.includes('call')) {
-            orderType = 'Call Order';
-          }
-        }
-        
-        // Count by type
-        switch (orderType) {
-          case 'Call Order':
-            callOrders++;
-            break;
-          case 'Tele-Sales':
-            teleSales++;
-            break;
-          case 'Web':
-            webOrders++;
-            break;
-          default:
-            onlineOrders++;
+        // Classify by source (basic)
+        const shippingMethod = order.shipping_description || '';
+        if (shippingMethod.toLowerCase().includes('call')) {
+          classification.call++;
+        } else if (shippingMethod.toLowerCase().includes('tele')) {
+          classification.tele++;
+        } else {
+          classification.web++;
         }
       });
     }
@@ -87,18 +64,15 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         success: true,
-        date: selectedDate,
-        orderTypes: {
-          callOrders,
-          teleSales,
-          webOrders,
-          onlineOrders
-        },
-        total: callOrders + teleSales + webOrders + onlineOrders
+        date,
+        classification,
+        total: ordersData.total_count || 0
       })
     };
     
   } catch (error) {
+    console.error('Order Classification Error:', error);
+    
     return {
       statusCode: 500,
       headers,
