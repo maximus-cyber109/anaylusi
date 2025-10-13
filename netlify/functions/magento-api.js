@@ -1,4 +1,43 @@
-const fetch = require('node-fetch');
+const https = require('https');
+
+function makeRequest(url, token) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const options = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    console.log('[DEBUG] Making request to:', urlObj.pathname);
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          console.log('[DEBUG] Response status:', res.statusCode);
+          resolve(parsed);
+        } catch (e) {
+          console.error('[ERROR] JSON parse failed:', e.message);
+          reject(e);
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      console.error('[ERROR] Request failed:', e.message);
+      reject(e);
+    });
+
+    req.end();
+  });
+}
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -15,27 +54,18 @@ exports.handler = async (event, context) => {
   const BASE_URL = 'https://pinkblue.in/rest/V1';
   
   try {
-    const selectedDate = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
+    const date = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
+    const startDate = event.queryStringParameters?.startDate || date;
+    const endDate = event.queryStringParameters?.endDate || date;
     
-    console.log('Fetching orders for date:', selectedDate);
+    console.log('[DEBUG] Fetching orders from', startDate, 'to', endDate);
     
-    // Fetch orders from Magento
-    const ordersUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${selectedDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${selectedDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=500`;
+    const ordersUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=1000`;
     
-    const ordersResponse = await fetch(ordersUrl, {
-      headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!ordersResponse.ok) {
-      throw new Error(`Magento API error: ${ordersResponse.status}`);
-    }
-
-    const ordersData = await ordersResponse.json();
+    const ordersData = await makeRequest(ordersUrl, API_TOKEN);
     
-    // Process the data
+    console.log('[DEBUG] Orders fetched:', ordersData.total_count || 0);
+    
     let totalOrders = 0;
     let totalRevenue = 0;
     let completedOrders = 0;
@@ -50,23 +80,13 @@ exports.handler = async (event, context) => {
         const orderValue = parseFloat(order.grand_total) || 0;
         totalRevenue += orderValue;
         
-        switch (order.status) {
-          case 'complete':
-            completedOrders++;
-            break;
-          case 'pending':
-            pendingOrders++;
-            break;
-          case 'canceled':
-          case 'cancelled':
-            cancelledOrders++;
-            break;
-        }
+        const status = (order.status || '').toLowerCase();
+        if (status === 'complete') completedOrders++;
+        else if (status === 'pending' || status === 'processing') pendingOrders++;
+        else if (status === 'canceled' || status === 'cancelled') cancelledOrders++;
         
-        // Check payment method
         if (order.payment && order.payment.method) {
-          if (order.payment.method.toLowerCase().includes('cod') || 
-              order.payment.method.toLowerCase().includes('cash')) {
+          if (order.payment.method.toLowerCase().includes('cod')) {
             codOrders++;
           } else {
             onlineOrders++;
@@ -80,7 +100,7 @@ exports.handler = async (event, context) => {
     
     const result = {
       success: true,
-      date: selectedDate,
+      dateRange: { startDate, endDate },
       totalOrders,
       totalRevenue: Math.round(totalRevenue),
       completedOrders,
@@ -90,10 +110,15 @@ exports.handler = async (event, context) => {
       onlineOrders,
       averageOrderValue,
       successRate: parseFloat(successRate),
-      items: ordersData.items || []
+      items: ordersData.items || [],
+      debug: {
+        apiCalled: true,
+        totalCount: ordersData.total_count || 0,
+        itemsReturned: ordersData.items ? ordersData.items.length : 0
+      }
     };
 
-    console.log('Processed orders:', totalOrders);
+    console.log('[DEBUG] Processing complete:', totalOrders, 'orders');
     
     return {
       statusCode: 200,
@@ -102,7 +127,7 @@ exports.handler = async (event, context) => {
     };
     
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('[ERROR] Function failed:', error.message);
     
     return {
       statusCode: 500,
@@ -110,7 +135,10 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: false,
         error: error.message,
-        date: event.queryStringParameters?.date
+        debug: {
+          errorType: error.constructor.name,
+          errorStack: error.stack
+        }
       })
     };
   }
