@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
-
+  
   const API_TOKEN = 't5xkjvxlgitd25cuhxixl9dflw008f4e';
   const BASE_URL = 'https://pinkblue.in/rest/V1';
   
