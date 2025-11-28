@@ -9,7 +9,12 @@ function makeRequest(url, token) {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        
+        // ★★★ CUSTOM HEADERS FOR FIREWALL WHITELISTING ★★★
+        'User-Agent': 'PB_Netlify', 
+        'X-Source-App': 'GameOfCrowns', 
+        'X-Netlify-Secret': 'X-PB-NetlifY2025-901AD7EE35110CCB445F3CA0EBEB1494'
       }
     };
 
@@ -50,8 +55,10 @@ exports.handler = async (event, context) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const API_TOKEN = 't5xkjvxlgitd25cuhxixl9dflw008f4e';
-  const BASE_URL = 'https://pinkblue.in/rest/V1';
+  // Use ENV variable first, fallback to the hardcoded string if needed
+  const API_TOKEN = process.env.MAGENTO_API_TOKEN || 't5xkjvxlgitd25cuhxixl9dflw008f4e';
+  // Ensure we use the /rest/V1 base URL
+  const BASE_URL = (process.env.MAGENTO_BASE_URL || 'https://pinkblue.in').replace(/\/$/, '') + '/rest/V1';
   
   try {
     const date = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
@@ -60,6 +67,8 @@ exports.handler = async (event, context) => {
     
     console.log('[DEBUG] Fetching orders from', startDate, 'to', endDate);
     
+    // Note: 'filterGroups' (camelCase) is standard for some libraries, but raw Magento API often uses 'filter_groups' (snake_case).
+    // I've kept your camelCase as it was in your snippet, but if it fails, try changing to snake_case.
     const ordersUrl = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=1000`;
     
     const ordersData = await makeRequest(ordersUrl, API_TOKEN);
