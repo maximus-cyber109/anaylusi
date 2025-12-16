@@ -1,371 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkBlue Intel /// 109</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* --- 1. THEME: MONOCHROME CYBER --- */
-        :root {
-            --bg: #000000;
-            --grid: #1a1a1a;
-            --text-main: #ffffff;
-            --text-dim: #666666;
-            --accent: #ffffff; 
-            --border: #333333;
-        }
-
-        body, html {
-            margin: 0; padding: 0;
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Courier New', Courier, monospace; /* Technical feel */
-            height: 100vh; overflow: hidden;
-        }
-
-        /* --- 2. BACKGROUND ANIMATION (CANVAS) --- */
-        #particle-canvas {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0; /* Behind everything */
-            pointer-events: none; /* Let clicks pass through */
-        }
-
-        /* --- 3. GHOST SCREENSAVER --- */
-        #ghost-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 999;
-            background: rgba(0,0,0,0.85); /* Slight transparency to see particles */
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
-        }
-        .blinking-cursor { animation: blink 1s step-end infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        /* --- 4. MAIN DASHBOARD UI --- */
-        #dashboard {
-            position: relative; z-index: 10;
-            display: none; /* Hidden initially */
-            height: 100vh;
-            display: grid;
-            grid-template-rows: 60px 1fr;
-            backdrop-filter: blur(2px);
-        }
-
-        /* Header */
-        header {
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px;
-            background: rgba(0,0,0,0.8);
-        }
-        .brand { font-weight: 900; letter-spacing: 2px; border: 1px solid #fff; padding: 5px 10px; }
-        .controls button {
-            background: #000; color: #fff; border: 1px solid #333;
-            padding: 5px 15px; cursor: pointer; font-family: inherit;
-            transition: 0.2s;
-        }
-        .controls button:hover { border-color: #fff; }
-
-        /* Grid Layout */
-        .content {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: 120px 1fr 1fr;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
-        /* Cards */
-        .card {
-            background: rgba(0,0,0,0.7);
-            border: 1px solid var(--border);
-            padding: 15px;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-        .card:hover { border-color: #fff; } /* Interactive feel */
-        
-        .card h3 { margin: 0; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
-        .stat { font-size: 1.8rem; font-weight: bold; }
-        
-        /* Layout specifics */
-        .card-lg { grid-column: span 2; grid-row: span 2; } /* Charts */
-        .card-wide { grid-column: span 2; } /* Lists */
-
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        td { padding: 8px 0; border-bottom: 1px solid #222; color: #aaa; }
-        tr:first-child td { color: #666; font-weight: bold; border-bottom: 1px solid #444; }
-        
-        .hidden { display: none !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Access</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Courier New', monospace; 
+      background: #000; 
+      color: #00ff00; 
+      overflow: hidden;
+      height: 100vh;
+    }
+    
+    #auth-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #auth-input {
+      position: absolute;
+      background: transparent;
+      border: none;
+      color: transparent;
+      caret-color: transparent;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+    
+    #dashboard {
+      display: none;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid #00ff00;
+      background: rgba(0, 255, 0, 0.05);
+    }
+    
+    .title { font-size: 28px; font-weight: bold; }
+    
+    .export-buttons button {
+      background: #000;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      padding: 10px 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      transition: all 0.3s;
+    }
+    
+    .export-buttons button:hover {
+      background: #00ff00;
+      color: #000;
+    }
+    
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      border: 2px solid #00ff00;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.03);
+    }
+    
+    .card-title {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+    
+    .card-value {
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      border: 2px solid #00ff00;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.03);
+    }
+    
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #00ff00;
+    }
+    
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    }
+    
+    .data-row:hover {
+      background: rgba(0, 255, 0, 0.1);
+    }
+    
+    .loading {
+      text-align: center;
+      font-size: 18px;
+      padding: 20px;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+    
+    .error {
+      color: #ff0000;
+      border-color: #ff0000;
+      background: rgba(255, 0, 0, 0.1);
+      padding: 15px;
+      margin: 10px 0;
+    }
+    
+    .ai-insight {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      padding: 15px;
+      background: rgba(0, 255, 0, 0.05);
+      border-left: 4px solid #00ff00;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-
-    <canvas id="particle-canvas"></canvas>
-
-    <div id="ghost-layer">
-        <div style="font-size: 1.2rem; letter-spacing: 3px;">
-            SYSTEM LOCKED <span class="blinking-cursor">_</span>
-        </div>
-        <div style="font-size: 0.8rem; color: #444; margin-top: 10px;">awaiting passphrase</div>
+  <div id="auth-screen">
+    <canvas id="canvas"></canvas>
+    <input type="text" id="auth-input" autocomplete="off">
+  </div>
+  
+  <div id="dashboard">
+    <div class="header">
+      <div class="title">PINKBLUE INTEL // ANALYTICS ENGINE</div>
+      <div class="export-buttons">
+        <button onclick="exportData('orders')">↓ ORDERS</button>
+        <button onclick="exportData('customers')">↓ CUSTOMERS</button>
+        <button onclick="exportData('products')">↓ PRODUCTS</button>
+        <button onclick="location.reload()">⟳ REFRESH</button>
+      </div>
     </div>
-
-    <div id="dashboard" class="hidden">
-        <header>
-            <div class="brand">PB /// INTEL</div>
-            <div class="controls">
-                <span id="status-ind" style="font-size: 0.8rem; color: #444; margin-right: 15px;">● SECURE CONNECT</span>
-                <button onclick="fetchData()">REFRESH DATA</button>
-            </div>
-        </header>
-
-        <div class="content">
-            <div class="card">
-                <h3>Total Revenue (30d)</h3>
-                <div class="stat" id="val-rev">--</div>
-            </div>
-            <div class="card">
-                <h3>Avg Order Value</h3>
-                <div class="stat" id="val-aov">--</div>
-            </div>
-            <div class="card">
-                <h3>Cancellation Risk</h3>
-                <div class="stat" id="val-cancel" style="color: #fff;">--</div>
-            </div>
-            <div class="card">
-                <h3>Active Customers</h3>
-                <div class="stat" id="val-cust">--</div>
-            </div>
-
-            <div class="card card-lg">
-                <h3>AI Revenue Forecast (Next 30 Days)</h3>
-                <canvas id="forecastChart"></canvas>
-            </div>
-
-            <div class="card card-wide">
-                <h3>Top Performing Products</h3>
-                <table id="prod-table">
-                    <tr><td>SKU</td><td>NAME</td><td>REVENUE</td></tr>
-                    </table>
-            </div>
-
-            <div class="card card-lg">
-                <h3>Customer Segmentation (RFM)</h3>
-                <canvas id="segChart"></canvas>
-            </div>
-        </div>
+    
+    <div id="metrics-container" class="metrics">
+      <div class="loading">INITIALIZING SYSTEMS...</div>
     </div>
+    
+    <div id="sections-container"></div>
+  </div>
 
-    <script>
-        // --- 1. CONNECTING DOTS ANIMATION ---
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        let particles = [];
-        const mouse = { x: null, y: null };
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 1; // Velocity
-                this.vy = (Math.random() - 0.5) * 1;
-                this.size = 2; 
-            }
-            update() {
-                this.x += this.vx; 
-                this.y += this.vy;
-                // Bounce off edges
-                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            // Create 100 particles
-            for(let i=0; i<80; i++) particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Interact with mouse
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-                
-                // Connect particles to each other
-                particles.forEach(p2 => {
-                    const dx = p.x - p2.x;
-                    const dy = p.y - p2.y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < 100) {
-                        ctx.strokeStyle = `rgba(255,255,255,${0.1 - dist/1000})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
-                    }
-                });
-
-                // Connect to mouse
-                if(mouse.x) {
-                    const dx = p.x - mouse.x;
-                    const dy = p.y - mouse.y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < 150) {
-                        ctx.strokeStyle = `rgba(255,255,255,0.2)`;
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(mouse.x, mouse.y);
-                        ctx.stroke();
-                    }
-                }
-            });
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
-        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initParticles(); });
-        initParticles();
-        animate();
-
-        // --- 2. AUTH & LOGIC ---
-        const SECRET = "pinkblueanalytics109";
-        let buffer = "";
-
-        document.addEventListener('keydown', (e) => {
-            if(document.getElementById('dashboard').style.display === 'block') return; // Already logged in
-
-            if(e.key === "Enter") {
-                if(buffer.endsWith(SECRET)) {
-                    document.getElementById('ghost-layer').style.opacity = 0;
-                    setTimeout(() => {
-                        document.getElementById('ghost-layer').style.display = 'none';
-                        document.getElementById('dashboard').classList.remove('hidden');
-                        document.getElementById('dashboard').style.display = 'grid'; // Ensure grid layout
-                        fetchData(); // Load data on unlock
-                    }, 1000);
-                }
-                buffer = "";
-            } else if(e.key.length === 1) {
-                buffer += e.key;
-            }
+  <script>
+    const PASSWORD = 'pinkblueanalytics109';
+    let inputBuffer = '';
+    
+    // Particle Animation
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles = [];
+    const particleCount = 100;
+    
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5
+      });
+    }
+    
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#00ff00';
+      ctx.strokeStyle = '#00ff00';
+      
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      particles.forEach((p1, i) => {
+        particles.slice(i + 1).forEach(p2 => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.globalAlpha = 1 - (dist / 100);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
         });
-
-        // --- 3. DATA FETCHING ---
-        async function fetchData() {
-            document.getElementById('status-ind').innerText = "● FETCHING...";
-            
-            try {
-                // A. Dashboard Stats
-                const res1 = await fetch('/api?type=dashboard');
-                const d = await res1.json();
-                document.getElementById('val-rev').innerText = "₹" + d.revenue.toLocaleString();
-                document.getElementById('val-aov').innerText = "₹" + d.avg_order_value;
-                document.getElementById('val-cancel').innerText = d.cancellation_rate + "%";
-
-                // B. Customers (RFM)
-                const res2 = await fetch('/api?type=customers');
-                const c = await res2.json();
-                document.getElementById('val-cust').innerText = c.total_customers;
-                renderPieChart(c.segments);
-
-                // C. Products
-                const res3 = await fetch('/api?type=products');
-                const p = await res3.json();
-                const table = document.getElementById('prod-table');
-                // clear old rows except header
-                table.innerHTML = `<tr><td>SKU</td><td>NAME</td><td>REVENUE</td></tr>`;
-                p.forEach(prod => {
-                    table.innerHTML += `<tr><td>${prod.sku || 'N/A'}</td><td>${(prod.name || '').substring(0,15)}...</td><td>₹${prod.rev}</td></tr>`;
-                });
-
-                // D. Forecast (Simulated graph based on fetched data)
-                const res4 = await fetch('/api?type=forecast');
-                const f = await res4.json();
-                renderLineChart(f.daily_trend, f.prediction_next_30);
-
-                document.getElementById('status-ind').innerText = "● LIVE";
-                document.getElementById('status-ind').style.color = "#0f0";
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('status-ind').innerText = "● ERROR";
-                document.getElementById('status-ind').style.color = "#f00";
-            }
+      });
+      
+      requestAnimationFrame(animate);
+    }
+    animate();
+    
+    // Auth System
+    document.addEventListener('keypress', (e) => {
+      if (document.getElementById('auth-screen').style.display === 'none') return;
+      inputBuffer += e.key;
+      if (inputBuffer.length > PASSWORD.length) {
+        inputBuffer = inputBuffer.slice(-PASSWORD.length);
+      }
+      if (inputBuffer === PASSWORD) {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadDashboard();
+      }
+    });
+    
+    // Dashboard Functions
+    async function fetchAPI(type) {
+      const response = await fetch(`/.netlify/functions/analytics-engine?type=${type}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    }
+    
+    async function loadDashboard() {
+      try {
+        const [dashboard, customers, products, forecast] = await Promise.all([
+          fetchAPI('dashboard'),
+          fetchAPI('customers'),
+          fetchAPI('products'),
+          fetchAPI('forecast')
+        ]);
+        
+        document.getElementById('metrics-container').innerHTML = `
+          <div class="card">
+            <div class="card-title">TODAY'S REVENUE</div>
+            <div class="card-value">₹${dashboard.revenue.toLocaleString()}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">TOTAL ORDERS</div>
+            <div class="card-value">${dashboard.orders}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">COD / ONLINE</div>
+            <div class="card-value">${dashboard.cod_orders} / ${dashboard.online_orders}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">CANCELLATION RATE</div>
+            <div class="card-value">${dashboard.cancellation_rate}%</div>
+          </div>
+          <div class="card">
+            <div class="card-title">LAST HOUR (LIVE)</div>
+            <div class="card-value">${dashboard.realtime.last_hour} Orders</div>
+          </div>
+          <div class="card">
+            <div class="card-title">PENDING / COMPLETE</div>
+            <div class="card-value">${dashboard.realtime.pending} / ${dashboard.realtime.complete}</div>
+          </div>
+        `;
+        
+        let sectionsHTML = `
+          <div class="section">
+            <div class="section-title">CUSTOMER SEGMENTATION (RFM)</div>
+            <div class="data-row">
+              <span>Total Customers</span>
+              <span>${customers.total}</span>
+            </div>
+            <div class="data-row">
+              <span>Champions (>5 orders, recent)</span>
+              <span>${customers.champions}</span>
+            </div>
+            <div class="data-row">
+              <span>Loyal (>2 orders)</span>
+              <span>${customers.loyal}</span>
+            </div>
+            <div class="data-row">
+              <span>New (1 order)</span>
+              <span>${customers.new}</span>
+            </div>
+            <div class="data-row">
+              <span>At Risk (>90 days inactive)</span>
+              <span>${customers.at_risk}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">TOP PRODUCTS (30 DAYS)</div>
+            ${products.top_products.slice(0, 10).map(p => `
+              <div class="data-row">
+                <span>${p.name} (${p.sku})</span>
+                <span>₹${Math.round(p.revenue).toLocaleString()} | Qty: ${p.qty} | Risk: ${p.cancellation_risk}%</span>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="section">
+            <div class="section-title">AI FORECAST & INSIGHTS</div>
+            <div class="data-row">
+              <span>Model</span>
+              <span>${forecast.model}</span>
+            </div>
+            <div class="data-row">
+              <span>Data Points Analyzed</span>
+              <span>${forecast.data_points} days</span>
+            </div>
+            <div class="ai-insight">${forecast.ai_insight}</div>
+          </div>
+        `;
+        
+        if (products.high_risk && products.high_risk.length > 0) {
+          sectionsHTML += `
+            <div class="section">
+              <div class="section-title">HIGH CANCELLATION RISK PRODUCTS</div>
+              ${products.high_risk.map(p => `
+                <div class="data-row">
+                  <span>${p.name}</span>
+                  <span style="color: #ff0000;">Risk: ${p.cancellation_risk}%</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
         }
-
-        // --- CHARTS HELPER ---
-        function renderPieChart(segments) {
-            const ctx = document.getElementById('segChart').getContext('2d');
-            // Destroy if exists (simplified for demo)
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Champions', 'Loyal', 'New', 'At Risk'],
-                    datasets: [{
-                        data: [segments.champions, segments.loyal, segments.new, segments.at_risk],
-                        backgroundColor: ['#fff', '#aaa', '#666', '#333'],
-                        borderColor: '#000',
-                        borderWidth: 2
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    plugins: { legend: { position: 'right', labels: { color: '#fff', font: {family: 'Courier New'} } } } 
-                }
-            });
-        }
-
-        function renderLineChart(history, prediction) {
-            const ctx = document.getElementById('forecastChart').getContext('2d');
-            const labels = history.map(h => h.date);
-            const data = history.map(h => h.val);
-            
-            // Add prediction point
-            labels.push('Next 30d');
-            data.push(prediction);
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Revenue Trend',
-                        data: data,
-                        borderColor: '#fff',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#000',
-                        pointBorderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { grid: { color: '#333' }, ticks: { color: '#666' } },
-                        x: { grid: { display: false }, ticks: { color: '#666' } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-    </script>
+        
+        document.getElementById('sections-container').innerHTML = sectionsHTML;
+        
+      } catch (error) {
+        document.getElementById('metrics-container').innerHTML = `
+          <div class="error">
+            ERROR LOADING DATA: ${error.message}<br>
+            Check Netlify environment variables (MAGENTO_API_TOKEN, GEMINI_API_KEY)
+          </div>
+        `;
+      }
+    }
+    
+    function exportData(type) {
+      window.location.href = `/.netlify/functions/analytics-engine?type=export&export=${type}`;
+    }
+  </script>
 </body>
 </html>
