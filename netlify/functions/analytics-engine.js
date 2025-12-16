@@ -59,7 +59,7 @@ async function fetchOrdersFast(startDate, endDate) {
   
   const allOrders = [];
   const pageSize = 200;
-  const maxPages = 3; // Only 3 pages = ~25 seconds total
+  const maxPages = 2; // Only 3 pages = ~25 seconds total
   
   const baseQuery = `/orders?` +
     `searchCriteria[filterGroups][0][filters][0][field]=created_at&` +
