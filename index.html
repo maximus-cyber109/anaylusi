@@ -3,188 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Engine</title>
+    <title>PinkBlue Intel /// 109</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #050505; --panel: #111; --border: #333; --text: #e0e0e0; --accent: #00ff9d; --danger: #ff0055; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', monospace; margin: 0; overflow: hidden; }
+        /* --- 1. THEME: MONOCHROME CYBER --- */
+        :root {
+            --bg: #000000;
+            --grid: #1a1a1a;
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --accent: #ffffff; 
+            --border: #333333;
+        }
 
-        /* GHOST SCREEN */
-        #ghost-layer { position: fixed; inset: 0; background: #000; z-index: 99; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s; }
-        .terminal-text { color: #444; font-size: 1.2rem; }
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace; /* Technical feel */
+            height: 100vh; overflow: hidden;
+        }
 
-        /* DASHBOARD */
-        #main-ui { display: none; height: 100vh; display: grid; grid-template-rows: 60px 1fr; }
+        /* --- 2. BACKGROUND ANIMATION (CANVAS) --- */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; /* Behind everything */
+            pointer-events: none; /* Let clicks pass through */
+        }
+
+        /* --- 3. GHOST SCREENSAVER --- */
+        #ghost-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 999;
+            background: rgba(0,0,0,0.85); /* Slight transparency to see particles */
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease;
+        }
+        .blinking-cursor { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- 4. MAIN DASHBOARD UI --- */
+        #dashboard {
+            position: relative; z-index: 10;
+            display: none; /* Hidden initially */
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 60px 1fr;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px;
+            background: rgba(0,0,0,0.8);
+        }
+        .brand { font-weight: 900; letter-spacing: 2px; border: 1px solid #fff; padding: 5px 10px; }
+        .controls button {
+            background: #000; color: #fff; border: 1px solid #333;
+            padding: 5px 15px; cursor: pointer; font-family: inherit;
+            transition: 0.2s;
+        }
+        .controls button:hover { border-color: #fff; }
+
+        /* Grid Layout */
+        .content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 120px 1fr 1fr;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--border);
+            padding: 15px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .card:hover { border-color: #fff; } /* Interactive feel */
         
-        /* TOP BAR (CONTROLS) */
-        header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-        .brand { font-weight: bold; color: var(--accent); letter-spacing: 2px; }
+        .card h3 { margin: 0; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
+        .stat { font-size: 1.8rem; font-weight: bold; }
         
-        .controls { display: flex; gap: 10px; align-items: center; }
-        input[type="date"] { background: #000; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 4px; }
-        button { background: #222; border: 1px solid #444; color: #fff; padding: 6px 15px; cursor: pointer; border-radius: 4px; transition: 0.2s; }
-        button:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-download { border-color: var(--accent); color: var(--accent); }
+        /* Layout specifics */
+        .card-lg { grid-column: span 2; grid-row: span 2; } /* Charts */
+        .card-wide { grid-column: span 2; } /* Lists */
 
-        /* CONTENT GRID */
-        .dashboard-grid { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 150px 1fr; gap: 20px; overflow-y: auto; }
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        td { padding: 8px 0; border-bottom: 1px solid #222; color: #aaa; }
+        tr:first-child td { color: #666; font-weight: bold; border-bottom: 1px solid #444; }
         
-        .stat-card { background: var(--panel); border: 1px solid var(--border); padding: 20px; border-radius: 6px; }
-        .stat-card h3 { color: #888; font-size: 0.8rem; margin: 0 0 10px 0; text-transform: uppercase; }
-        .stat-val { font-size: 2rem; font-weight: bold; }
-        
-        .chart-area { grid-column: span 3; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; min-height: 400px; }
-        .report-area { grid-column: span 1; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
-
-        /* TAB SYSTEM */
-        .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .tab { cursor: pointer; padding: 5px 10px; opacity: 0.5; }
-        .tab.active { opacity: 1; border-bottom: 2px solid var(--accent); }
-
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+    <canvas id="particle-canvas"></canvas>
+
     <div id="ghost-layer">
-        <div class="terminal-text">_ SYSTEM LOCKED // AWAITING INPUT</div>
+        <div style="font-size: 1.2rem; letter-spacing: 3px;">
+            SYSTEM LOCKED <span class="blinking-cursor">_</span>
+        </div>
+        <div style="font-size: 0.8rem; color: #444; margin-top: 10px;">awaiting passphrase</div>
     </div>
 
-    <div id="main-ui" class="hidden">
+    <div id="dashboard" class="hidden">
         <header>
-            <div class="brand">PINK-BLUE /// INTEL</div>
+            <div class="brand">PB /// INTEL</div>
             <div class="controls">
-                <input type="date" id="date-start">
-                <span style="color:#444">to</span>
-                <input type="date" id="date-end">
-                <button onclick="refreshData()">Update Analysis</button>
-                <button class="btn-download" onclick="downloadReport()">⬇ Export CSV</button>
+                <span id="status-ind" style="font-size: 0.8rem; color: #444; margin-right: 15px;">● SECURE CONNECT</span>
+                <button onclick="fetchData()">REFRESH DATA</button>
             </div>
         </header>
 
-        <div class="dashboard-grid">
-            <div class="stat-card">
-                <h3>Total Revenue</h3>
-                <div id="kpi-rev" class="stat-val">--</div>
+        <div class="content">
+            <div class="card">
+                <h3>Total Revenue (30d)</h3>
+                <div class="stat" id="val-rev">--</div>
             </div>
-            <div class="stat-card">
+            <div class="card">
                 <h3>Avg Order Value</h3>
-                <div id="kpi-aov" class="stat-val">--</div>
+                <div class="stat" id="val-aov">--</div>
             </div>
-            <div class="stat-card">
-                <h3>Cancellation Rate</h3>
-                <div id="kpi-cancel" class="stat-val" style="color: var(--danger)">--</div>
+            <div class="card">
+                <h3>Cancellation Risk</h3>
+                <div class="stat" id="val-cancel" style="color: #fff;">--</div>
             </div>
-            <div class="stat-card">
+            <div class="card">
                 <h3>Active Customers</h3>
-                <div id="kpi-cust" class="stat-val">--</div>
+                <div class="stat" id="val-cust">--</div>
             </div>
 
-            <div class="chart-area">
-                <div class="tab-nav">
-                    <div class="tab active" onclick="switchView('trends')">Revenue Trends</div>
-                    <div class="tab" onclick="switchView('segments')">Customer Segments</div>
-                </div>
-                <div id="view-content" style="margin-top:20px;">
-                    <p style="color:#666">Select date range and click Update...</p>
-                </div>
+            <div class="card card-lg">
+                <h3>AI Revenue Forecast (Next 30 Days)</h3>
+                <canvas id="forecastChart"></canvas>
             </div>
 
-            <div class="report-area">
-                <h3>Quick Reports</h3>
-                <ul style="list-style:none; padding:0; margin-top:20px; line-height:2em; font-size:0.9rem;">
-                    <li>📄 <a href="#" onclick="downloadReport('orders')">Full Order Dump</a></li>
-                    <li>👥 <a href="#" onclick="downloadReport('customers')">Customer List</a></li>
-                    <li>📉 <a href="#" onclick="downloadReport('products')">Product Performance</a></li>
-                </ul>
+            <div class="card card-wide">
+                <h3>Top Performing Products</h3>
+                <table id="prod-table">
+                    <tr><td>SKU</td><td>NAME</td><td>REVENUE</td></tr>
+                    </table>
+            </div>
+
+            <div class="card card-lg">
+                <h3>Customer Segmentation (RFM)</h3>
+                <canvas id="segChart"></canvas>
             </div>
         </div>
     </div>
 
     <script>
-        // --- AUTH LOGIC ---
-        const SECRET = "pinkblueanalytics109";
-        let buffer = "";
-        
-        document.addEventListener('keydown', (e) => {
-            if(document.getElementById('ghost-layer').style.display === 'none') return;
-            
-            if(e.key === "Enter") {
-                if(buffer.endsWith(SECRET)) {
-                    document.getElementById('ghost-layer').style.display = 'none';
-                    document.getElementById('main-ui').classList.remove('hidden');
-                    initDates();
-                    refreshData();
-                }
-                buffer = "";
-            } else if(e.key.length === 1) buffer += e.key;
-        });
+        // --- 1. CONNECTING DOTS ANIMATION ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        // --- DASHBOARD LOGIC ---
-        function initDates() {
-            const today = new Date();
-            const lastMonth = new Date(); 
-            lastMonth.setDate(today.getDate() - 30);
-            document.getElementById('date-end').value = today.toISOString().split('T')[0];
-            document.getElementById('date-start').value = lastMonth.toISOString().split('T')[0];
-        }
+        let particles = [];
+        const mouse = { x: null, y: null };
 
-        async function refreshData() {
-            const start = document.getElementById('date-start').value;
-            const end = document.getElementById('date-end').value;
-
-            // 1. Fetch Dashboard Stats
-            const dashRes = await fetch(`/api?type=dashboard&startDate=${start}&endDate=${end}`);
-            const dashData = await dashRes.json();
-            
-            document.getElementById('kpi-rev').innerText = "₹" + parseFloat(dashData.total_revenue).toLocaleString();
-            document.getElementById('kpi-aov').innerText = "₹" + dashData.avg_order_value;
-            document.getElementById('kpi-cancel').innerText = dashData.cancellation_rate;
-
-            // 2. Fetch Customer Stats
-            const custRes = await fetch(`/api?type=customer_analysis&startDate=${start}&endDate=${end}`);
-            const custData = await custRes.json();
-            document.getElementById('kpi-cust').innerText = custData.total_customers;
-
-            renderTrendView(start, end);
-        }
-
-        async function renderTrendView(start, end) {
-            const res = await fetch(`/api?type=trend_analysis&startDate=${start}&endDate=${end}`);
-            const data = await res.json();
-            const sortedDates = Object.keys(data.timeline).sort();
-            
-            let html = '<div style="display:flex; align-items:flex-end; height:300px; gap:2px;">';
-            
-            // Simple Bar Chart Generator
-            const maxVal = Math.max(...Object.values(data.timeline));
-            sortedDates.forEach(d => {
-                const val = data.timeline[d];
-                const height = (val / maxVal) * 100;
-                html += `<div style="flex:1; background:#333; height:100%; position:relative;">
-                            <div style="position:absolute; bottom:0; width:100%; background:var(--accent); height:${height}%" title="${d}: ₹${val}"></div>
-                         </div>`;
-            });
-            html += '</div><div style="text-align:center; margin-top:10px; color:#666">Revenue Timeline (Hover bars for details)</div>';
-            
-            document.getElementById('view-content').innerHTML = html;
-        }
-
-        function downloadReport(type = 'export_orders') {
-            const start = document.getElementById('date-start').value;
-            const end = document.getElementById('date-end').value;
-            // Direct browser download trigger
-            window.location.href = `/api?type=${type}&startDate=${start}&endDate=${end}`;
-        }
-
-        function switchView(view) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            if(view === 'segments') {
-                document.getElementById('view-content').innerHTML = "<br><h2>Customer Segments Loaded.</h2><p>Check console for JSON detail (Visuals coming in v3.1)</p>";
-            } else {
-                refreshData(); // defaults back to trend
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 1; // Velocity
+                this.vy = (Math.random() - 0.5) * 1;
+                this.size = 2; 
+            }
+            update() {
+                this.x += this.vx; 
+                this.y += this.vy;
+                // Bounce off edges
+                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
+
+        function initParticles() {
+            particles = [];
+            // Create 100 particles
+            for(let i=0; i<80; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Interact with mouse
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+                
+                // Connect particles to each other
+                particles.forEach(p2 => {
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 100) {
+                        ctx.strokeStyle = `rgba(255,255,255,${0.1 - dist/1000})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                });
+
+                // Connect to mouse
+                if(mouse.x) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 150) {
+                        ctx.strokeStyle = `rgba(255,255,255,0.2)`;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initParticles(); });
+        initParticles();
+        animate();
+
+        // --- 2. AUTH & LOGIC ---
+        const SECRET = "pinkblueanalytics109";
+        let buffer = "";
+
+        document.addEventListener('keydown', (e) => {
+            if(document.getElementById('dashboard').style.display === 'block') return; // Already logged in
+
+            if(e.key === "Enter") {
+                if(buffer.endsWith(SECRET)) {
+                    document.getElementById('ghost-layer').style.opacity = 0;
+                    setTimeout(() => {
+                        document.getElementById('ghost-layer').style.display = 'none';
+                        document.getElementById('dashboard').classList.remove('hidden');
+                        document.getElementById('dashboard').style.display = 'grid'; // Ensure grid layout
+                        fetchData(); // Load data on unlock
+                    }, 1000);
+                }
+                buffer = "";
+            } else if(e.key.length === 1) {
+                buffer += e.key;
+            }
+        });
+
+        // --- 3. DATA FETCHING ---
+        async function fetchData() {
+            document.getElementById('status-ind').innerText = "● FETCHING...";
+            
+            try {
+                // A. Dashboard Stats
+                const res1 = await fetch('/api?type=dashboard');
+                const d = await res1.json();
+                document.getElementById('val-rev').innerText = "₹" + d.revenue.toLocaleString();
+                document.getElementById('val-aov').innerText = "₹" + d.avg_order_value;
+                document.getElementById('val-cancel').innerText = d.cancellation_rate + "%";
+
+                // B. Customers (RFM)
+                const res2 = await fetch('/api?type=customers');
+                const c = await res2.json();
+                document.getElementById('val-cust').innerText = c.total_customers;
+                renderPieChart(c.segments);
+
+                // C. Products
+                const res3 = await fetch('/api?type=products');
+                const p = await res3.json();
+                const table = document.getElementById('prod-table');
+                // clear old rows except header
+                table.innerHTML = `<tr><td>SKU</td><td>NAME</td><td>REVENUE</td></tr>`;
+                p.forEach(prod => {
+                    table.innerHTML += `<tr><td>${prod.sku || 'N/A'}</td><td>${(prod.name || '').substring(0,15)}...</td><td>₹${prod.rev}</td></tr>`;
+                });
+
+                // D. Forecast (Simulated graph based on fetched data)
+                const res4 = await fetch('/api?type=forecast');
+                const f = await res4.json();
+                renderLineChart(f.daily_trend, f.prediction_next_30);
+
+                document.getElementById('status-ind').innerText = "● LIVE";
+                document.getElementById('status-ind').style.color = "#0f0";
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status-ind').innerText = "● ERROR";
+                document.getElementById('status-ind').style.color = "#f00";
+            }
+        }
+
+        // --- CHARTS HELPER ---
+        function renderPieChart(segments) {
+            const ctx = document.getElementById('segChart').getContext('2d');
+            // Destroy if exists (simplified for demo)
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Champions', 'Loyal', 'New', 'At Risk'],
+                    datasets: [{
+                        data: [segments.champions, segments.loyal, segments.new, segments.at_risk],
+                        backgroundColor: ['#fff', '#aaa', '#666', '#333'],
+                        borderColor: '#000',
+                        borderWidth: 2
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { position: 'right', labels: { color: '#fff', font: {family: 'Courier New'} } } } 
+                }
+            });
+        }
+
+        function renderLineChart(history, prediction) {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            const labels = history.map(h => h.date);
+            const data = history.map(h => h.val);
+            
+            // Add prediction point
+            labels.push('Next 30d');
+            data.push(prediction);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue Trend',
+                        data: data,
+                        borderColor: '#fff',
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#000',
+                        pointBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { grid: { color: '#333' }, ticks: { color: '#666' } },
+                        x: { grid: { display: false }, ticks: { color: '#666' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
     </script>
 </body>
 </html>
