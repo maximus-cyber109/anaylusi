@@ -22,7 +22,7 @@ function log(level, message, data = null) {
 function makeRequest(endpoint, timeout = 20000) {
   return new Promise((resolve) => {
     const url = `${BASE_URL}${endpoint}`;
-    log('INFO', `Requesting: ${endpoint.substring(0, 100)}...`);
+    log('INFO', `Requesting: ${endpoint.substring(0, 150)}...`);
     
     const req = https.request(url, { method: 'GET', headers: FIREWALL_HEADERS }, (res) => {
       let data = '';
@@ -53,36 +53,63 @@ function makeRequest(endpoint, timeout = 20000) {
   });
 }
 
-// OPTIMIZED: Fetch only what we need within timeout limits
-async function fetchOrdersSmart(startDate, endDate, maxPages = 10) {
-  log('INFO', `Smart fetch: ${startDate} to ${endDate} (max ${maxPages} pages)`);
+// FIXED: Proper Magento 2 date filtering with separate filterGroups
+async function fetchOrdersSmart(startDate, endDate, maxOrders = 5000) {
+  log('INFO', `Fetching orders: ${startDate} to ${endDate}`);
   
   const allOrders = [];
+  let currentPage = 1;
   const pageSize = 200;
   
-  // Build query with proper date filtering
-  const baseQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=gteq&searchCriteria[filterGroups][0][filters][1][field]=created_at&searchCriteria[filterGroups][0][filters][1][value]=${endDate} 23:59:59&searchCriteria[filterGroups][0][filters][1][conditionType]=lteq&searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC`;
+  // CORRECT MAGENTO 2 SYNTAX:
+  // filterGroups[0] = created_at >= startDate (from)
+  // filterGroups[1] = created_at <= endDate (to)
+  // This creates AND logic between the two groups
   
-  for (let page = 1; page <= maxPages; page++) {
-    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${page}`;
-    const data = await makeRequest(query, 18000);
+  const baseQuery = `/orders?` +
+    `searchCriteria[filterGroups][0][filters][0][field]=created_at&` +
+    `searchCriteria[filterGroups][0][filters][0][value]=${startDate} 00:00:00&` +
+    `searchCriteria[filterGroups][0][filters][0][conditionType]=from&` +
+    `searchCriteria[filterGroups][1][filters][0][field]=created_at&` +
+    `searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&` +
+    `searchCriteria[filterGroups][1][filters][0][conditionType]=to&` +
+    `searchCriteria[sortOrders][0][field]=created_at&` +
+    `searchCriteria[sortOrders][0][direction]=DESC`;
+  
+  while (allOrders.length < maxOrders) {
+    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${currentPage}`;
+    const data = await makeRequest(query, 20000);
     
     if (!data.items || data.items.length === 0) {
-      log('INFO', `No more data at page ${page}. Total: ${allOrders.length}`);
+      log('INFO', `No more data. Total fetched: ${allOrders.length}`);
       break;
     }
     
     allOrders.push(...data.items);
-    log('INFO', `Page ${page}: +${data.items.length} orders | Total: ${allOrders.length}`);
+    log('INFO', `Page ${currentPage}: +${data.items.length} orders | Total: ${allOrders.length}/${data.total_count || '?'}`);
     
-    // Stop if we got less than a full page (last page)
+    // If we fetched less than pageSize, it's the last page
     if (data.items.length < pageSize) {
-      log('INFO', `Last page reached. Total: ${allOrders.length}`);
+      log('INFO', `Last page. Final count: ${allOrders.length}`);
+      break;
+    }
+    
+    // If total_count is known and we've fetched them all
+    if (data.total_count && allOrders.length >= data.total_count) {
+      log('INFO', `All ${allOrders.length} orders fetched`);
+      break;
+    }
+    
+    currentPage++;
+    
+    // Safety limit: max 25 pages (5000 orders)
+    if (currentPage > 25) {
+      log('WARN', 'Reached max 25 pages limit');
       break;
     }
   }
   
-  log('INFO', `Fetch complete: ${allOrders.length} orders retrieved`);
+  log('INFO', `Fetch complete: ${allOrders.length} orders`);
   return allOrders;
 }
 
@@ -178,8 +205,7 @@ function linearRegression(data) {
 async function getDashboard(startDate, endDate) {
   log('INFO', 'Getting Dashboard', { startDate, endDate });
   
-  // Fetch up to 2000 orders (10 pages) - enough for analysis, fast enough for timeout
-  const orders = await fetchOrdersSmart(startDate, endDate, 10);
+  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
   log('INFO', `Processing ${orders.length} orders for dashboard`);
   
   let revenue = 0, cod = 0, online = 0, cancelled = 0, pending = 0, complete = 0, processing = 0;
@@ -228,15 +254,14 @@ async function getDashboard(startDate, endDate) {
       std_deviation: Math.round(stats.stdDev),
       variance: Math.round(stats.variance),
       total_days: days.length
-    },
-    note: orders.length >= 2000 ? 'Showing sample of 2000 most recent orders' : `Showing all ${orders.length} orders`
+    }
   };
 }
 
 async function getCustomerRFM(startDate, endDate) {
   log('INFO', 'Getting Customer RFM', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 10);
+  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
   log('INFO', `Processing ${orders.length} orders for RFM`);
   
   const customers = {};
@@ -324,7 +349,7 @@ async function getCustomerRFM(startDate, endDate) {
 async function getProductAnalytics(startDate, endDate) {
   log('INFO', 'Getting Product Analytics', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 10);
+  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
   log('INFO', `Processing ${orders.length} orders for products`);
   
   const products = {};
@@ -379,7 +404,7 @@ async function getProductAnalytics(startDate, endDate) {
 async function getCancellationReport(startDate, endDate) {
   log('INFO', 'Getting Cancellation Report', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 10);
+  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
   const cancelledOrders = orders.filter(o => o.status === 'canceled' || o.status === 'cancelled');
   
   log('INFO', `Found ${cancelledOrders.length} cancelled out of ${orders.length}`);
@@ -420,7 +445,7 @@ async function getCancellationReport(startDate, endDate) {
 async function getAIForecast(startDate, endDate) {
   log('INFO', 'Getting AI Forecast', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 10);
+  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
   log('INFO', `Processing ${orders.length} orders for forecast`);
   
   const dailyData = {};
