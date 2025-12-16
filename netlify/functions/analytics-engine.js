@@ -19,16 +19,16 @@ function log(level, message, data = null) {
   console.log(logMsg, data ? JSON.stringify(data).substring(0, 200) : '');
 }
 
-function makeRequest(endpoint, timeout = 30000) {
+function makeRequest(endpoint, timeout = 20000) {
   return new Promise((resolve) => {
     const url = `${BASE_URL}${endpoint}`;
-    log('INFO', `Making request to: ${endpoint.substring(0, 150)}...`);
+    log('INFO', `Requesting: ${endpoint.substring(0, 100)}...`);
     
     const req = https.request(url, { method: 'GET', headers: FIREWALL_HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        log('INFO', `Response: ${res.statusCode} | Size: ${data.length} bytes`);
+        log('INFO', `Response: ${res.statusCode} | ${(data.length / 1024).toFixed(0)}KB`);
         try {
           const parsed = JSON.parse(data);
           resolve(parsed);
@@ -45,7 +45,7 @@ function makeRequest(endpoint, timeout = 30000) {
     });
     
     req.setTimeout(timeout, () => {
-      log('ERROR', `Request Timeout (${timeout}ms)`, { endpoint: endpoint.substring(0, 100) });
+      log('ERROR', `Timeout (${timeout}ms)`);
       req.abort();
     });
     
@@ -53,39 +53,36 @@ function makeRequest(endpoint, timeout = 30000) {
   });
 }
 
-// FIXED: Fetch orders in chunks to avoid timeout
-async function fetchOrdersInChunks(startDate, endDate, maxOrders = 5000) {
-  log('INFO', `Fetching orders from ${startDate} to ${endDate} in chunks`);
+// OPTIMIZED: Fetch only what we need within timeout limits
+async function fetchOrdersSmart(startDate, endDate, maxPages = 10) {
+  log('INFO', `Smart fetch: ${startDate} to ${endDate} (max ${maxPages} pages)`);
   
   const allOrders = [];
-  let currentPage = 1;
   const pageSize = 200;
   
-  // FIXED: Use simpler date filter without multiple filterGroups
-  const baseQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=gteq&searchCriteria[filterGroups][0][filters][1][field]=created_at&searchCriteria[filterGroups][0][filters][1][value]=${endDate} 23:59:59&searchCriteria[filterGroups][0][filters][1][conditionType]=lteq`;
+  // Build query with proper date filtering
+  const baseQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=gteq&searchCriteria[filterGroups][0][filters][1][field]=created_at&searchCriteria[filterGroups][0][filters][1][value]=${endDate} 23:59:59&searchCriteria[filterGroups][0][filters][1][conditionType]=lteq&searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC`;
   
-  while (allOrders.length < maxOrders) {
-    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${currentPage}`;
-    const data = await makeRequest(query, 35000);
+  for (let page = 1; page <= maxPages; page++) {
+    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${page}`;
+    const data = await makeRequest(query, 18000);
     
     if (!data.items || data.items.length === 0) {
-      log('INFO', `No more orders. Total fetched: ${allOrders.length}`);
+      log('INFO', `No more data at page ${page}. Total: ${allOrders.length}`);
       break;
     }
     
     allOrders.push(...data.items);
-    log('INFO', `Page ${currentPage}: Fetched ${data.items.length} orders | Total: ${allOrders.length}/${data.total_count || '?'}`);
+    log('INFO', `Page ${page}: +${data.items.length} orders | Total: ${allOrders.length}`);
     
-    if (data.items.length < pageSize) break; // Last page
-    currentPage++;
-    
-    // Safety limit
-    if (currentPage > 25) {
-      log('WARN', 'Reached max page limit (25 pages)');
+    // Stop if we got less than a full page (last page)
+    if (data.items.length < pageSize) {
+      log('INFO', `Last page reached. Total: ${allOrders.length}`);
       break;
     }
   }
   
+  log('INFO', `Fetch complete: ${allOrders.length} orders retrieved`);
   return allOrders;
 }
 
@@ -120,7 +117,7 @@ function makeGeminiRequest(prompt, data) {
         try {
           const result = JSON.parse(responseData);
           const text = result.candidates?.[0]?.content?.parts?.[0]?.text || 'AI analysis unavailable';
-          log('INFO', 'Gemini response received', { length: text.length });
+          log('INFO', `Gemini OK: ${text.length} chars`);
           resolve(text);
         } catch (e) {
           log('ERROR', 'Gemini Parse Error', { error: e.message });
@@ -130,11 +127,11 @@ function makeGeminiRequest(prompt, data) {
     });
     
     req.on('error', (e) => {
-      log('ERROR', 'Gemini Request Error', { error: e.message });
+      log('ERROR', 'Gemini Error', { error: e.message });
       resolve('AI analysis failed');
     });
     
-    req.setTimeout(15000, () => {
+    req.setTimeout(10000, () => {
       log('ERROR', 'Gemini Timeout');
       req.abort();
       resolve('AI analysis timed out');
@@ -179,9 +176,10 @@ function linearRegression(data) {
 }
 
 async function getDashboard(startDate, endDate) {
-  log('INFO', 'Getting Dashboard Data', { startDate, endDate });
+  log('INFO', 'Getting Dashboard', { startDate, endDate });
   
-  const orders = await fetchOrdersInChunks(startDate, endDate);
+  // Fetch up to 2000 orders (10 pages) - enough for analysis, fast enough for timeout
+  const orders = await fetchOrdersSmart(startDate, endDate, 10);
   log('INFO', `Processing ${orders.length} orders for dashboard`);
   
   let revenue = 0, cod = 0, online = 0, cancelled = 0, pending = 0, complete = 0, processing = 0;
@@ -209,10 +207,9 @@ async function getDashboard(startDate, endDate) {
   const revenueValues = Object.values(dailyRevenue);
   const stats = calculateStatistics(revenueValues);
   
-  // Calculate growth rate
   const days = Object.keys(dailyRevenue).sort();
   const growthRate = days.length > 1 ? 
-    ((dailyRevenue[days[days.length - 1]] - dailyRevenue[days[0]]) / dailyRevenue[days[0]] * 100) : 0;
+    ((dailyRevenue[days[days.length - 1]] - dailyRevenue[days[0]]) / (dailyRevenue[days[0]] || 1) * 100) : 0;
   
   return {
     revenue: Math.round(revenue),
@@ -231,14 +228,15 @@ async function getDashboard(startDate, endDate) {
       std_deviation: Math.round(stats.stdDev),
       variance: Math.round(stats.variance),
       total_days: days.length
-    }
+    },
+    note: orders.length >= 2000 ? 'Showing sample of 2000 most recent orders' : `Showing all ${orders.length} orders`
   };
 }
 
 async function getCustomerRFM(startDate, endDate) {
-  log('INFO', 'Getting Customer RFM Data', { startDate, endDate });
+  log('INFO', 'Getting Customer RFM', { startDate, endDate });
   
-  const orders = await fetchOrdersInChunks(startDate, endDate);
+  const orders = await fetchOrdersSmart(startDate, endDate, 10);
   log('INFO', `Processing ${orders.length} orders for RFM`);
   
   const customers = {};
@@ -326,7 +324,7 @@ async function getCustomerRFM(startDate, endDate) {
 async function getProductAnalytics(startDate, endDate) {
   log('INFO', 'Getting Product Analytics', { startDate, endDate });
   
-  const orders = await fetchOrdersInChunks(startDate, endDate);
+  const orders = await fetchOrdersSmart(startDate, endDate, 10);
   log('INFO', `Processing ${orders.length} orders for products`);
   
   const products = {};
@@ -381,10 +379,10 @@ async function getProductAnalytics(startDate, endDate) {
 async function getCancellationReport(startDate, endDate) {
   log('INFO', 'Getting Cancellation Report', { startDate, endDate });
   
-  const orders = await fetchOrdersInChunks(startDate, endDate);
+  const orders = await fetchOrdersSmart(startDate, endDate, 10);
   const cancelledOrders = orders.filter(o => o.status === 'canceled' || o.status === 'cancelled');
   
-  log('INFO', `Found ${cancelledOrders.length} cancelled orders out of ${orders.length}`);
+  log('INFO', `Found ${cancelledOrders.length} cancelled out of ${orders.length}`);
   
   let totalLostRevenue = 0;
   const reasonMap = {};
@@ -422,7 +420,7 @@ async function getCancellationReport(startDate, endDate) {
 async function getAIForecast(startDate, endDate) {
   log('INFO', 'Getting AI Forecast', { startDate, endDate });
   
-  const orders = await fetchOrdersInChunks(startDate, endDate);
+  const orders = await fetchOrdersSmart(startDate, endDate, 10);
   log('INFO', `Processing ${orders.length} orders for forecast`);
   
   const dailyData = {};
@@ -448,20 +446,16 @@ async function getAIForecast(startDate, endDate) {
   const regression = linearRegression(revenueArray);
   const stats = calculateStatistics(revenueArray);
   
-  // FIXED: Predict TOTAL revenue for different periods
   const totalRevenue = revenueArray.reduce((a, b) => a + b, 0);
   const avgDailyRevenue = stats.mean;
   
-  // Tomorrow's prediction
   const nextDayIndex = revenueArray.length;
   const tomorrowPrediction = regression.slope * nextDayIndex + regression.intercept;
   
-  // Next 7 days TOTAL prediction
   const next7DaysTotal = Array.from({length: 7}, (_, i) => {
     return Math.max(0, regression.slope * (nextDayIndex + i) + regression.intercept);
   }).reduce((a, b) => a + b, 0);
   
-  // Next 30 days TOTAL prediction
   const next30DaysTotal = Array.from({length: 30}, (_, i) => {
     return Math.max(0, regression.slope * (nextDayIndex + i) + regression.intercept);
   }).reduce((a, b) => a + b, 0);
@@ -500,15 +494,12 @@ Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
     model: 'Gemini 1.5 Flash + Linear Regression',
     confidence: `${(regression.r2 * 100).toFixed(1)}%`,
     
-    // TODAY prediction
     today_prediction: Math.round(avgDailyRevenue),
     tomorrow_prediction: Math.round(tomorrowPrediction),
     
-    // TOTAL predictions (what user wanted!)
     next_7_days_total: Math.round(next7DaysTotal),
     next_30_days_total: Math.round(next30DaysTotal),
     
-    // Daily breakdown
     next_7_days_daily: Array.from({length: 7}, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() + i + 1);
@@ -537,7 +528,6 @@ Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
     daily_data: chartData,
     ai_insight: aiInsight,
     
-    // What to improve section
     improvement_areas: {
       aov: `Current AOV needs optimization. Target: Increase by 15-20%`,
       cancellation: `Focus on reducing cancellation rate`,
@@ -547,7 +537,7 @@ Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
 }
 
 function exportCSV(type, data, startDate, endDate) {
-  log('INFO', `Exporting ${type}`, { startDate, endDate });
+  log('INFO', `Exporting ${type}`);
   
   let csv = '';
   let filename = `${type}_${startDate}_to_${endDate}.csv`;
@@ -574,8 +564,9 @@ function exportCSV(type, data, startDate, endDate) {
 
 exports.handler = async (event) => {
   const startTime = Date.now();
-  log('INFO', '=== NEW REQUEST ===', { 
-    queryParams: event.queryStringParameters
+  log('INFO', '=== REQUEST START ===', { 
+    type: event.queryStringParameters?.type,
+    dates: `${event.queryStringParameters?.start_date} to ${event.queryStringParameters?.end_date}`
   });
   
   if (!MAGENTO_TOKEN) {
@@ -586,7 +577,7 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not configured in Netlify Environment Variables' })
+      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not configured' })
     };
   }
   
@@ -610,7 +601,7 @@ exports.handler = async (event) => {
       
       const exported = exportCSV(exportType, data, startDate, endDate);
       
-      log('INFO', `Export completed: ${exported.filename} (${exported.csv.length} bytes)`);
+      log('INFO', `Export OK: ${exported.filename}`);
       
       return {
         statusCode: 200,
@@ -630,7 +621,7 @@ exports.handler = async (event) => {
     else if (type === 'forecast') response = await getAIForecast(startDate, endDate);
     
     const duration = Date.now() - startTime;
-    log('INFO', `✅ Request completed in ${duration}ms`, { type, dataSize: JSON.stringify(response).length });
+    log('INFO', `✅ SUCCESS in ${duration}ms`);
     
     return {
       statusCode: 200,
@@ -643,7 +634,7 @@ exports.handler = async (event) => {
     
   } catch (error) {
     const duration = Date.now() - startTime;
-    log('ERROR', 'Handler Error', { error: error.message, stack: error.stack, duration });
+    log('ERROR', `FAILED after ${duration}ms`, { error: error.message });
     return {
       statusCode: 500,
       headers: { 
