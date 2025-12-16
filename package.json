@@ -1,7 +1,9 @@
 {
-  "name": "pinkblue-functions",
-  "version": "1.0.0",
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  }
+  "name": "pink-blue-stealth-analytics",
+  "version": "2.0.0",
+  "description": "Unified Analytics Dashboard",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "dependencies": {}
 }
