@@ -3,141 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Status: Idle</title>
+    <title>Analytics Engine</title>
     <style>
-        /* --- THEME --- */
-        :root { --bg: #0a0a0a; --card: #111; --text: #eee; --accent: #ff0055; --blue: #00ccff; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; overflow: hidden; }
+        :root { --bg: #050505; --panel: #111; --border: #333; --text: #e0e0e0; --accent: #00ff9d; --danger: #ff0055; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', monospace; margin: 0; overflow: hidden; }
 
-        /* --- GHOST SCREEN --- */
-        #ghost-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 100; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s; }
-        .quote { font-size: 1.2rem; color: #666; animation: breathe 3s infinite; text-align: center; padding: 20px;}
-        @keyframes breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        /* GHOST SCREEN */
+        #ghost-layer { position: fixed; inset: 0; background: #000; z-index: 99; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s; }
+        .terminal-text { color: #444; font-size: 1.2rem; }
 
-        /* --- DASHBOARD --- */
-        #dashboard { display: none; padding: 20px; height: 100vh; overflow-y: auto; }
-        .header { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; }
+        /* DASHBOARD */
+        #main-ui { display: none; height: 100vh; display: grid; grid-template-rows: 60px 1fr; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 8px; }
-        .card h3 { color: #888; font-size: 0.9rem; margin-top: 0; text-transform: uppercase; }
-        .value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
-        .sub { font-size: 0.8rem; color: var(--blue); }
+        /* TOP BAR (CONTROLS) */
+        header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+        .brand { font-weight: bold; color: var(--accent); letter-spacing: 2px; }
+        
+        .controls { display: flex; gap: 10px; align-items: center; }
+        input[type="date"] { background: #000; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 4px; }
+        button { background: #222; border: 1px solid #444; color: #fff; padding: 6px 15px; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        button:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-download { border-color: var(--accent); color: var(--accent); }
 
-        /* --- PRODUCT LIST --- */
-        .prod-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; }
-        .prod-name { color: #aaa; }
-        .prod-val { color: #fff; font-weight: bold; }
+        /* CONTENT GRID */
+        .dashboard-grid { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 150px 1fr; gap: 20px; overflow-y: auto; }
+        
+        .stat-card { background: var(--panel); border: 1px solid var(--border); padding: 20px; border-radius: 6px; }
+        .stat-card h3 { color: #888; font-size: 0.8rem; margin: 0 0 10px 0; text-transform: uppercase; }
+        .stat-val { font-size: 2rem; font-weight: bold; }
+        
+        .chart-area { grid-column: span 3; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; min-height: 400px; }
+        .report-area { grid-column: span 1; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
+
+        /* TAB SYSTEM */
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .tab { cursor: pointer; padding: 5px 10px; opacity: 0.5; }
+        .tab.active { opacity: 1; border-bottom: 2px solid var(--accent); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="ghost-layer">
-        <div id="quote-text" class="quote">"System checks in progress..."</div>
+        <div class="terminal-text">_ SYSTEM LOCKED // AWAITING INPUT</div>
     </div>
 
-    <div id="dashboard">
-        <div class="header">
-            <h1>PINK-BLUE ANALYTICS /// STEALTH</h1>
-            <div style="color: var(--accent)">SECURE</div>
-        </div>
+    <div id="main-ui" class="hidden">
+        <header>
+            <div class="brand">PINK-BLUE /// INTEL</div>
+            <div class="controls">
+                <input type="date" id="date-start">
+                <span style="color:#444">to</span>
+                <input type="date" id="date-end">
+                <button onclick="refreshData()">Update Analysis</button>
+                <button class="btn-download" onclick="downloadReport()">⬇ Export CSV</button>
+            </div>
+        </header>
 
-        <div class="grid">
-            <div class="card">
-                <h3>Today's Revenue</h3>
-                <div id="rev-val" class="value">Loading...</div>
-                <div id="rev-sub" class="sub">Fetching live Magento data...</div>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <div id="kpi-rev" class="stat-val">--</div>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Order Value</h3>
+                <div id="kpi-aov" class="stat-val">--</div>
+            </div>
+            <div class="stat-card">
+                <h3>Cancellation Rate</h3>
+                <div id="kpi-cancel" class="stat-val" style="color: var(--danger)">--</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Customers</h3>
+                <div id="kpi-cust" class="stat-val">--</div>
             </div>
 
-            <div class="card" style="border-color: var(--blue)">
-                <h3>AI Revenue Forecast (30 Days)</h3>
-                <div id="ai-val" class="value">...</div>
-                <div id="ai-sub" class="sub">Computing Regression Model...</div>
+            <div class="chart-area">
+                <div class="tab-nav">
+                    <div class="tab active" onclick="switchView('trends')">Revenue Trends</div>
+                    <div class="tab" onclick="switchView('segments')">Customer Segments</div>
+                </div>
+                <div id="view-content" style="margin-top:20px;">
+                    <p style="color:#666">Select date range and click Update...</p>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Order Health</h3>
-                <div id="ord-val" class="value">0</div>
-                <div class="sub">COD vs Online split loading...</div>
-            </div>
-
-            <div class="card">
-                <h3>Top Selling Today</h3>
-                <div id="prod-list"></div>
+            <div class="report-area">
+                <h3>Quick Reports</h3>
+                <ul style="list-style:none; padding:0; margin-top:20px; line-height:2em; font-size:0.9rem;">
+                    <li>📄 <a href="#" onclick="downloadReport('orders')">Full Order Dump</a></li>
+                    <li>👥 <a href="#" onclick="downloadReport('customers')">Customer List</a></li>
+                    <li>📉 <a href="#" onclick="downloadReport('products')">Product Performance</a></li>
+                </ul>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIG ---
+        // --- AUTH LOGIC ---
         const SECRET = "pinkblueanalytics109";
-        const QUOTES = [
-            "Experience is the name everyone gives to their mistakes.",
-            "Java is to JavaScript what car is to Carpet.",
-            "It works on my machine.",
-            "I have not failed. I've just found 10,000 ways that won't work."
-        ];
-
-        // --- GHOST LOGIC ---
         let buffer = "";
-        const ghost = document.getElementById('ghost-layer');
-        const dash = document.getElementById('dashboard');
-
-        // Rotate Quotes
-        setInterval(() => {
-            document.getElementById('quote-text').innerText = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-        }, 4000);
-
-        // Key Listener
+        
         document.addEventListener('keydown', (e) => {
+            if(document.getElementById('ghost-layer').style.display === 'none') return;
+            
             if(e.key === "Enter") {
-                if(buffer.endsWith(SECRET)) unlock();
+                if(buffer.endsWith(SECRET)) {
+                    document.getElementById('ghost-layer').style.display = 'none';
+                    document.getElementById('main-ui').classList.remove('hidden');
+                    initDates();
+                    refreshData();
+                }
                 buffer = "";
-            } else if(e.key.length === 1) {
-                buffer += e.key;
-            }
+            } else if(e.key.length === 1) buffer += e.key;
         });
 
-        function unlock() {
-            ghost.style.opacity = 0;
-            setTimeout(() => {
-                ghost.style.display = 'none';
-                dash.style.display = 'block';
-                loadAllData(); // Trigger the API calls
-            }, 1000);
+        // --- DASHBOARD LOGIC ---
+        function initDates() {
+            const today = new Date();
+            const lastMonth = new Date(); 
+            lastMonth.setDate(today.getDate() - 30);
+            document.getElementById('date-end').value = today.toISOString().split('T')[0];
+            document.getElementById('date-start').value = lastMonth.toISOString().split('T')[0];
         }
 
-        // --- DASHBOARD LOGIC ---
-        async function loadAllData() {
-            try {
-                // 1. Get Overview
-                const res1 = await fetch('/api?type=overview');
-                const overview = await res1.json();
-                
-                document.getElementById('rev-val').innerText = "₹" + (overview.revenue || 0).toLocaleString();
-                document.getElementById('rev-sub').innerText = `${overview.orders} Orders processed`;
-                
-                document.getElementById('ord-val').innerText = overview.orders;
-                document.querySelector('.sub').innerText = `COD: ${overview.cod_orders} | Online: ${overview.online_orders}`;
+        async function refreshData() {
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
 
-                // 2. Get AI Forecast
-                const res2 = await fetch('/api?type=ai-forecast');
-                const ai = await res2.json();
-                document.getElementById('ai-val').innerText = "₹" + (ai.prediction_next_30_days || 0).toLocaleString();
-                document.getElementById('ai-sub').innerText = `Confidence: ${ai.confidence} | Trend: ${ai.trend}`;
+            // 1. Fetch Dashboard Stats
+            const dashRes = await fetch(`/api?type=dashboard&startDate=${start}&endDate=${end}`);
+            const dashData = await dashRes.json();
+            
+            document.getElementById('kpi-rev').innerText = "₹" + parseFloat(dashData.total_revenue).toLocaleString();
+            document.getElementById('kpi-aov').innerText = "₹" + dashData.avg_order_value;
+            document.getElementById('kpi-cancel').innerText = dashData.cancellation_rate;
 
-                // 3. Get Products
-                const res3 = await fetch('/api?type=products');
-                const prod = await res3.json();
-                const list = document.getElementById('prod-list');
-                list.innerHTML = "";
-                (prod.top_products || []).forEach(p => {
-                    list.innerHTML += `<div class="prod-row"><span class="prod-name">${p.name.substring(0,20)}...</span><span class="prod-val">${p.qty}</span></div>`;
-                });
+            // 2. Fetch Customer Stats
+            const custRes = await fetch(`/api?type=customer_analysis&startDate=${start}&endDate=${end}`);
+            const custData = await custRes.json();
+            document.getElementById('kpi-cust').innerText = custData.total_customers;
 
-            } catch (err) {
-                console.error(err);
-                alert("API Error: Check Console");
+            renderTrendView(start, end);
+        }
+
+        async function renderTrendView(start, end) {
+            const res = await fetch(`/api?type=trend_analysis&startDate=${start}&endDate=${end}`);
+            const data = await res.json();
+            const sortedDates = Object.keys(data.timeline).sort();
+            
+            let html = '<div style="display:flex; align-items:flex-end; height:300px; gap:2px;">';
+            
+            // Simple Bar Chart Generator
+            const maxVal = Math.max(...Object.values(data.timeline));
+            sortedDates.forEach(d => {
+                const val = data.timeline[d];
+                const height = (val / maxVal) * 100;
+                html += `<div style="flex:1; background:#333; height:100%; position:relative;">
+                            <div style="position:absolute; bottom:0; width:100%; background:var(--accent); height:${height}%" title="${d}: ₹${val}"></div>
+                         </div>`;
+            });
+            html += '</div><div style="text-align:center; margin-top:10px; color:#666">Revenue Timeline (Hover bars for details)</div>';
+            
+            document.getElementById('view-content').innerHTML = html;
+        }
+
+        function downloadReport(type = 'export_orders') {
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
+            // Direct browser download trigger
+            window.location.href = `/api?type=${type}&startDate=${start}&endDate=${end}`;
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            if(view === 'segments') {
+                document.getElementById('view-content').innerHTML = "<br><h2>Customer Segments Loaded.</h2><p>Check console for JSON detail (Visuals coming in v3.1)</p>";
+            } else {
+                refreshData(); // defaults back to trend
             }
         }
     </script>
