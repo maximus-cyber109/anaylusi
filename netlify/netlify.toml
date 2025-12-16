@@ -3,5 +3,5 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/analytics-engine"
+  to = "/.netlify/functions/analytics-core"
   status = 200
