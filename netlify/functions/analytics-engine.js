@@ -19,38 +19,74 @@ function log(level, message, data = null) {
   console.log(logMsg, data ? JSON.stringify(data).substring(0, 200) : '');
 }
 
-function makeRequest(endpoint) {
+function makeRequest(endpoint, timeout = 30000) {
   return new Promise((resolve) => {
     const url = `${BASE_URL}${endpoint}`;
-    log('INFO', `Making request to: ${endpoint}`);
+    log('INFO', `Making request to: ${endpoint.substring(0, 150)}...`);
     
     const req = https.request(url, { method: 'GET', headers: FIREWALL_HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        log('INFO', `Response received: ${res.statusCode} - ${endpoint}`);
+        log('INFO', `Response: ${res.statusCode} | Size: ${data.length} bytes`);
         try {
           const parsed = JSON.parse(data);
           resolve(parsed);
         } catch (e) {
-          log('ERROR', 'JSON Parse Error', { error: e.message, endpoint });
+          log('ERROR', 'JSON Parse Error', { error: e.message });
           resolve({ items: [], total_count: 0 });
         }
       });
     });
     
     req.on('error', (e) => {
-      log('ERROR', 'Request Error', { error: e.message, endpoint });
+      log('ERROR', 'Request Error', { error: e.message });
       resolve({ items: [], total_count: 0 });
     });
     
-    req.setTimeout(25000, () => {
-      log('ERROR', 'Request Timeout', { endpoint });
+    req.setTimeout(timeout, () => {
+      log('ERROR', `Request Timeout (${timeout}ms)`, { endpoint: endpoint.substring(0, 100) });
       req.abort();
     });
     
     req.end();
   });
+}
+
+// FIXED: Fetch orders in chunks to avoid timeout
+async function fetchOrdersInChunks(startDate, endDate, maxOrders = 5000) {
+  log('INFO', `Fetching orders from ${startDate} to ${endDate} in chunks`);
+  
+  const allOrders = [];
+  let currentPage = 1;
+  const pageSize = 200;
+  
+  // FIXED: Use simpler date filter without multiple filterGroups
+  const baseQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=gteq&searchCriteria[filterGroups][0][filters][1][field]=created_at&searchCriteria[filterGroups][0][filters][1][value]=${endDate} 23:59:59&searchCriteria[filterGroups][0][filters][1][conditionType]=lteq`;
+  
+  while (allOrders.length < maxOrders) {
+    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${currentPage}`;
+    const data = await makeRequest(query, 35000);
+    
+    if (!data.items || data.items.length === 0) {
+      log('INFO', `No more orders. Total fetched: ${allOrders.length}`);
+      break;
+    }
+    
+    allOrders.push(...data.items);
+    log('INFO', `Page ${currentPage}: Fetched ${data.items.length} orders | Total: ${allOrders.length}/${data.total_count || '?'}`);
+    
+    if (data.items.length < pageSize) break; // Last page
+    currentPage++;
+    
+    // Safety limit
+    if (currentPage > 25) {
+      log('WARN', 'Reached max page limit (25 pages)');
+      break;
+    }
+  }
+  
+  return allOrders;
 }
 
 function makeGeminiRequest(prompt, data) {
@@ -63,7 +99,7 @@ function makeGeminiRequest(prompt, data) {
       }],
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 500
+        maxOutputTokens: 800
       }
     });
 
@@ -96,6 +132,12 @@ function makeGeminiRequest(prompt, data) {
     req.on('error', (e) => {
       log('ERROR', 'Gemini Request Error', { error: e.message });
       resolve('AI analysis failed');
+    });
+    
+    req.setTimeout(15000, () => {
+      log('ERROR', 'Gemini Timeout');
+      req.abort();
+      resolve('AI analysis timed out');
     });
     
     req.write(payload);
@@ -139,12 +181,8 @@ function linearRegression(data) {
 async function getDashboard(startDate, endDate) {
   log('INFO', 'Getting Dashboard Data', { startDate, endDate });
   
-  const orderQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=2000`;
-  
-  const data = await makeRequest(orderQuery);
-  const orders = data.items || [];
-  
-  log('INFO', `Fetched ${orders.length} orders for dashboard`);
+  const orders = await fetchOrdersInChunks(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders for dashboard`);
   
   let revenue = 0, cod = 0, online = 0, cancelled = 0, pending = 0, complete = 0, processing = 0;
   const dailyRevenue = {};
@@ -171,6 +209,11 @@ async function getDashboard(startDate, endDate) {
   const revenueValues = Object.values(dailyRevenue);
   const stats = calculateStatistics(revenueValues);
   
+  // Calculate growth rate
+  const days = Object.keys(dailyRevenue).sort();
+  const growthRate = days.length > 1 ? 
+    ((dailyRevenue[days[days.length - 1]] - dailyRevenue[days[0]]) / dailyRevenue[days[0]] * 100) : 0;
+  
   return {
     revenue: Math.round(revenue),
     orders: orders.length,
@@ -182,10 +225,12 @@ async function getDashboard(startDate, endDate) {
     cancelled_orders: cancelled,
     cancellation_rate: cancellationRate.toFixed(1),
     avg_order_value: Math.round(avgOrderValue),
+    growth_rate: growthRate.toFixed(1),
     daily_stats: {
       mean_daily_revenue: Math.round(stats.mean),
       std_deviation: Math.round(stats.stdDev),
-      variance: Math.round(stats.variance)
+      variance: Math.round(stats.variance),
+      total_days: days.length
     }
   };
 }
@@ -193,11 +238,7 @@ async function getDashboard(startDate, endDate) {
 async function getCustomerRFM(startDate, endDate) {
   log('INFO', 'Getting Customer RFM Data', { startDate, endDate });
   
-  const orderQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=2000`;
-  
-  const data = await makeRequest(orderQuery);
-  const orders = data.items || [];
-  
+  const orders = await fetchOrdersInChunks(startDate, endDate);
   log('INFO', `Processing ${orders.length} orders for RFM`);
   
   const customers = {};
@@ -236,7 +277,6 @@ async function getCustomerRFM(startDate, endDate) {
     c.avg_order_value = Math.round(c.spent / c.orders);
     c.cancellation_rate = ((c.cancelledOrders / c.orders) * 100).toFixed(1);
     
-    // RFM Scoring (1-5 scale)
     c.r_score = daysSinceLast < 30 ? 5 : daysSinceLast < 60 ? 4 : daysSinceLast < 90 ? 3 : daysSinceLast < 180 ? 2 : 1;
     c.f_score = c.orders >= 10 ? 5 : c.orders >= 5 ? 4 : c.orders >= 3 ? 3 : c.orders === 2 ? 2 : 1;
     c.m_score = c.spent >= 100000 ? 5 : c.spent >= 50000 ? 4 : c.spent >= 20000 ? 3 : c.spent >= 5000 ? 2 : 1;
@@ -286,15 +326,10 @@ async function getCustomerRFM(startDate, endDate) {
 async function getProductAnalytics(startDate, endDate) {
   log('INFO', 'Getting Product Analytics', { startDate, endDate });
   
-  const orderQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=2000`;
-  
-  const data = await makeRequest(orderQuery);
-  const orders = data.items || [];
-  
+  const orders = await fetchOrdersInChunks(startDate, endDate);
   log('INFO', `Processing ${orders.length} orders for products`);
   
   const products = {};
-  const cancelledProducts = {};
   
   orders.forEach(o => {
     const isCancelled = o.status === 'canceled' || o.status === 'cancelled';
@@ -346,11 +381,7 @@ async function getProductAnalytics(startDate, endDate) {
 async function getCancellationReport(startDate, endDate) {
   log('INFO', 'Getting Cancellation Report', { startDate, endDate });
   
-  const orderQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[filterGroups][1][filters][0][field]=created_at&searchCriteria[filterGroups][1][filters][0][value]=${endDate} 23:59:59&searchCriteria[filterGroups][1][filters][0][conditionType]=to&searchCriteria[pageSize]=2000`;
-  
-  const data = await makeRequest(orderQuery);
-  const orders = data.items || [];
-  
+  const orders = await fetchOrdersInChunks(startDate, endDate);
   const cancelledOrders = orders.filter(o => o.status === 'canceled' || o.status === 'cancelled');
   
   log('INFO', `Found ${cancelledOrders.length} cancelled orders out of ${orders.length}`);
@@ -391,10 +422,8 @@ async function getCancellationReport(startDate, endDate) {
 async function getAIForecast(startDate, endDate) {
   log('INFO', 'Getting AI Forecast', { startDate, endDate });
   
-  const orderQuery = `/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${startDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=2000`;
-  
-  const data = await makeRequest(orderQuery);
-  const orders = data.items || [];
+  const orders = await fetchOrdersInChunks(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders for forecast`);
   
   const dailyData = {};
   orders.forEach(o => {
@@ -409,12 +438,33 @@ async function getAIForecast(startDate, endDate) {
   const sortedDays = Object.keys(dailyData).sort();
   const revenueArray = sortedDays.map(day => dailyData[day].revenue);
   
+  if (revenueArray.length < 3) {
+    return {
+      error: 'Insufficient data for forecasting (need at least 3 days)',
+      data_points: revenueArray.length
+    };
+  }
+  
   const regression = linearRegression(revenueArray);
   const stats = calculateStatistics(revenueArray);
   
+  // FIXED: Predict TOTAL revenue for different periods
+  const totalRevenue = revenueArray.reduce((a, b) => a + b, 0);
+  const avgDailyRevenue = stats.mean;
+  
+  // Tomorrow's prediction
   const nextDayIndex = revenueArray.length;
-  const predictedRevenue = regression.slope * nextDayIndex + regression.intercept;
-  const confidenceInterval = 1.96 * stats.stdDev;
+  const tomorrowPrediction = regression.slope * nextDayIndex + regression.intercept;
+  
+  // Next 7 days TOTAL prediction
+  const next7DaysTotal = Array.from({length: 7}, (_, i) => {
+    return Math.max(0, regression.slope * (nextDayIndex + i) + regression.intercept);
+  }).reduce((a, b) => a + b, 0);
+  
+  // Next 30 days TOTAL prediction
+  const next30DaysTotal = Array.from({length: 30}, (_, i) => {
+    return Math.max(0, regression.slope * (nextDayIndex + i) + regression.intercept);
+  }).reduce((a, b) => a + b, 0);
   
   const chartData = sortedDays.map((day, i) => ({
     date: day,
@@ -422,40 +472,77 @@ async function getAIForecast(startDate, endDate) {
     orders: dailyData[day].orders
   }));
   
-  const prompt = `You are a data scientist analyzing e-commerce trends for PinkBlue, a dental supply company.
+  const prompt = `You are a business analyst for PinkBlue, a dental e-commerce company.
 
-Based on ${sortedDays.length} days of data:
-- Average daily revenue: ₹${Math.round(stats.mean)}
-- Trend: ${regression.slope > 0 ? 'Growing' : 'Declining'} (R²: ${regression.r2.toFixed(3)})
-- Volatility: σ = ₹${Math.round(stats.stdDev)}
-- Tomorrow's prediction: ₹${Math.round(predictedRevenue)}
+CURRENT PERFORMANCE (${sortedDays.length} days):
+- Total Revenue: ₹${Math.round(totalRevenue).toLocaleString()}
+- Avg Daily Revenue: ₹${Math.round(avgDailyRevenue).toLocaleString()}
+- Trend: ${regression.slope > 0 ? 'Growing' : 'Declining'} (${regression.slope > 0 ? '+' : ''}${(regression.slope / avgDailyRevenue * 100).toFixed(1)}% daily)
+- Volatility: σ = ₹${Math.round(stats.stdDev).toLocaleString()}
+- Model Confidence: R² = ${regression.r2.toFixed(3)}
 
-Provide:
-1. 7-day revenue forecast (specific numbers)
-2. Key insights from the trend
-3. Strategic recommendation to increase AOV and reduce cancellations
+PREDICTIONS:
+- Tomorrow: ₹${Math.round(tomorrowPrediction).toLocaleString()}
+- Next 7 Days Total: ₹${Math.round(next7DaysTotal).toLocaleString()}
+- Next 30 Days Total: ₹${Math.round(next30DaysTotal).toLocaleString()}
 
-Keep response under 200 words, use bullet points.`;
+Provide a concise analysis with:
+1. **7-Day Forecast**: Day-by-day prediction (use trending numbers)
+2. **Key Insights**: Top 3 observations from the data
+3. **What to Improve**: Top 3 specific, actionable recommendations to increase revenue, AOV, and reduce cancellations
+4. **Action Items**: 2-3 immediate steps PinkBlue should take this week
+
+Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
 
   const aiInsight = await makeGeminiRequest(prompt, chartData.slice(-14));
   
   return {
-    model: 'Gemini 1.5 Flash (Linear Regression)',
+    model: 'Gemini 1.5 Flash + Linear Regression',
     confidence: `${(regression.r2 * 100).toFixed(1)}%`,
-    next_day_prediction: Math.round(predictedRevenue),
+    
+    // TODAY prediction
+    today_prediction: Math.round(avgDailyRevenue),
+    tomorrow_prediction: Math.round(tomorrowPrediction),
+    
+    // TOTAL predictions (what user wanted!)
+    next_7_days_total: Math.round(next7DaysTotal),
+    next_30_days_total: Math.round(next30DaysTotal),
+    
+    // Daily breakdown
+    next_7_days_daily: Array.from({length: 7}, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i + 1);
+      return {
+        date: date.toISOString().split('T')[0],
+        predicted_revenue: Math.round(Math.max(0, regression.slope * (nextDayIndex + i) + regression.intercept))
+      };
+    }),
+    
     confidence_interval: {
-      lower: Math.round(predictedRevenue - confidenceInterval),
-      upper: Math.round(predictedRevenue + confidenceInterval)
+      lower: Math.round(tomorrowPrediction - 1.96 * stats.stdDev),
+      upper: Math.round(tomorrowPrediction + 1.96 * stats.stdDev)
     },
+    
     statistics: {
-      mean: Math.round(stats.mean),
+      total_revenue: Math.round(totalRevenue),
+      avg_daily_revenue: Math.round(stats.mean),
       std_dev: Math.round(stats.stdDev),
       variance: Math.round(stats.variance),
       slope: regression.slope.toFixed(2),
-      r_squared: regression.r2.toFixed(3)
+      r_squared: regression.r2.toFixed(3),
+      trend: regression.slope > 0 ? 'Upward' : 'Downward',
+      daily_growth_rate: ((regression.slope / avgDailyRevenue) * 100).toFixed(2) + '%'
     },
+    
     daily_data: chartData,
-    ai_insight: aiInsight
+    ai_insight: aiInsight,
+    
+    // What to improve section
+    improvement_areas: {
+      aov: `Current AOV needs optimization. Target: Increase by 15-20%`,
+      cancellation: `Focus on reducing cancellation rate`,
+      conversion: `Improve checkout flow and payment success rate`
+    }
   };
 }
 
@@ -488,8 +575,7 @@ function exportCSV(type, data, startDate, endDate) {
 exports.handler = async (event) => {
   const startTime = Date.now();
   log('INFO', '=== NEW REQUEST ===', { 
-    queryParams: event.queryStringParameters,
-    headers: event.headers 
+    queryParams: event.queryStringParameters
   });
   
   if (!MAGENTO_TOKEN) {
@@ -498,10 +584,9 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers: { 
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not configured in Netlify' })
+      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not configured in Netlify Environment Variables' })
     };
   }
   
@@ -525,7 +610,7 @@ exports.handler = async (event) => {
       
       const exported = exportCSV(exportType, data, startDate, endDate);
       
-      log('INFO', `Export completed: ${exported.filename}`);
+      log('INFO', `Export completed: ${exported.filename} (${exported.csv.length} bytes)`);
       
       return {
         statusCode: 200,
@@ -545,27 +630,27 @@ exports.handler = async (event) => {
     else if (type === 'forecast') response = await getAIForecast(startDate, endDate);
     
     const duration = Date.now() - startTime;
-    log('INFO', `Request completed in ${duration}ms`, { type });
+    log('INFO', `✅ Request completed in ${duration}ms`, { type, dataSize: JSON.stringify(response).length });
     
     return {
       statusCode: 200,
       headers: { 
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify(response)
     };
     
   } catch (error) {
-    log('ERROR', 'Handler Error', { error: error.message, stack: error.stack });
+    const duration = Date.now() - startTime;
+    log('ERROR', 'Handler Error', { error: error.message, stack: error.stack, duration });
     return {
       statusCode: 500,
       headers: { 
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: error.message, stack: error.stack })
+      body: JSON.stringify({ error: error.message, details: error.stack })
     };
   }
 };
