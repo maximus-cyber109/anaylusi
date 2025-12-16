@@ -116,6 +116,7 @@
       padding: 15px;
       border: 2px solid #0f0;
       background: rgba(0, 255, 0, 0.05);
+      flex-wrap: wrap;
     }
     
     .filter-group {
@@ -324,14 +325,6 @@
       box-shadow: 0 0 10px #0f0;
     }
     
-    .chart-container {
-      height: 300px;
-      border: 2px solid #0f0;
-      padding: 20px;
-      background: rgba(0, 255, 0, 0.02);
-      position: relative;
-    }
-    
     .log-viewer {
       background: #000;
       border: 2px solid #0f0;
@@ -350,6 +343,27 @@
     .log-entry.info { color: #0f0; }
     .log-entry.error { color: #f00; }
     .log-entry.warn { color: #ff0; }
+    
+    .prediction-card {
+      background: rgba(0, 255, 0, 0.1);
+      border: 2px solid #0f0;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .prediction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .highlight-box {
+      background: rgba(0, 255, 0, 0.15);
+      padding: 15px;
+      border-left: 4px solid #0f0;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -357,7 +371,7 @@
     <canvas id="canvas"></canvas>
     <div class="auth-text">
       <div id="auth-quote"></div>
-      <div class="quote" style="margin-top: 30px;">[ Type the passphrase to continue ]</div>
+      <div class="quote" style="margin-top: 30px;">Server is Tired</div>
     </div>
   </div>
   
@@ -393,8 +407,8 @@
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
             <option value="7">Last 7 Days</option>
+            <option value="15">Last 15 Days</option>
             <option value="30" selected>Last 30 Days</option>
-            <option value="90">Last 90 Days</option>
           </select>
         </div>
         <button onclick="loadAllData()">🔄 REFRESH</button>
@@ -430,10 +444,16 @@
       "🤓 'Debugging is like being a detective in a crime movie where you're also the murderer'",
       "📊 'In God we trust. All others must bring data.' - W. Edwards Deming",
       "💻 'It works on my machine' - Every developer ever",
-      "🔐 'Access Denied... Just kidding, type the password!'",
+      "🔐 'Access Denied... Just kidding, Go Back to The Cave!'",
       "⚡ 'May the forecast be ever in your favor'",
       "🎯 'Data doesn't lie, but it can be very misleading' - Loading Analytics...",
-      "🧠 'AI is the new electricity' - Andrew Ng | Powering your insights..."
+      "🧠 'AI is the new electricity' - Andrew Ng | Powering your insights...",
+      "📈 'The only thing we have to fear is bad data... and also bears'",
+      "🦄 'Unicorns exist. They're called Champion Customers!'",
+      "🎲 'Statistics: The art of never having to say you're certain'",
+      "🔮 'I predict you will see predictions in the Forecast tab'",
+      "💰 'Money can't buy happiness, but it can buy dental supplies!'",
+      "🎪 'Welcome to the greatest data show on earth!'"
     ];
     
     let inputBuffer = '';
@@ -614,12 +634,16 @@
     }
     
     function renderDashboard(data) {
+      const growthIcon = parseFloat(data.growth_rate) > 0 ? '📈' : '📉';
+      const growthColor = parseFloat(data.growth_rate) > 0 ? '#0f0' : '#f60';
+      
       document.getElementById('tab-dashboard').innerHTML = `
         <div class="metrics">
           <div class="card">
             <div class="card-title">💰 Total Revenue</div>
             <div class="card-value">₹${data.revenue.toLocaleString()}</div>
             <div class="card-sub">Avg Daily: ₹${data.daily_stats.mean_daily_revenue.toLocaleString()}</div>
+            <div class="card-sub" style="color: ${growthColor};">${growthIcon} ${data.growth_rate}% growth</div>
           </div>
           <div class="card">
             <div class="card-title">📦 Total Orders</div>
@@ -651,21 +675,25 @@
         
         <div class="section">
           <div class="section-header">
-            <div class="section-title">📈 Statistical Analysis</div>
+            <div class="section-title">📈 Statistical Analysis (${data.daily_stats.total_days} days)</div>
           </div>
           <div class="section-content">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-              <div>
+              <div class="highlight-box">
                 <strong>Mean Daily Revenue:</strong><br>
                 ₹${data.daily_stats.mean_daily_revenue.toLocaleString()}
               </div>
-              <div>
+              <div class="highlight-box">
                 <strong>Standard Deviation (σ):</strong><br>
                 ₹${data.daily_stats.std_deviation.toLocaleString()}
               </div>
-              <div>
+              <div class="highlight-box">
                 <strong>Variance (σ²):</strong><br>
                 ₹${data.daily_stats.variance.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Growth Rate:</strong><br>
+                <span style="color: ${growthColor};">${growthIcon} ${data.growth_rate}%</span>
               </div>
             </div>
           </div>
@@ -689,17 +717,17 @@
               <div class="card">
                 <div class="card-title">🏆 Champions</div>
                 <div class="card-value">${data.segments.champions}</div>
-                <div class="card-sub">High RFM Score</div>
+                <div class="card-sub">High RFM Score (13-15)</div>
               </div>
               <div class="card">
                 <div class="card-title">💎 Loyal</div>
                 <div class="card-value">${data.segments.loyal}</div>
-                <div class="card-sub">Regular Buyers</div>
+                <div class="card-sub">Regular Buyers (10-12)</div>
               </div>
               <div class="card">
                 <div class="card-title">🌟 Promising</div>
                 <div class="card-value">${data.segments.promising}</div>
-                <div class="card-sub">Recent Activity</div>
+                <div class="card-sub">Recent Activity (8-9)</div>
               </div>
               <div class="card">
                 <div class="card-title">🆕 New</div>
@@ -709,12 +737,12 @@
               <div class="card">
                 <div class="card-title">⚠️ At Risk</div>
                 <div class="card-value">${data.segments.at_risk}</div>
-                <div class="card-sub">90-180 Days</div>
+                <div class="card-sub">90-180 Days Inactive</div>
               </div>
               <div class="card">
                 <div class="card-title">😢 Lost</div>
                 <div class="card-value">${data.segments.lost}</div>
-                <div class="card-sub">>180 Days</div>
+                <div class="card-sub">>180 Days Inactive</div>
               </div>
             </div>
           </div>
@@ -743,7 +771,7 @@
                   <tr>
                     <td>${c.email}</td>
                     <td><span class="badge ${c.segment.toLowerCase().replace(' ', '-')}">${c.segment}</span></td>
-                    <td>₹${c.monetary.toLocaleString()}</td>
+                    <td><strong>₹${c.monetary.toLocaleString()}</strong></td>
                     <td>${c.orders}</td>
                     <td>₹${c.avg_order_value.toLocaleString()}</td>
                     <td>${new Date(c.lastOrder).toLocaleDateString()}</td>
@@ -762,7 +790,7 @@
       document.getElementById('tab-products').innerHTML = `
         <div class="section">
           <div class="section-header">
-            <div class="section-title">🏆 Top 20 Sellers</div>
+            <div class="section-title">🏆 Top 20 Sellers (${data.total_unique} unique products)</div>
             <button onclick="exportData('products')">↓ Export CSV</button>
           </div>
           <div class="section-content">
@@ -798,7 +826,7 @@
         ${data.high_cancellation_risk.length > 0 ? `
         <div class="section">
           <div class="section-header">
-            <div class="section-title">⚠️ High Cancellation Risk Products</div>
+            <div class="section-title">⚠️ High Cancellation Risk Products (>15%)</div>
           </div>
           <div class="section-content">
             <table class="data-table">
@@ -881,11 +909,63 @@
     }
     
     function renderForecast(data) {
+      if (data.error) {
+        document.getElementById('tab-forecast').innerHTML = `<div class="error">${data.error}</div>`;
+        return;
+      }
+      
       document.getElementById('tab-forecast').innerHTML = `
+        <div class="prediction-card">
+          <h2 style="margin-bottom: 20px; font-size: 20px;">🔮 REVENUE PREDICTIONS</h2>
+          <div class="prediction-grid">
+            <div class="highlight-box">
+              <strong>📅 TODAY (Estimated):</strong><br>
+              <span style="font-size: 24px; color: #0f0;">₹${data.today_prediction.toLocaleString()}</span>
+            </div>
+            <div class="highlight-box">
+              <strong>🌅 TOMORROW:</strong><br>
+              <span style="font-size: 24px; color: #0f0;">₹${data.tomorrow_prediction.toLocaleString()}</span>
+              <br><small>Range: ₹${data.confidence_interval.lower.toLocaleString()} - ₹${data.confidence_interval.upper.toLocaleString()}</small>
+            </div>
+            <div class="highlight-box">
+              <strong>📊 NEXT 7 DAYS TOTAL:</strong><br>
+              <span style="font-size: 28px; color: #0ff; font-weight: bold;">₹${data.next_7_days_total.toLocaleString()}</span>
+            </div>
+            <div class="highlight-box">
+              <strong>🚀 NEXT 30 DAYS TOTAL:</strong><br>
+              <span style="font-size: 28px; color: #0ff; font-weight: bold;">₹${data.next_30_days_total.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📈 Next 7 Days Breakdown</div>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Predicted Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.next_7_days_daily.map(d => `
+                  <tr>
+                    <td><strong>${new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}</strong></td>
+                    <td style="color: #0ff; font-size: 16px;">₹${d.predicted_revenue.toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
         <div class="metrics">
           <div class="card">
             <div class="card-title">🤖 Model</div>
-            <div class="card-value" style="font-size: 16px;">${data.model}</div>
+            <div class="card-value" style="font-size: 14px;">${data.model}</div>
           </div>
           <div class="card">
             <div class="card-title">📊 Confidence (R²)</div>
@@ -893,19 +973,19 @@
             <div class="card-sub">R² = ${data.statistics.r_squared}</div>
           </div>
           <div class="card">
-            <div class="card-title">🔮 Tomorrow's Prediction</div>
-            <div class="card-value">₹${data.next_day_prediction.toLocaleString()}</div>
-            <div class="card-sub">±₹${(data.confidence_interval.upper - data.next_day_prediction).toLocaleString()}</div>
+            <div class="card-title">📈 Trend</div>
+            <div class="card-value" style="font-size: 18px;">${data.statistics.trend}</div>
+            <div class="card-sub">Daily Growth: ${data.statistics.daily_growth_rate}</div>
           </div>
           <div class="card">
-            <div class="card-title">📈 Trend Slope</div>
-            <div class="card-value">${data.statistics.slope > 0 ? '↗️' : '↘️'} ${Math.abs(data.statistics.slope).toFixed(2)}</div>
+            <div class="card-title">💰 Avg Daily Revenue</div>
+            <div class="card-value" style="font-size: 18px;">₹${data.statistics.avg_daily_revenue.toLocaleString()}</div>
           </div>
         </div>
         
         <div class="section">
           <div class="section-header">
-            <div class="section-title">🧠 AI Insights (Gemini 1.5 Flash)</div>
+            <div class="section-title">🧠 AI Insights & Recommendations (Gemini 1.5 Flash)</div>
           </div>
           <div class="section-content">
             <div class="ai-insight">${data.ai_insight}</div>
@@ -918,29 +998,29 @@
           </div>
           <div class="section-content">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; font-size: 14px;">
-              <div>
-                <strong>Mean Revenue:</strong><br>
-                ₹${data.statistics.mean.toLocaleString()}
+              <div class="highlight-box">
+                <strong>Total Revenue:</strong><br>
+                ₹${data.statistics.total_revenue.toLocaleString()}
               </div>
-              <div>
+              <div class="highlight-box">
+                <strong>Mean Revenue:</strong><br>
+                ₹${data.statistics.avg_daily_revenue.toLocaleString()}
+              </div>
+              <div class="highlight-box">
                 <strong>Std Deviation (σ):</strong><br>
                 ₹${data.statistics.std_dev.toLocaleString()}
               </div>
-              <div>
+              <div class="highlight-box">
                 <strong>Variance (σ²):</strong><br>
                 ₹${data.statistics.variance.toLocaleString()}
               </div>
-              <div>
+              <div class="highlight-box">
                 <strong>Regression Slope:</strong><br>
                 ${data.statistics.slope}
               </div>
-              <div>
+              <div class="highlight-box">
                 <strong>R-Squared:</strong><br>
                 ${data.statistics.r_squared}
-              </div>
-              <div>
-                <strong>Data Points:</strong><br>
-                ${data.data_points} days
               </div>
             </div>
           </div>
@@ -948,7 +1028,7 @@
         
         <div class="section">
           <div class="section-header">
-            <div class="section-title">📅 Daily Revenue Trend</div>
+            <div class="section-title">📅 Historical Data (Last 14 Days)</div>
           </div>
           <div class="section-content">
             <table class="data-table">
