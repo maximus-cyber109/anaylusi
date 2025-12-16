@@ -19,33 +19,33 @@ function log(level, message, data = null) {
   console.log(logMsg, data ? JSON.stringify(data).substring(0, 200) : '');
 }
 
-function makeRequest(endpoint, timeout = 20000) {
+function makeRequest(endpoint, timeout = 18000) {
   return new Promise((resolve) => {
     const url = `${BASE_URL}${endpoint}`;
-    log('INFO', `Requesting: ${endpoint.substring(0, 150)}...`);
+    log('INFO', `API Call: ${endpoint.substring(0, 100)}...`);
     
     const req = https.request(url, { method: 'GET', headers: FIREWALL_HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        log('INFO', `Response: ${res.statusCode} | ${(data.length / 1024).toFixed(0)}KB`);
+        log('INFO', `✓ ${res.statusCode} | ${(data.length / 1024).toFixed(0)}KB`);
         try {
           const parsed = JSON.parse(data);
           resolve(parsed);
         } catch (e) {
-          log('ERROR', 'JSON Parse Error', { error: e.message });
+          log('ERROR', 'Parse Error', { error: e.message });
           resolve({ items: [], total_count: 0 });
         }
       });
     });
     
     req.on('error', (e) => {
-      log('ERROR', 'Request Error', { error: e.message });
+      log('ERROR', 'Network Error', { error: e.message });
       resolve({ items: [], total_count: 0 });
     });
     
     req.setTimeout(timeout, () => {
-      log('ERROR', `Timeout (${timeout}ms)`);
+      log('ERROR', `Timeout ${timeout}ms`);
       req.abort();
     });
     
@@ -53,18 +53,13 @@ function makeRequest(endpoint, timeout = 20000) {
   });
 }
 
-// FIXED: Proper Magento 2 date filtering with separate filterGroups
-async function fetchOrdersSmart(startDate, endDate, maxOrders = 5000) {
-  log('INFO', `Fetching orders: ${startDate} to ${endDate}`);
+// OPTIMIZED: Fetch only 2-3 pages (400-600 orders) to stay under 30s timeout
+async function fetchOrdersFast(startDate, endDate) {
+  log('INFO', `Fast fetch: ${startDate} to ${endDate} (max 3 pages for speed)`);
   
   const allOrders = [];
-  let currentPage = 1;
   const pageSize = 200;
-  
-  // CORRECT MAGENTO 2 SYNTAX:
-  // filterGroups[0] = created_at >= startDate (from)
-  // filterGroups[1] = created_at <= endDate (to)
-  // This creates AND logic between the two groups
+  const maxPages = 3; // Only 3 pages = ~25 seconds total
   
   const baseQuery = `/orders?` +
     `searchCriteria[filterGroups][0][filters][0][field]=created_at&` +
@@ -76,46 +71,32 @@ async function fetchOrdersSmart(startDate, endDate, maxOrders = 5000) {
     `searchCriteria[sortOrders][0][field]=created_at&` +
     `searchCriteria[sortOrders][0][direction]=DESC`;
   
-  while (allOrders.length < maxOrders) {
-    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${currentPage}`;
-    const data = await makeRequest(query, 20000);
+  for (let page = 1; page <= maxPages; page++) {
+    const query = `${baseQuery}&searchCriteria[pageSize]=${pageSize}&searchCriteria[currentPage]=${page}`;
+    const data = await makeRequest(query, 18000);
     
     if (!data.items || data.items.length === 0) {
-      log('INFO', `No more data. Total fetched: ${allOrders.length}`);
+      log('INFO', `No data on page ${page}. Total: ${allOrders.length}`);
       break;
     }
     
     allOrders.push(...data.items);
-    log('INFO', `Page ${currentPage}: +${data.items.length} orders | Total: ${allOrders.length}/${data.total_count || '?'}`);
+    log('INFO', `Page ${page}/${maxPages}: +${data.items.length} | Total: ${allOrders.length}/${data.total_count || '?'}`);
     
-    // If we fetched less than pageSize, it's the last page
+    // Stop if less than full page (last page reached)
     if (data.items.length < pageSize) {
-      log('INFO', `Last page. Final count: ${allOrders.length}`);
-      break;
-    }
-    
-    // If total_count is known and we've fetched them all
-    if (data.total_count && allOrders.length >= data.total_count) {
-      log('INFO', `All ${allOrders.length} orders fetched`);
-      break;
-    }
-    
-    currentPage++;
-    
-    // Safety limit: max 25 pages (5000 orders)
-    if (currentPage > 25) {
-      log('WARN', 'Reached max 25 pages limit');
+      log('INFO', `Last page reached. Total: ${allOrders.length}`);
       break;
     }
   }
   
-  log('INFO', `Fetch complete: ${allOrders.length} orders`);
+  log('INFO', `✅ Fetched ${allOrders.length} orders (sample for fast analysis)`);
   return allOrders;
 }
 
 function makeGeminiRequest(prompt, data) {
   return new Promise((resolve) => {
-    log('INFO', 'Calling Gemini Flash API');
+    log('INFO', 'Gemini API call');
     
     const payload = JSON.stringify({
       contents: [{
@@ -144,21 +125,21 @@ function makeGeminiRequest(prompt, data) {
         try {
           const result = JSON.parse(responseData);
           const text = result.candidates?.[0]?.content?.parts?.[0]?.text || 'AI analysis unavailable';
-          log('INFO', `Gemini OK: ${text.length} chars`);
+          log('INFO', `✓ Gemini: ${text.length} chars`);
           resolve(text);
         } catch (e) {
-          log('ERROR', 'Gemini Parse Error', { error: e.message });
+          log('ERROR', 'Gemini Parse Error');
           resolve('AI analysis temporarily unavailable');
         }
       });
     });
     
     req.on('error', (e) => {
-      log('ERROR', 'Gemini Error', { error: e.message });
+      log('ERROR', 'Gemini Error');
       resolve('AI analysis failed');
     });
     
-    req.setTimeout(10000, () => {
+    req.setTimeout(8000, () => {
       log('ERROR', 'Gemini Timeout');
       req.abort();
       resolve('AI analysis timed out');
@@ -203,10 +184,10 @@ function linearRegression(data) {
 }
 
 async function getDashboard(startDate, endDate) {
-  log('INFO', 'Getting Dashboard', { startDate, endDate });
+  log('INFO', '📊 Dashboard', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
-  log('INFO', `Processing ${orders.length} orders for dashboard`);
+  const orders = await fetchOrdersFast(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders`);
   
   let revenue = 0, cod = 0, online = 0, cancelled = 0, pending = 0, complete = 0, processing = 0;
   const dailyRevenue = {};
@@ -254,15 +235,16 @@ async function getDashboard(startDate, endDate) {
       std_deviation: Math.round(stats.stdDev),
       variance: Math.round(stats.variance),
       total_days: days.length
-    }
+    },
+    sample_info: `Analyzed ${orders.length} most recent orders (sampled for speed)`
   };
 }
 
 async function getCustomerRFM(startDate, endDate) {
-  log('INFO', 'Getting Customer RFM', { startDate, endDate });
+  log('INFO', '👥 Customer RFM', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
-  log('INFO', `Processing ${orders.length} orders for RFM`);
+  const orders = await fetchOrdersFast(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders`);
   
   const customers = {};
   const now = new Date();
@@ -347,10 +329,10 @@ async function getCustomerRFM(startDate, endDate) {
 }
 
 async function getProductAnalytics(startDate, endDate) {
-  log('INFO', 'Getting Product Analytics', { startDate, endDate });
+  log('INFO', '📦 Product Analytics', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
-  log('INFO', `Processing ${orders.length} orders for products`);
+  const orders = await fetchOrdersFast(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders`);
   
   const products = {};
   
@@ -402,12 +384,12 @@ async function getProductAnalytics(startDate, endDate) {
 }
 
 async function getCancellationReport(startDate, endDate) {
-  log('INFO', 'Getting Cancellation Report', { startDate, endDate });
+  log('INFO', '❌ Cancellation Report', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
+  const orders = await fetchOrdersFast(startDate, endDate);
   const cancelledOrders = orders.filter(o => o.status === 'canceled' || o.status === 'cancelled');
   
-  log('INFO', `Found ${cancelledOrders.length} cancelled out of ${orders.length}`);
+  log('INFO', `${cancelledOrders.length} cancelled / ${orders.length} total`);
   
   let totalLostRevenue = 0;
   const reasonMap = {};
@@ -443,10 +425,10 @@ async function getCancellationReport(startDate, endDate) {
 }
 
 async function getAIForecast(startDate, endDate) {
-  log('INFO', 'Getting AI Forecast', { startDate, endDate });
+  log('INFO', '🤖 AI Forecast', { startDate, endDate });
   
-  const orders = await fetchOrdersSmart(startDate, endDate, 5000);
-  log('INFO', `Processing ${orders.length} orders for forecast`);
+  const orders = await fetchOrdersFast(startDate, endDate);
+  log('INFO', `Processing ${orders.length} orders`);
   
   const dailyData = {};
   orders.forEach(o => {
@@ -463,7 +445,7 @@ async function getAIForecast(startDate, endDate) {
   
   if (revenueArray.length < 3) {
     return {
-      error: 'Insufficient data for forecasting (need at least 3 days)',
+      error: 'Need at least 3 days of data for forecasting',
       data_points: revenueArray.length
     };
   }
@@ -491,27 +473,26 @@ async function getAIForecast(startDate, endDate) {
     orders: dailyData[day].orders
   }));
   
-  const prompt = `You are a business analyst for PinkBlue, a dental e-commerce company.
+  const prompt = `Business Analyst for PinkBlue dental e-commerce:
 
-CURRENT PERFORMANCE (${sortedDays.length} days):
-- Total Revenue: ₹${Math.round(totalRevenue).toLocaleString()}
-- Avg Daily Revenue: ₹${Math.round(avgDailyRevenue).toLocaleString()}
-- Trend: ${regression.slope > 0 ? 'Growing' : 'Declining'} (${regression.slope > 0 ? '+' : ''}${(regression.slope / avgDailyRevenue * 100).toFixed(1)}% daily)
-- Volatility: σ = ₹${Math.round(stats.stdDev).toLocaleString()}
-- Model Confidence: R² = ${regression.r2.toFixed(3)}
+DATA (${sortedDays.length} days):
+- Total: ₹${Math.round(totalRevenue).toLocaleString()}
+- Daily Avg: ₹${Math.round(avgDailyRevenue).toLocaleString()}
+- Trend: ${regression.slope > 0 ? '↗' : '↘'} ${((regression.slope / avgDailyRevenue) * 100).toFixed(1)}%/day
+- R²: ${regression.r2.toFixed(3)}
 
 PREDICTIONS:
 - Tomorrow: ₹${Math.round(tomorrowPrediction).toLocaleString()}
-- Next 7 Days Total: ₹${Math.round(next7DaysTotal).toLocaleString()}
-- Next 30 Days Total: ₹${Math.round(next30DaysTotal).toLocaleString()}
+- Next 7 days: ₹${Math.round(next7DaysTotal).toLocaleString()}
+- Next 30 days: ₹${Math.round(next30DaysTotal).toLocaleString()}
 
-Provide a concise analysis with:
-1. **7-Day Forecast**: Day-by-day prediction (use trending numbers)
-2. **Key Insights**: Top 3 observations from the data
-3. **What to Improve**: Top 3 specific, actionable recommendations to increase revenue, AOV, and reduce cancellations
-4. **Action Items**: 2-3 immediate steps PinkBlue should take this week
+Provide:
+1. 7-Day Forecast (daily predictions)
+2. Top 3 Insights
+3. Top 3 Actions to improve revenue/AOV/reduce cancellations
+4. This week's priorities
 
-Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
+Bullets. 250 words max.`;
 
   const aiInsight = await makeGeminiRequest(prompt, chartData.slice(-14));
   
@@ -551,34 +532,28 @@ Format with bullet points. Be specific and data-driven. Maximum 250 words.`;
     },
     
     daily_data: chartData,
-    ai_insight: aiInsight,
-    
-    improvement_areas: {
-      aov: `Current AOV needs optimization. Target: Increase by 15-20%`,
-      cancellation: `Focus on reducing cancellation rate`,
-      conversion: `Improve checkout flow and payment success rate`
-    }
+    ai_insight: aiInsight
   };
 }
 
 function exportCSV(type, data, startDate, endDate) {
-  log('INFO', `Exporting ${type}`);
+  log('INFO', `Export: ${type}`);
   
   let csv = '';
-  let filename = `${type}_${startDate}_to_${endDate}.csv`;
+  let filename = `PinkBlue_${type}_${startDate}_to_${endDate}.csv`;
   
   if (type === 'customers') {
-    csv = 'Email,Total Spent,Total Orders,Last Order,Recency (Days),Frequency,Monetary,Segment,AOV,Cancellation Rate,R Score,F Score,M Score\n';
+    csv = 'Email,Total Spent,Orders,Last Order,Recency Days,Segment,AOV,Cancel Rate,RFM Score\n';
     (data.all_customers || []).forEach(c => {
-      csv += `${c.email},${c.monetary},${c.orders},${c.lastOrder},${c.recency},${c.frequency},${c.monetary},${c.segment},${c.avg_order_value},${c.cancellation_rate}%,${c.r_score},${c.f_score},${c.m_score}\n`;
+      csv += `${c.email},${c.monetary},${c.orders},${c.lastOrder},${c.recency},${c.segment},${c.avg_order_value},${c.cancellation_rate}%,${c.r_score}-${c.f_score}-${c.m_score}\n`;
     });
   } else if (type === 'products') {
-    csv = 'SKU,Product Name,Qty Sold,Revenue,Orders,Avg Price,Cancelled Qty,Cancelled Revenue,Cancellation Rate\n';
+    csv = 'SKU,Name,Qty,Revenue,Orders,Avg Price,Cancelled Qty,Cancel Rate\n';
     (data.all_products || []).forEach(p => {
-      csv += `${p.sku},"${p.name.replace(/"/g, '""')}",${p.qty},${p.revenue},${p.orders},${p.avg_price},${p.cancelled_qty},${Math.round(p.cancelled_revenue)},${p.cancellation_rate}%\n`;
+      csv += `${p.sku},"${p.name.replace(/"/g, '""')}",${p.qty},${p.revenue},${p.orders},${p.avg_price},${p.cancelled_qty},${p.cancellation_rate}%\n`;
     });
   } else if (type === 'cancellations') {
-    csv = 'Order ID,Date,Customer Email,Amount,Payment Method\n';
+    csv = 'Order ID,Date,Customer,Amount,Payment\n';
     (data.cancelled_orders || []).forEach(o => {
       csv += `${o.order_id},${o.date},${o.customer_email},${o.amount},${o.payment_method}\n`;
     });
@@ -589,20 +564,17 @@ function exportCSV(type, data, startDate, endDate) {
 
 exports.handler = async (event) => {
   const startTime = Date.now();
-  log('INFO', '=== REQUEST START ===', { 
+  log('INFO', '🚀 START', { 
     type: event.queryStringParameters?.type,
-    dates: `${event.queryStringParameters?.start_date} to ${event.queryStringParameters?.end_date}`
+    range: `${event.queryStringParameters?.start_date} to ${event.queryStringParameters?.end_date}`
   });
   
   if (!MAGENTO_TOKEN) {
-    log('ERROR', 'MAGENTO_API_TOKEN not configured');
+    log('ERROR', 'Missing MAGENTO_API_TOKEN');
     return {
       statusCode: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not configured' })
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: 'MAGENTO_API_TOKEN not set in Netlify env vars' })
     };
   }
   
@@ -626,7 +598,7 @@ exports.handler = async (event) => {
       
       const exported = exportCSV(exportType, data, startDate, endDate);
       
-      log('INFO', `Export OK: ${exported.filename}`);
+      log('INFO', `✅ Export OK: ${exported.filename}`);
       
       return {
         statusCode: 200,
@@ -646,27 +618,21 @@ exports.handler = async (event) => {
     else if (type === 'forecast') response = await getAIForecast(startDate, endDate);
     
     const duration = Date.now() - startTime;
-    log('INFO', `✅ SUCCESS in ${duration}ms`);
+    log('INFO', `✅ DONE in ${duration}ms`);
     
     return {
       statusCode: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify(response)
     };
     
   } catch (error) {
     const duration = Date.now() - startTime;
-    log('ERROR', `FAILED after ${duration}ms`, { error: error.message });
+    log('ERROR', `❌ FAILED after ${duration}ms: ${error.message}`);
     return {
       statusCode: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: error.message, details: error.stack })
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: error.message, stack: error.stack })
     };
   }
 };
