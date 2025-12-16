@@ -1,10 +1,16 @@
 const https = require('https');
 
-// --- CONFIGURATION ---
-const API_TOKEN = process.env.MAGENTO_TOKEN || 't5xkjvxlgitd25cuhxixl9dflw008f4e';
+// --- SECURE CONFIGURATION ---
+// accessing the environment variable directly. 
+// If this is missing, the API calls will fail (which is safer than exposing a key).
+const API_TOKEN = process.env.MAGENTO_TOKEN; 
 const BASE_URL = 'https://pinkblue.in/rest/V1';
 
-// --- HELPER: Native HTTPS Request (No dependencies needed) ---
+if (!API_TOKEN) {
+    console.error("CRITICAL ERROR: MAGENTO_TOKEN is missing from environment variables.");
+}
+
+// --- HELPER: Native HTTPS Request ---
 function makeRequest(url) {
     return new Promise((resolve, reject) => {
         const options = {
@@ -22,7 +28,6 @@ function makeRequest(url) {
                 try {
                     resolve(JSON.parse(data));
                 } catch (e) {
-                    // If JSON fails, return empty structure
                     console.error("JSON Parse Error", e);
                     resolve({ items: [], total_count: 0 }); 
                 }
@@ -30,7 +35,7 @@ function makeRequest(url) {
         });
         req.on('error', (e) => {
             console.error("API Error", e);
-            resolve({ items: [], total_count: 0 }); // Fallback on error
+            resolve({ items: [], total_count: 0 }); 
         });
         req.end();
     });
@@ -38,27 +43,30 @@ function makeRequest(url) {
 
 // --- MAIN HANDLER ---
 exports.handler = async (event, context) => {
+    // Security Check
+    if (!API_TOKEN) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Server Configuration Error: Missing API Token" })
+        };
+    }
+
     const type = event.queryStringParameters?.type || 'overview';
     console.log(`[SYSTEM] Processing request: ${type}`);
 
     try {
         let responseData = {};
 
-        // --- ROUTER: Decide what data to fetch based on "type" ---
         switch (type) {
-            
             case 'overview':
                 responseData = await getOverviewData();
                 break;
-
             case 'ai-forecast':
                 responseData = await getAIForecast();
                 break;
-            
             case 'products':
                 responseData = await getProductAnalytics();
                 break;
-
             default:
                 responseData = { message: "Unknown endpoint" };
         }
@@ -77,11 +85,9 @@ exports.handler = async (event, context) => {
     }
 };
 
-// --- LOGIC 1: DASHBOARD OVERVIEW (Merged from magento-api & realtime-data) ---
+// --- LOGIC 1: DASHBOARD OVERVIEW ---
 async function getOverviewData() {
     const today = new Date().toISOString().split('T')[0];
-    
-    // Fetch today's orders
     const url = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${today}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=200`;
     const data = await makeRequest(url);
 
@@ -92,10 +98,8 @@ async function getOverviewData() {
 
     (data.items || []).forEach(order => {
         revenue += parseFloat(order.grand_total) || 0;
-        
         if (order.payment?.method?.includes('cod')) cod++;
         else online++;
-
         if (order.status === 'canceled' || order.status === 'cancelled') cancelled++;
     });
 
@@ -109,37 +113,26 @@ async function getOverviewData() {
     };
 }
 
-// --- LOGIC 2: AI FORECASTING (Simplified from ai-forecasting.js) ---
+// --- LOGIC 2: AI FORECASTING ---
 async function getAIForecast() {
-    // 1. Fetch last 30 days of data
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
-    
     const sDate = startDate.toISOString().split('T')[0];
-    const eDate = endDate.toISOString().split('T')[0];
-
     const url = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${sDate}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=500`;
     const data = await makeRequest(url);
 
-    // 2. Process Daily Revenue
     const dailyRevenue = {};
     (data.items || []).forEach(order => {
         const d = order.created_at.split('T')[0];
         const val = parseFloat(order.grand_total) || 0;
-        if (order.status === 'complete') {
-            dailyRevenue[d] = (dailyRevenue[d] || 0) + val;
-        }
+        if (order.status === 'complete') dailyRevenue[d] = (dailyRevenue[d] || 0) + val;
     });
 
     const values = Object.values(dailyRevenue);
-    
-    // 3. Simple Linear Trend Calculation (y = mx + b)
     const n = values.length || 1;
     const avg = values.reduce((a,b)=>a+b,0) / n;
-    
-    // Prediction logic (Simulated growth if data is sparse)
-    const predictedGrowth = n > 5 ? 1.15 : 1.05; // 15% growth if we have data, else 5%
+    const predictedGrowth = n > 5 ? 1.15 : 1.05; 
     const nextMonthForecast = Math.round(avg * 30 * predictedGrowth);
 
     return {
@@ -151,29 +144,22 @@ async function getAIForecast() {
     };
 }
 
-// --- LOGIC 3: PRODUCT ANALYTICS (Top selling products) ---
+// --- LOGIC 3: PRODUCT ANALYTICS ---
 async function getProductAnalytics() {
     const today = new Date().toISOString().split('T')[0];
     const url = `${BASE_URL}/orders?searchCriteria[filterGroups][0][filters][0][field]=created_at&searchCriteria[filterGroups][0][filters][0][value]=${today}&searchCriteria[filterGroups][0][filters][0][conditionType]=from&searchCriteria[pageSize]=100`;
-    
     const data = await makeRequest(url);
     const productMap = {};
 
     (data.items || []).forEach(order => {
         (order.items || []).forEach(item => {
-            if(!productMap[item.sku]) {
-                productMap[item.sku] = { name: item.name, qty: 0, revenue: 0 };
-            }
+            if(!productMap[item.sku]) productMap[item.sku] = { name: item.name, qty: 0, revenue: 0 };
             productMap[item.sku].qty += (item.qty_ordered || 0);
             productMap[item.sku].revenue += (item.row_total || 0);
         });
     });
 
-    // Sort by revenue
     const sorted = Object.values(productMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
 
-    return {
-        top_products: sorted,
-        total_unique_items: Object.keys(productMap).length
-    };
+    return { top_products: sorted, total_unique_items: Object.keys(productMap).length };
 }
