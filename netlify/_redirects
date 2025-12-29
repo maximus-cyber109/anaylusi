@@ -1,1 +1,5 @@
+# Netlify Functions - these must come FIRST
+/.netlify/functions/* /.netlify/functions/:splat 200
+
+# SPA fallback - only for non-function routes
 /* /index.html 200
