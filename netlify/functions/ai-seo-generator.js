@@ -6,12 +6,11 @@ function makeGeminiRequest(prompt, timeout = 15000) {
   return new Promise((resolve) => {
     
     // Try different model endpoints in order
-    const modelPaths = [
-      '/v1beta/models/gemini-1.5-flash:generateContent',
-      '/v1/models/gemini-1.5-flash:generateContent',
-      '/v1beta/models/gemini-pro:generateContent',
-      '/v1/models/gemini-pro:generateContent'
-    ];
+   const modelPaths = [
+  'gemini-2.0-flash',      // Current best free model
+  'gemini-2.0-flash-lite', // Fallback for higher rate limits
+  'gemini-1.5-flash'       // Legacy fallback
+];
     
     let currentPathIndex = 0;
     
