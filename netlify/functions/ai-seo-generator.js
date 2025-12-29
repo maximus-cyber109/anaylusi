@@ -19,7 +19,7 @@ function makeGeminiRequest(prompt, timeout = 10000) {
     // and gemini-1.5-flash is the most reliable free workhorse.
     const options = {
       hostname: 'generativelanguage.googleapis.com',
-      path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      path: `/v1beta/models/gemini-1.5-flash-001:generateContent?key=${GEMINI_API_KEY}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
