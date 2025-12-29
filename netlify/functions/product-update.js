@@ -84,12 +84,10 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Headers': 'Content-Type'
   };
   
-  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
   
-  // Check API token
   if (!MAGENTO_TOKEN) {
     log('ERROR: MAGENTO_API_TOKEN not configured');
     return {
@@ -99,7 +97,6 @@ exports.handler = async (event) => {
     };
   }
   
-  // Get SKU from query params
   const sku = event.queryStringParameters?.sku;
   
   if (!sku) {
@@ -111,7 +108,6 @@ exports.handler = async (event) => {
     };
   }
   
-  // Parse request body
   let updates;
   try {
     updates = JSON.parse(event.body || '[]');
@@ -124,7 +120,6 @@ exports.handler = async (event) => {
     };
   }
   
-  // Validate updates array
   if (!Array.isArray(updates) || updates.length === 0) {
     log('ERROR: Updates must be a non-empty array');
     return {
@@ -140,7 +135,7 @@ exports.handler = async (event) => {
       attributes: updates.map(u => u.attribute_code) 
     });
     
-    // Character limit validation
+    // Character limit validation (NO FAQs)
     const limits = {
       meta_title: 70,
       meta_description: 160,
@@ -155,11 +150,9 @@ exports.handler = async (event) => {
       meta_keyword: 255,
       description: 65000,
       features: 65000,
-      technical_details: 65000,
-      faqs: 65000
+      technical_details: 65000
     };
     
-    // Validate each update
     for (const update of updates) {
       const limit = limits[update.attribute_code];
       if (limit && update.value && update.value.length > limit) {
@@ -179,11 +172,10 @@ exports.handler = async (event) => {
       }
     }
     
-    // Build payload - IMPORTANT: Use store_id: 0 for ALL STORE VIEWS
     const payload = {
       product: {
         sku: sku,
-        store_id: 0, // 🔥 THIS UPDATES ALL STORE VIEWS, NOT JUST DEFAULT
+        store_id: 0, // ALL STORE VIEWS
         custom_attributes: updates.map(u => ({
           attribute_code: u.attribute_code,
           value: u.value || ''
@@ -198,7 +190,6 @@ exports.handler = async (event) => {
       attributes_count: payload.product.custom_attributes.length
     });
     
-    // Make the API request
     const url = `${BASE_URL}/products/${encodeURIComponent(sku)}`;
     const result = await makeRequest(url, 'PUT', payload, 25000);
     
@@ -237,7 +228,7 @@ exports.handler = async (event) => {
         updated_attributes: updates.map(u => u.attribute_code),
         timestamp: new Date().toISOString(),
         duration: duration,
-        store_scope: 'all' // Indicates it updated all store views
+        store_scope: 'all'
       })
     };
     
