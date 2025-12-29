@@ -3,1164 +3,1063 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Manager - PinkBlue</title>
+  <title>Access Denied</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    :root {
-      --bg: #000;
-      --text: #fff;
-      --border: #333;
-      --accent: #0f0;
-      --error: #f00;
-      --warning: #ff0;
-      --success: #0f0;
-    }
-    
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Courier New', monospace;
-      min-height: 100vh;
+    body { 
+      font-family: 'Courier New', monospace; 
+      background: #000; 
+      color: #0f0; 
       overflow-x: hidden;
     }
-
-    /* ===== CALCULATOR LOGIN SCREEN ===== */
-    #calculator-screen {
+    
+    #auth-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100vh;
-      background: var(--bg);
-      z-index: 9999;
+      height: 100%;
+      background: #000;
+      z-index: 10000;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
     }
-
-    #calculator-screen.hidden {
-      display: none;
+    
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
-
-    .calc-title {
-      font-size: 1.5rem;
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      border: 1px solid var(--text);
-      padding: 10px 20px;
-    }
-
-    .calculator {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
+    
+    .auth-text {
+      position: relative;
+      z-index: 10001;
+      text-align: center;
+      font-size: 18px;
       padding: 20px;
-      border-radius: 5px;
+      line-height: 1.8;
+      max-width: 600px;
     }
-
-    .calc-display {
+    
+    .quote {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 20px;
+      font-style: italic;
+    }
+    
+    #dashboard {
+      display: none;
       background: #000;
-      border: 1px solid var(--accent);
-      padding: 20px;
-      font-size: 2rem;
-      text-align: right;
-      margin-bottom: 15px;
-      min-height: 60px;
-      color: var(--accent);
-      font-family: 'Courier New', monospace;
+      min-height: 100vh;
     }
-
-    .calc-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 80px);
-      gap: 10px;
+    
+    .header {
+      background: linear-gradient(90deg, #000 0%, #001a00 100%);
+      border-bottom: 2px solid #0f0;
+      padding: 15px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-
-    .calc-btn {
-      background: #111;
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 1.2rem;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .calc-btn:hover {
-      background: var(--text);
-      color: var(--bg);
-    }
-
-    .calc-btn.operator {
-      background: #222;
-    }
-
-    .calc-btn.equals {
-      grid-column: span 2;
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .calc-btn.clear {
-      background: var(--error);
-      color: var(--bg);
-    }
-
-    /* ===== MAIN APP ===== */
-    #main-app {
-      display: none;
-      padding: 20px;
-    }
-
-    #main-app.show {
-      display: block;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 20px;
-      margin-bottom: 30px;
+    
+    .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      letter-spacing: 3px;
-      border: 1px solid var(--text);
-      padding: 10px 20px;
-      display: inline-block;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .search-box {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 10px;
       margin-bottom: 15px;
     }
-
-    input, textarea, select, button {
+    
+    .title { 
+      font-size: 22px; 
+      font-weight: bold;
+      text-shadow: 0 0 10px #0f0;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 0;
+      border: 2px solid #0f0;
       background: #000;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 10px 15px;
-      font-family: inherit;
-      font-size: 0.9rem;
     }
-
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    input[type="text"] {
-      flex: 1;
-    }
-
-    button {
+    
+    .tab {
+      padding: 10px 20px;
       cursor: pointer;
-      transition: all 0.2s;
+      border-right: 2px solid #0f0;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+    
+    .tab:last-child { border-right: none; }
+    
+    .tab:hover {
+      background: rgba(0, 255, 0, 0.1);
+    }
+    
+    .tab.active {
+      background: #0f0;
+      color: #000;
+      font-weight: bold;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-top: 15px;
+      padding: 15px;
+      border: 2px solid #0f0;
+      background: rgba(0, 255, 0, 0.05);
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .filter-group label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 8px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    
+    button {
+      background: #000;
+      color: #0f0;
+      border: 2px solid #0f0;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background: #0f0;
+      color: #000;
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .content {
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .card {
+      border: 2px solid #0f0;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.02);
+      transition: all 0.3s;
+    }
+    
+    .card:hover {
+      background: rgba(0, 255, 0, 0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+    }
+    
+    .card-title {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
-    button:hover:not(:disabled) {
-      background: var(--text);
-      color: var(--bg);
+    
+    .card-value {
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 0 0 5px #0f0;
     }
-
-    button:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+    
+    .card-sub {
+      font-size: 12px;
+      margin-top: 8px;
+      opacity: 0.6;
     }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-      border-color: var(--accent);
-    }
-
-    .btn-secondary {
-      background: #333;
-      border-color: #666;
-    }
-
-    .btn-ai {
-      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-      color: var(--text);
-      border: none;
-    }
-
-    .product-info {
-      background: rgba(0,255,0,0.05);
-      border: 1px solid var(--accent);
-      padding: 15px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .product-info.show {
-      display: block;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
-    }
-
-    .product-status-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .product-status-toggle.show {
-      display: flex;
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 60px;
-      height: 30px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 30px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 22px;
-      width: 22px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(30px);
-    }
-
-    .attributes-grid {
-      display: grid;
-      gap: 20px;
-    }
-
+    
     .section {
-      border: 1px solid var(--border);
-      padding: 20px;
-      background: rgba(255,255,255,0.02);
+      margin-bottom: 25px;
+      border: 2px solid #0f0;
+      background: rgba(0, 255, 0, 0.02);
     }
-
-    .section h2 {
-      font-size: 1rem;
-      margin-bottom: 15px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .attr-row {
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 20px;
-    }
-
-    .attr-row:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .attr-label {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 5px;
+    
+    .section-header {
+      background: rgba(0, 255, 0, 0.1);
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 2px solid #0f0;
     }
-
-    .char-counter {
-      font-size: 0.75rem;
-      color: #666;
-    }
-
-    .char-counter.warning {
-      color: var(--warning);
-    }
-
-    .char-counter.error {
-      color: var(--error);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .attr-actions {
-      display: flex;
-      gap: 5px;
-      margin-top: 5px;
-    }
-
-    .attr-actions button {
-      font-size: 0.75rem;
-      padding: 5px 10px;
-    }
-
-    .html-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 5px;
-      font-size: 0.8rem;
-    }
-
-    .html-toggle input[type="checkbox"] {
-      width: auto;
-    }
-
-    .preview {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #aaa;
-      display: none;
-    }
-
-    .preview.show {
-      display: block;
-    }
-
-    /* ===== MODAL/POPUP ===== */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      z-index: 10000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      position: relative;
-    }
-
-    .modal-content.success {
-      border-color: var(--success);
-    }
-
-    .modal-content.error {
-      border-color: var(--error);
-    }
-
-    .modal-content.loading {
-      border-color: var(--accent);
-    }
-
-    .modal-title {
-      font-size: 1.2rem;
-      margin-bottom: 15px;
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
     }
-
-    .modal-message {
-      margin-bottom: 20px;
+    
+    .section-content {
+      padding: 20px;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    
+    .data-table th {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 2px solid #0f0;
+      background: rgba(0, 255, 0, 0.1);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .data-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    }
+    
+    .data-table tr:hover {
+      background: rgba(0, 255, 0, 0.05);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 16px;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    
+    .error {
+      color: #f00;
+      border-color: #f00;
+      background: rgba(255, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .ai-insight {
+      white-space: pre-wrap;
+      line-height: 1.8;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.05);
+      border-left: 4px solid #0f0;
+      font-size: 13px;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid #0f0;
+      font-size: 10px;
+      margin-left: 10px;
+      border-radius: 3px;
+    }
+    
+    .badge.champions { background: rgba(0, 255, 0, 0.2); }
+    .badge.loyal { background: rgba(0, 200, 255, 0.2); border-color: #0cf; color: #0cf; }
+    .badge.at-risk { background: rgba(255, 100, 0, 0.2); border-color: #f60; color: #f60; }
+    .badge.lost { background: rgba(255, 0, 0, 0.2); border-color: #f00; color: #f00; }
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 255, 0, 0.2);
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #0f0;
+      transition: width 0.5s;
+      box-shadow: 0 0 10px #0f0;
+    }
+    
+    .log-viewer {
+      background: #000;
+      border: 2px solid #0f0;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 11px;
       line-height: 1.6;
     }
-
-    .modal-close {
-      background: var(--text);
-      color: var(--bg);
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
+    
+    .log-entry {
+      margin: 5px 0;
+      opacity: 0.8;
     }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .update-actions {
-      position: sticky;
-      bottom: 0;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
+    
+    .log-entry.info { color: #0f0; }
+    .log-entry.error { color: #f00; }
+    .log-entry.warn { color: #ff0; }
+    
+    .prediction-card {
+      background: rgba(0, 255, 0, 0.1);
+      border: 2px solid #0f0;
       padding: 20px;
-      text-align: center;
-      margin-top: 20px;
+      margin-bottom: 20px;
     }
-
-    .update-actions button {
-      padding: 15px 50px;
-      font-size: 1.1rem;
-      margin: 0 10px;
+    
+    .prediction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .highlight-box {
+      background: rgba(0, 255, 0, 0.15);
+      padding: 15px;
+      border-left: 4px solid #0f0;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-
-  <!-- CALCULATOR LOGIN SCREEN -->
-  <div id="calculator-screen">
-    <div class="calc-title">CALCULATOR</div>
-    <div class="calculator">
-      <div class="calc-display" id="calc-display">0</div>
-      <div class="calc-buttons">
-        <button class="calc-btn clear" onclick="calcClear()">C</button>
-        <button class="calc-btn" onclick="calcInput('(')">(</button>
-        <button class="calc-btn" onclick="calcInput(')')">)</button>
-        <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
-        
-        <button class="calc-btn" onclick="calcInput('7')">7</button>
-        <button class="calc-btn" onclick="calcInput('8')">8</button>
-        <button class="calc-btn" onclick="calcInput('9')">9</button>
-        <button class="calc-btn operator" onclick="calcInput('*')">×</button>
-        
-        <button class="calc-btn" onclick="calcInput('4')">4</button>
-        <button class="calc-btn" onclick="calcInput('5')">5</button>
-        <button class="calc-btn" onclick="calcInput('6')">6</button>
-        <button class="calc-btn operator" onclick="calcInput('-')">-</button>
-        
-        <button class="calc-btn" onclick="calcInput('1')">1</button>
-        <button class="calc-btn" onclick="calcInput('2')">2</button>
-        <button class="calc-btn" onclick="calcInput('3')">3</button>
-        <button class="calc-btn operator" onclick="calcInput('+')">+</button>
-        
-        <button class="calc-btn" onclick="calcInput('0')">0</button>
-        <button class="calc-btn" onclick="calcInput('.')">.</button>
-        <button class="calc-btn equals" onclick="calcEquals()">=</button>
-      </div>
+  <div id="auth-screen">
+    <canvas id="canvas"></canvas>
+    <div class="auth-text">
+      <div id="auth-quote"></div>
+      <div class="quote" style="margin-top: 30px;">Server is Tired</div>
     </div>
   </div>
-
-  <!-- MAIN APP -->
-  <div id="main-app">
-    <div class="container">
-      <header>
-        <h1>🔧 PRODUCT MANAGER</h1>
-        <div class="header-actions">
-          <button onclick="logout()">LOGOUT</button>
-        </div>
-      </header>
-
-      <!-- Search Box -->
-      <div class="search-box">
-        <div class="input-group">
-          <input type="text" id="sku-input" placeholder="Enter Product SKU (e.g., PBX01_011_01)" autocomplete="off">
-          <button onclick="loadProduct()">LOAD PRODUCT</button>
-        </div>
+  
+  <div id="dashboard">
+    <div class="header">
+      <div class="header-top">
+        <div class="title">⚡ PINKBLUE INTEL // ANALYTICS ENGINE</div>
+        <div style="font-size: 12px; opacity: 0.7;" id="last-update"></div>
       </div>
-
-      <!-- Product Info -->
-      <div class="product-info" id="product-info">
-        <div class="info-row">
-          <strong>SKU:</strong>
-          <span id="info-sku">-</span>
-        </div>
-        <div class="info-row">
-          <strong>Name:</strong>
-          <span id="info-name">-</span>
-        </div>
-        <div class="info-row">
-          <strong>Price:</strong>
-          <span id="info-price">-</span>
-        </div>
-        <div class="info-row">
-          <strong>ID:</strong>
-          <span id="info-id">-</span>
-        </div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="dashboard">📊 DASHBOARD</div>
+        <div class="tab" data-tab="customers">👥 CUSTOMERS</div>
+        <div class="tab" data-tab="products">📦 PRODUCTS</div>
+        <div class="tab" data-tab="cancellations">❌ CANCELLATIONS</div>
+        <div class="tab" data-tab="forecast">🤖 AI FORECAST</div>
+        <div class="tab" data-tab="logs">📝 LOGS</div>
       </div>
-
-      <!-- Product Status Toggle -->
-      <div class="product-status-toggle" id="product-status-toggle">
-        <strong>Product Status:</strong>
-        <label class="toggle-switch">
-          <input type="checkbox" id="status-toggle">
-          <span class="slider"></span>
-        </label>
-        <span id="status-label">Disabled</span>
-        <button class="btn-secondary" onclick="toggleProductStatus()">SAVE STATUS</button>
-      </div>
-
-      <!-- Attributes Grid -->
-      <div class="attributes-grid" id="attributes-grid" style="display: none;">
-        
-        <!-- SECTION: CONTENT -->
-        <div class="section">
-          <h2>📝 Content</h2>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Description</span>
-              <span class="char-counter" data-attr="description">0 / 65000</span>
-            </div>
-            <textarea id="attr-description" data-limit="65000"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-description">
-              <label for="html-description">Convert to HTML bullets</label>
-            </div>
-            <div class="preview" id="preview-description"></div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Short Description</span>
-              <span class="char-counter" data-attr="short_description">0 / 255</span>
-            </div>
-            <textarea id="attr-short_description" data-limit="255"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-short_description">
-              <label for="html-short_description">Convert to HTML bullets</label>
-            </div>
-            <div class="preview" id="preview-short_description"></div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Features Tab</span>
-              <span class="char-counter" data-attr="features">0 / 65000</span>
-            </div>
-            <textarea id="attr-features" data-limit="65000"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-features">
-              <label for="html-features">Convert to HTML bullets</label>
-            </div>
-            <div class="preview" id="preview-features"></div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Technical Details</span>
-              <span class="char-counter" data-attr="technical_details">0 / 65000</span>
-            </div>
-            <textarea id="attr-technical_details" data-limit="65000"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-technical_details">
-              <label for="html-technical_details">Convert to HTML bullets</label>
-            </div>
-            <div class="preview" id="preview-technical_details"></div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Package Content</span>
-              <span class="char-counter" data-attr="package_content">0 / 2000</span>
-            </div>
-            <textarea id="attr-package_content" data-limit="2000"></textarea>
-          </div>
-
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>FAQs</span>
-              <span class="char-counter" data-attr="faqs">0 / 65000</span>
-            </div>
-            <textarea id="attr-faqs" data-limit="65000" placeholder="<div class='faq'><strong>Q:</strong> Question?<br><strong>A:</strong> Answer.</div>"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-faqs">
-              <label for="html-faqs">Convert to HTML</label>
-            </div>
-            <div class="preview" id="preview-faqs"></div>
-          </div>
+      
+      <div class="filters">
+        <div class="filter-group">
+          <label>FROM:</label>
+          <input type="date" id="start-date">
         </div>
-
-        <!-- SECTION: KEY SPECS -->
-        <div class="section">
-          <h2>⭐ Key Specifications</h2>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Key Specification 1</span>
-              <span class="char-counter" data-attr="key_specification1">0 / 255</span>
-            </div>
-            <input type="text" id="attr-key_specification1" data-limit="255" placeholder="e.g., Premium Quality Material">
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Key Specification 2</span>
-              <span class="char-counter" data-attr="key_specification2">0 / 255</span>
-            </div>
-            <input type="text" id="attr-key_specification2" data-limit="255" placeholder="e.g., Fast Delivery Available">
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Key Specification 3</span>
-              <span class="char-counter" data-attr="key_specification3">0 / 255</span>
-            </div>
-            <input type="text" id="attr-key_specification3" data-limit="255" placeholder="e.g., Best Price Guaranteed">
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Key Specification 4</span>
-              <span class="char-counter" data-attr="key_specification4">0 / 255</span>
-            </div>
-            <input type="text" id="attr-key_specification4" data-limit="255" placeholder="e.g., 100% Authentic">
-          </div>
+        <div class="filter-group">
+          <label>TO:</label>
+          <input type="date" id="end-date">
         </div>
-
-        <!-- SECTION: SEO WITH AI -->
-        <div class="section">
-          <h2>🔍 SEO (AI-Powered)</h2>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Meta Title</span>
-              <span class="char-counter" data-attr="meta_title">0 / 70</span>
-            </div>
-            <input type="text" id="attr-meta_title" data-limit="70" placeholder="Product Name | Brand | PinkBlue">
-            <div class="attr-actions">
-              <button class="btn-ai" onclick="generateAI('meta_title')">🤖 AI Generate</button>
-            </div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Meta Description</span>
-              <span class="char-counter" data-attr="meta_description">0 / 160</span>
-            </div>
-            <textarea id="attr-meta_description" data-limit="160" placeholder="Buy product at best prices with fast delivery..."></textarea>
-            <div class="attr-actions">
-              <button class="btn-ai" onclick="generateAI('meta_description')">🤖 AI Generate</button>
-            </div>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>SEO Keywords</span>
-              <span class="char-counter" data-attr="meta_keyword">0 / 255</span>
-            </div>
-            <input type="text" id="attr-meta_keyword" data-limit="255" placeholder="dental, product, buy online">
-            <div class="attr-actions">
-              <button class="btn-ai" onclick="generateAI('meta_keywords')">🤖 AI Generate</button>
-            </div>
-          </div>
+        <div class="filter-group">
+          <label>QUICK:</label>
+          <select id="quick-filter">
+            <option value="custom">Custom</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="7">Last 7 Days</option>
+            <option value="15">Last 15 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+          </select>
         </div>
-
-        <!-- SECTION: MARKETING -->
-        <div class="section">
-          <h2>📢 Marketing</h2>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Special Offers</span>
-              <span class="char-counter" data-attr="special_offers">0 / 500</span>
-            </div>
-            <textarea id="attr-special_offers" data-limit="500" placeholder="Regular Price: Rs 1000. Get Premium discount!"></textarea>
-          </div>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Product Tags</span>
-              <span class="char-counter" data-attr="pdt_tags">0 / 255</span>
-            </div>
-            <input type="text" id="attr-pdt_tags" data-limit="255" placeholder="Best Buy, Hot Deal, Premium">
-          </div>
-        </div>
-
-        <!-- UPDATE ACTIONS -->
-        <div class="update-actions">
-          <button class="btn-primary" onclick="updateProduct()">💾 UPDATE PRODUCT</button>
-          <button class="btn-secondary" onclick="clearForm()">🔄 CLEAR FORM</button>
-        </div>
+        <button onclick="loadAllData()">🔄 REFRESH</button>
       </div>
     </div>
-  </div>
-
-  <!-- MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-content" id="modal-content">
-      <div class="modal-title" id="modal-title">Title</div>
-      <div class="modal-message" id="modal-message">Message</div>
-      <button class="modal-close" onclick="closeModal()">CLOSE</button>
+    
+    <div class="content">
+      <div id="tab-dashboard" class="tab-content active"></div>
+      <div id="tab-customers" class="tab-content"></div>
+      <div id="tab-products" class="tab-content"></div>
+      <div id="tab-cancellations" class="tab-content"></div>
+      <div id="tab-forecast" class="tab-content"></div>
+      <div id="tab-logs" class="tab-content">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">System Logs</div>
+            <button onclick="document.getElementById('log-content').innerHTML = ''">Clear</button>
+          </div>
+          <div class="section-content">
+            <div class="log-viewer" id="log-content"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ===== CALCULATOR LOGIN =====
-    let calcBuffer = '';
-    let calcDisplay = '0';
-    let secretPassword = 'pbadmin109'; // Will use env var
-    let passwordBuffer = '';
-
-    function calcInput(val) {
-      // Hidden password check
-      passwordBuffer += val;
-      if (passwordBuffer.includes(secretPassword)) {
-        unlock();
-        return;
-      }
-      // Keep buffer short
-      if (passwordBuffer.length > 20) {
-        passwordBuffer = passwordBuffer.substring(passwordBuffer.length - 20);
-      }
-
-      // Normal calculator function
-      if (calcDisplay === '0' && val !== '.') {
-        calcDisplay = val;
-      } else {
-        calcDisplay += val;
-      }
-      document.getElementById('calc-display').textContent = calcDisplay;
+    const PASSWORD = 'pinkblueanalytics109';
+    const FUNNY_QUOTES = [
+      "🦷 'A dentist's favorite time? Tooth-hurty!' - Loading PinkBlue Intel...",
+      "💡 'Why did the data go to therapy? It had too many issues!' - Initializing...",
+      "🚀 'There are 10 types of people: those who understand binary and those who don't'",
+      "🤓 'Debugging is like being a detective in a crime movie where you're also the murderer'",
+      "📊 'In God we trust. All others must bring data.' - W. Edwards Deming",
+      "💻 'It works on my machine' - Every developer ever",
+      "🔐 'Access Denied... Just kidding, Go Back to The Cave!'",
+      "⚡ 'May the forecast be ever in your favor'",
+      "🎯 'Data doesn't lie, but it can be very misleading' - Loading Analytics...",
+      "🧠 'AI is the new electricity' - Andrew Ng | Powering your insights...",
+      "📈 'The only thing we have to fear is bad data... and also bears'",
+      "🦄 'Unicorns exist. They're called Champion Customers!'",
+      "🎲 'Statistics: The art of never having to say you're certain'",
+      "🔮 'I predict you will see predictions in the Forecast tab'",
+      "💰 'Money can't buy happiness, but it can buy dental supplies!'",
+      "🎪 'Welcome to the greatest data show on earth!'"
+    ];
+    
+    let inputBuffer = '';
+    let logBuffer = [];
+    
+    function addLog(level, message) {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+      console.log(entry);
+      logBuffer.unshift({ level, message: entry, time: timestamp });
+      if (logBuffer.length > 100) logBuffer.pop();
+      updateLogViewer();
     }
-
-    function calcClear() {
-      calcDisplay = '0';
-      passwordBuffer = '';
-      document.getElementById('calc-display').textContent = calcDisplay;
-    }
-
-    function calcEquals() {
-      try {
-        const result = eval(calcDisplay);
-        calcDisplay = result.toString();
-        document.getElementById('calc-display').textContent = calcDisplay;
-      } catch (e) {
-        calcDisplay = 'ERROR';
-        document.getElementById('calc-display').textContent = calcDisplay;
-        setTimeout(() => {
-          calcDisplay = '0';
-          document.getElementById('calc-display').textContent = calcDisplay;
-        }, 1000);
+    
+    function updateLogViewer() {
+      const logContent = document.getElementById('log-content');
+      if (logContent) {
+        logContent.innerHTML = logBuffer.map(log => 
+          `<div class="log-entry ${log.level}">${log.message}</div>`
+        ).join('');
       }
     }
-
-    function unlock() {
-      console.log('[AUTH] Access granted');
-      document.getElementById('calculator-screen').classList.add('hidden');
-      document.getElementById('main-app').classList.add('show');
-      sessionStorage.setItem('authenticated', 'true');
-    }
-
-    function logout() {
-      sessionStorage.removeItem('authenticated');
-      document.getElementById('calculator-screen').classList.remove('hidden');
-      document.getElementById('main-app').classList.remove('show');
-      calcClear();
-    }
-
-    // Check if already authenticated
-    if (sessionStorage.getItem('authenticated') === 'true') {
-      unlock();
-    }
-
-    // ===== PRODUCT MANAGER =====
-    let currentSKU = '';
-    let currentAttributes = {};
-    let currentProductName = '';
-
-    // Character counter
-    document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
-      el.addEventListener('input', function() {
-        const attrCode = this.id.replace('attr-', '');
-        const counter = document.querySelector(`[data-attr="${attrCode}"]`);
-        if (!counter) return;
-        
-        const limit = parseInt(this.dataset.limit);
-        const length = this.value.length;
-        
-        counter.textContent = `${length} / ${limit}`;
-        
-        if (length > limit) {
-          counter.classList.add('error');
-          counter.classList.remove('warning');
-        } else if (length > limit * 0.8) {
-          counter.classList.add('warning');
-          counter.classList.remove('error');
-        } else {
-          counter.classList.remove('warning', 'error');
-        }
-
-        // Update preview
-        const htmlCheckbox = document.getElementById(`html-${attrCode}`);
-        if (htmlCheckbox && htmlCheckbox.checked) {
-          updatePreview(attrCode);
-        }
+    
+    // Particle Animation
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8
       });
-    });
-
-    // HTML conversion toggle
-    document.querySelectorAll('[id^="html-"]').forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-        const attrCode = this.id.replace('html-', '');
-        updatePreview(attrCode);
+    }
+    
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#0f0';
+      ctx.strokeStyle = '#0f0';
+      
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fill();
       });
-    });
-
-    // Status toggle
-    document.getElementById('status-toggle').addEventListener('change', function() {
-      document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
-    });
-
-    function updatePreview(attrCode) {
-      const textarea = document.getElementById(`attr-${attrCode}`);
-      const preview = document.getElementById(`preview-${attrCode}`);
-      const checkbox = document.getElementById(`html-${attrCode}`);
       
-      if (!textarea || !preview || !checkbox) return;
-      
-      if (checkbox.checked && textarea.value.trim()) {
-        const html = convertToHTML(textarea.value);
-        preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
-        preview.classList.add('show');
-      } else {
-        preview.classList.remove('show');
-      }
-    }
-
-    function convertToHTML(text) {
-      if (!text.trim()) return '';
-      const lines = text.split('\n').filter(l => l.trim());
-      const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-      return `<ul>\n${bullets}\n</ul>`;
-    }
-
-    async function loadProduct() {
-      const sku = document.getElementById('sku-input').value.trim();
-      
-      if (!sku) {
-        showModal('Error', 'Please enter a SKU', 'error');
-        return;
-      }
-      
-      showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
-      
-      console.log('[LOAD] Fetching product:', sku);
-      
-      try {
-        const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
-        const data = await response.json();
-        
-        console.log('[LOAD] Response:', data);
-        
-        if (!data.success) {
-          showModal('Error', data.error || 'Product not found', 'error');
-          return;
-        }
-        
-        currentSKU = data.sku;
-        currentAttributes = data.attributes;
-        currentProductName = data.name;
-        
-        // Populate product info
-        document.getElementById('info-sku').textContent = data.sku;
-        document.getElementById('info-name').textContent = data.name;
-        document.getElementById('info-price').textContent = `₹${data.price}`;
-        document.getElementById('info-id').textContent = data.id;
-        
-        // Status
-        const isEnabled = data.status === '1' || data.status === 1;
-        document.getElementById('status-toggle').checked = isEnabled;
-        document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
-        
-        // Populate attributes
-        Object.keys(data.attributes).forEach(attr => {
-          const field = document.getElementById(`attr-${attr}`);
-          if (field) {
-            field.value = data.attributes[attr] || '';
-            field.dispatchEvent(new Event('input'));
+      particles.forEach((p1, i) => {
+        particles.slice(i + 1).forEach(p2 => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.globalAlpha = 1 - (dist / 120);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
           }
         });
-        
-        // Show sections
-        document.getElementById('product-info').classList.add('show');
-        document.getElementById('product-status-toggle').classList.add('show');
-        document.getElementById('attributes-grid').style.display = 'grid';
-        
-        closeModal();
-        showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
-        
-        console.log('[LOAD] Product loaded successfully');
-        
-      } catch (error) {
-        console.error('[LOAD] Error:', error);
-        showModal('Error', 'Error loading product: ' + error.message, 'error');
-      }
+      });
+      
+      requestAnimationFrame(animate);
     }
-
-    async function updateProduct() {
-      if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
+    animate();
+    
+    // Auth
+    document.getElementById('auth-quote').textContent = FUNNY_QUOTES[Math.floor(Math.random() * FUNNY_QUOTES.length)];
+    
+    document.addEventListener('keypress', (e) => {
+      if (document.getElementById('auth-screen').style.display === 'none') return;
+      inputBuffer += e.key;
+      if (inputBuffer.length > PASSWORD.length) {
+        inputBuffer = inputBuffer.slice(-PASSWORD.length);
       }
+      if (inputBuffer === PASSWORD) {
+        addLog('info', 'Authentication successful');
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        initDashboard();
+      }
+    });
+    
+    // Date Filters
+    function initDashboard() {
+      const today = new Date().toISOString().split('T')[0];
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
-      const updates = [];
-      const attrs = [
-        'description', 'short_description', 'features', 'technical_details',
-        'package_content', 'key_specification1', 'key_specification2',
-        'key_specification3', 'key_specification4', 'meta_title',
-        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags', 'faqs'
-      ];
+      document.getElementById('end-date').value = today;
+      document.getElementById('start-date').value = thirtyDaysAgo.toISOString().split('T')[0];
       
-      attrs.forEach(attr => {
-        const field = document.getElementById(`attr-${attr}`);
-        if (!field) return;
+      document.getElementById('quick-filter').addEventListener('change', (e) => {
+        const value = e.target.value;
+        const end = new Date();
+        const start = new Date();
         
-        let value = field.value;
-        
-        // HTML conversion
-        const htmlCheckbox = document.getElementById(`html-${attr}`);
-        if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
-          const lines = value.split('\n').filter(l => l.trim());
-          if (lines.length > 0) {
-            const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-            value = `<ul>\n${bullets}\n</ul>`;
-          }
+        if (value === 'today') {
+          start.setHours(0, 0, 0, 0);
+        } else if (value === 'yesterday') {
+          start.setDate(start.getDate() - 1);
+          end.setDate(end.getDate() - 1);
+        } else if (value !== 'custom') {
+          start.setDate(start.getDate() - parseInt(value));
         }
         
-        // Only include if changed
-        if (value !== (currentAttributes[attr] || '')) {
-          updates.push({
-            attribute_code: attr,
-            value: value
-          });
+        if (value !== 'custom') {
+          document.getElementById('start-date').value = start.toISOString().split('T')[0];
+          document.getElementById('end-date').value = end.toISOString().split('T')[0];
         }
       });
       
-      if (updates.length === 0) {
-        showModal('Warning', 'No changes detected', 'error');
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+        });
+      });
+      
+      loadAllData();
+    }
+    
+    async function fetchAPI(type) {
+      const start = document.getElementById('start-date').value;
+      const end = document.getElementById('end-date').value;
+      addLog('info', `Fetching ${type} data from ${start} to ${end}`);
+      
+      try {
+        const response = await fetch(`/.netlify/functions/analytics-engine?type=${type}&start_date=${start}&end_date=${end}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        addLog('info', `${type} data received successfully`);
+        return data;
+      } catch (error) {
+        addLog('error', `Failed to fetch ${type}: ${error.message}`);
+        throw error;
+      }
+    }
+    
+    async function loadAllData() {
+      addLog('info', 'Loading all dashboard data...');
+      document.getElementById('last-update').textContent = `Last Update: ${new Date().toLocaleString()}`;
+      
+      try {
+        const [dashboard, customers, products, cancellations, forecast] = await Promise.all([
+          fetchAPI('dashboard'),
+          fetchAPI('customers'),
+          fetchAPI('products'),
+          fetchAPI('cancellations'),
+          fetchAPI('forecast')
+        ]);
+        
+        renderDashboard(dashboard);
+        renderCustomers(customers);
+        renderProducts(products);
+        renderCancellations(cancellations);
+        renderForecast(forecast);
+        
+        addLog('info', 'All data loaded successfully ✓');
+      } catch (error) {
+        addLog('error', `Dashboard load failed: ${error.message}`);
+        document.getElementById('tab-dashboard').innerHTML = `<div class="error">❌ ERROR: ${error.message}<br><br>Check console and Netlify function logs for details.</div>`;
+      }
+    }
+    
+    function renderDashboard(data) {
+      const growthIcon = parseFloat(data.growth_rate) > 0 ? '📈' : '📉';
+      const growthColor = parseFloat(data.growth_rate) > 0 ? '#0f0' : '#f60';
+      
+      document.getElementById('tab-dashboard').innerHTML = `
+        <div class="metrics">
+          <div class="card">
+            <div class="card-title">💰 Total Revenue</div>
+            <div class="card-value">₹${data.revenue.toLocaleString()}</div>
+            <div class="card-sub">Avg Daily: ₹${data.daily_stats.mean_daily_revenue.toLocaleString()}</div>
+            <div class="card-sub" style="color: ${growthColor};">${growthIcon} ${data.growth_rate}% growth</div>
+          </div>
+          <div class="card">
+            <div class="card-title">📦 Total Orders</div>
+            <div class="card-value">${data.orders}</div>
+            <div class="card-sub">Complete: ${data.complete_orders} | Pending: ${data.pending_orders}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">💳 Avg Order Value</div>
+            <div class="card-value">₹${data.avg_order_value.toLocaleString()}</div>
+            <div class="card-sub">σ = ₹${data.daily_stats.std_deviation.toLocaleString()}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">💵 COD Orders</div>
+            <div class="card-value">${data.cod_orders}</div>
+            <div class="card-sub">${((data.cod_orders/data.orders)*100).toFixed(1)}% of total</div>
+          </div>
+          <div class="card">
+            <div class="card-title">💎 Online Orders</div>
+            <div class="card-value">${data.online_orders}</div>
+            <div class="card-sub">${((data.online_orders/data.orders)*100).toFixed(1)}% of total</div>
+          </div>
+          <div class="card">
+            <div class="card-title">❌ Cancellation Rate</div>
+            <div class="card-value">${data.cancellation_rate}%</div>
+            <div class="card-sub">${data.cancelled_orders} cancelled</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: ${data.cancellation_rate}%"></div></div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📈 Statistical Analysis (${data.daily_stats.total_days} days)</div>
+          </div>
+          <div class="section-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+              <div class="highlight-box">
+                <strong>Mean Daily Revenue:</strong><br>
+                ₹${data.daily_stats.mean_daily_revenue.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Standard Deviation (σ):</strong><br>
+                ₹${data.daily_stats.std_deviation.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Variance (σ²):</strong><br>
+                ₹${data.daily_stats.variance.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Growth Rate:</strong><br>
+                <span style="color: ${growthColor};">${growthIcon} ${data.growth_rate}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderCustomers(data) {
+      document.getElementById('tab-customers').innerHTML = `
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">👥 Customer Segmentation (RFM Analysis)</div>
+            <button onclick="exportData('customers')">↓ Export CSV</button>
+          </div>
+          <div class="section-content">
+            <div class="metrics">
+              <div class="card">
+                <div class="card-title">Total Customers</div>
+                <div class="card-value">${data.total}</div>
+              </div>
+              <div class="card">
+                <div class="card-title">🏆 Champions</div>
+                <div class="card-value">${data.segments.champions}</div>
+                <div class="card-sub">High RFM Score (13-15)</div>
+              </div>
+              <div class="card">
+                <div class="card-title">💎 Loyal</div>
+                <div class="card-value">${data.segments.loyal}</div>
+                <div class="card-sub">Regular Buyers (10-12)</div>
+              </div>
+              <div class="card">
+                <div class="card-title">🌟 Promising</div>
+                <div class="card-value">${data.segments.promising}</div>
+                <div class="card-sub">Recent Activity (8-9)</div>
+              </div>
+              <div class="card">
+                <div class="card-title">🆕 New</div>
+                <div class="card-value">${data.segments.new}</div>
+                <div class="card-sub">First Purchase</div>
+              </div>
+              <div class="card">
+                <div class="card-title">⚠️ At Risk</div>
+                <div class="card-value">${data.segments.at_risk}</div>
+                <div class="card-sub">90-180 Days Inactive</div>
+              </div>
+              <div class="card">
+                <div class="card-title">😢 Lost</div>
+                <div class="card-value">${data.segments.lost}</div>
+                <div class="card-sub">>180 Days Inactive</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">💰 Top 20 Buyers</div>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Segment</th>
+                  <th>Total Spent</th>
+                  <th>Orders</th>
+                  <th>AOV</th>
+                  <th>Last Order</th>
+                  <th>Recency</th>
+                  <th>RFM Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.top_buyers.slice(0, 20).map(c => `
+                  <tr>
+                    <td>${c.email}</td>
+                    <td><span class="badge ${c.segment.toLowerCase().replace(' ', '-')}">${c.segment}</span></td>
+                    <td><strong>₹${c.monetary.toLocaleString()}</strong></td>
+                    <td>${c.orders}</td>
+                    <td>₹${c.avg_order_value.toLocaleString()}</td>
+                    <td>${new Date(c.lastOrder).toLocaleDateString()}</td>
+                    <td>${c.recency}d</td>
+                    <td>${c.r_score}-${c.f_score}-${c.m_score}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderProducts(data) {
+      document.getElementById('tab-products').innerHTML = `
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">🏆 Top 20 Sellers (${data.total_unique} unique products)</div>
+            <button onclick="exportData('products')">↓ Export CSV</button>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Revenue</th>
+                  <th>Qty Sold</th>
+                  <th>Orders</th>
+                  <th>Avg Price</th>
+                  <th>Cancel Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.top_sellers.slice(0, 20).map(p => `
+                  <tr>
+                    <td><code>${p.sku}</code></td>
+                    <td>${p.name}</td>
+                    <td><strong>₹${p.revenue.toLocaleString()}</strong></td>
+                    <td>${p.qty}</td>
+                    <td>${p.orders}</td>
+                    <td>₹${p.avg_price}</td>
+                    <td>${p.cancellation_rate}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        ${data.high_cancellation_risk.length > 0 ? `
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">⚠️ High Cancellation Risk Products (>15%)</div>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Cancellation Rate</th>
+                  <th>Cancelled Qty</th>
+                  <th>Lost Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.high_cancellation_risk.slice(0, 15).map(p => `
+                  <tr>
+                    <td><code>${p.sku}</code></td>
+                    <td>${p.name}</td>
+                    <td><strong style="color: #f00;">${p.cancellation_rate}%</strong></td>
+                    <td>${p.cancelled_qty}</td>
+                    <td>₹${Math.round(p.cancelled_revenue).toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        ` : ''}
+      `;
+    }
+    
+    function renderCancellations(data) {
+      document.getElementById('tab-cancellations').innerHTML = `
+        <div class="metrics">
+          <div class="card">
+            <div class="card-title">Total Cancelled</div>
+            <div class="card-value">${data.total_cancelled}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Cancellation Rate</div>
+            <div class="card-value">${data.cancellation_rate}%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: ${data.cancellation_rate}%"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">💸 Lost Revenue</div>
+            <div class="card-value">₹${data.lost_revenue.toLocaleString()}</div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">❌ Recent Cancellations</div>
+            <button onclick="exportData('cancellations')">↓ Export CSV</button>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.cancelled_orders.slice(0, 30).map(o => `
+                  <tr>
+                    <td><code>#${o.order_id}</code></td>
+                    <td>${new Date(o.date).toLocaleString()}</td>
+                    <td>${o.customer_email}</td>
+                    <td>₹${o.amount.toLocaleString()}</td>
+                    <td>${o.payment_method}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderForecast(data) {
+      if (data.error) {
+        document.getElementById('tab-forecast').innerHTML = `<div class="error">${data.error}</div>`;
         return;
       }
       
-      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
-      
-      console.log('[UPDATE] Sending updates:', updates);
-      
-      try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        });
+      document.getElementById('tab-forecast').innerHTML = `
+        <div class="prediction-card">
+          <h2 style="margin-bottom: 20px; font-size: 20px;">🔮 REVENUE PREDICTIONS</h2>
+          <div class="prediction-grid">
+            <div class="highlight-box">
+              <strong>📅 TODAY (Estimated):</strong><br>
+              <span style="font-size: 24px; color: #0f0;">₹${data.today_prediction.toLocaleString()}</span>
+            </div>
+            <div class="highlight-box">
+              <strong>🌅 TOMORROW:</strong><br>
+              <span style="font-size: 24px; color: #0f0;">₹${data.tomorrow_prediction.toLocaleString()}</span>
+              <br><small>Range: ₹${data.confidence_interval.lower.toLocaleString()} - ₹${data.confidence_interval.upper.toLocaleString()}</small>
+            </div>
+            <div class="highlight-box">
+              <strong>📊 NEXT 7 DAYS TOTAL:</strong><br>
+              <span style="font-size: 28px; color: #0ff; font-weight: bold;">₹${data.next_7_days_total.toLocaleString()}</span>
+            </div>
+            <div class="highlight-box">
+              <strong>🚀 NEXT 30 DAYS TOTAL:</strong><br>
+              <span style="font-size: 28px; color: #0ff; font-weight: bold;">₹${data.next_30_days_total.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
         
-        const data = await response.json();
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📈 Next 7 Days Breakdown</div>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Predicted Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.next_7_days_daily.map(d => `
+                  <tr>
+                    <td><strong>${new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}</strong></td>
+                    <td style="color: #0ff; font-size: 16px;">₹${d.predicted_revenue.toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
         
-        console.log('[UPDATE] Response:', data);
+        <div class="metrics">
+          <div class="card">
+            <div class="card-title">🤖 Model</div>
+            <div class="card-value" style="font-size: 14px;">${data.model}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">📊 Confidence (R²)</div>
+            <div class="card-value">${data.confidence}</div>
+            <div class="card-sub">R² = ${data.statistics.r_squared}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">📈 Trend</div>
+            <div class="card-value" style="font-size: 18px;">${data.statistics.trend}</div>
+            <div class="card-sub">Daily Growth: ${data.statistics.daily_growth_rate}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">💰 Avg Daily Revenue</div>
+            <div class="card-value" style="font-size: 18px;">₹${data.statistics.avg_daily_revenue.toLocaleString()}</div>
+          </div>
+        </div>
         
-        if (!data.success) {
-          showModal('Error', data.error || 'Update failed', 'error');
-          return;
-        }
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">🧠 AI Insights & Recommendations (Gemini 1.5 Flash)</div>
+          </div>
+          <div class="section-content">
+            <div class="ai-insight">${data.ai_insight}</div>
+          </div>
+        </div>
         
-        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📊 Statistical Summary</div>
+          </div>
+          <div class="section-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; font-size: 14px;">
+              <div class="highlight-box">
+                <strong>Total Revenue:</strong><br>
+                ₹${data.statistics.total_revenue.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Mean Revenue:</strong><br>
+                ₹${data.statistics.avg_daily_revenue.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Std Deviation (σ):</strong><br>
+                ₹${data.statistics.std_dev.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Variance (σ²):</strong><br>
+                ₹${data.statistics.variance.toLocaleString()}
+              </div>
+              <div class="highlight-box">
+                <strong>Regression Slope:</strong><br>
+                ${data.statistics.slope}
+              </div>
+              <div class="highlight-box">
+                <strong>R-Squared:</strong><br>
+                ${data.statistics.r_squared}
+              </div>
+            </div>
+          </div>
+        </div>
         
-        // Reload product
-        setTimeout(() => loadProduct(), 2000);
-        
-      } catch (error) {
-        console.error('[UPDATE] Error:', error);
-        showModal('Error', 'Error updating product: ' + error.message, 'error');
-      }
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📅 Historical Data (Last 14 Days)</div>
+          </div>
+          <div class="section-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Revenue</th>
+                  <th>Orders</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.daily_data.slice(-14).reverse().map(d => `
+                  <tr>
+                    <td>${d.date}</td>
+                    <td>₹${d.revenue.toLocaleString()}</td>
+                    <td>${d.orders}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
     }
-
-    async function toggleProductStatus() {
-      if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
-
-      const isEnabled = document.getElementById('status-toggle').checked;
-      const updates = [{
-        attribute_code: 'status',
-        value: isEnabled ? '1' : '2'
-      }];
-
-      showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
-
-      console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
-
-      try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        });
-
-        const data = await response.json();
-
-        console.log('[STATUS] Response:', data);
-
-        if (!data.success) {
-          showModal('Error', data.error || 'Status update failed', 'error');
-          return;
-        }
-
-        showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
-
-      } catch (error) {
-        console.error('[STATUS] Error:', error);
-        showModal('Error', 'Error updating status: ' + error.message, 'error');
-      }
+    
+    function exportData(type) {
+      const start = document.getElementById('start-date').value;
+      const end = document.getElementById('end-date').value;
+      addLog('info', `Exporting ${type} data...`);
+      window.location.href = `/.netlify/functions/analytics-engine?type=export&export=${type}&start_date=${start}&end_date=${end}`;
     }
-
-    async function generateAI(action) {
-      if (!currentProductName) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
-
-      showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
-
-      console.log('[AI] Generating:', action);
-
-      try {
-        const response = await fetch('/.netlify/functions/ai-seo-generator', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productName: currentProductName,
-            category: 'dental supplies',
-            action: action
-          })
-        });
-
-        const data = await response.json();
-
-        console.log('[AI] Response:', data);
-
-        if (!data.success) {
-          showModal('Error', data.error || 'AI generation failed', 'error');
-          return;
-        }
-
-        // Populate the field
-        const field = document.getElementById(`attr-${action}`);
-        if (field) {
-          field.value = data.generated;
-          field.dispatchEvent(new Event('input'));
-        }
-
-        closeModal();
-        showModal('Success', `✓ AI generated ${action} successfully!`, 'success');
-
-      } catch (error) {
-        console.error('[AI] Error:', error);
-        showModal('Error', 'AI error: ' + error.message, 'error');
-      }
-    }
-
-    function clearForm() {
-      if (confirm('Clear all form data? Unsaved changes will be lost.')) {
-        document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
-          el.value = '';
-          el.dispatchEvent(new Event('input'));
-        });
-        document.querySelectorAll('input[id^="html-"]').forEach(cb => {
-          cb.checked = false;
-        });
-        console.log('[FORM] Cleared');
-      }
-    }
-
-    function showModal(title, message, type = '', closeButton = true) {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal-message').innerHTML = message;
-      document.getElementById('modal-content').className = `modal-content ${type}`;
-      document.getElementById('modal').classList.add('show');
-      
-      if (!closeButton) {
-        document.querySelector('.modal-close').style.display = 'none';
-      } else {
-        document.querySelector('.modal-close').style.display = 'block';
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    // Enter key to load
-    document.getElementById('sku-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') loadProduct();
-    });
-
-    console.log('[APP] Product Manager loaded');
   </script>
 </body>
 </html>
