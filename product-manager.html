@@ -388,6 +388,59 @@
       display: block;
     }
 
+    /* IMAGE UPLOAD */
+    .image-upload-area {
+      border: 2px dashed var(--border);
+      padding: 20px;
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .image-upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(0,255,0,0.05);
+    }
+
+    .image-upload-area.dragging {
+      border-color: var(--accent);
+      background: rgba(0,255,0,0.1);
+    }
+
+    .image-preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .image-preview-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--error);
+      color: var(--text);
+      border: none;
+      padding: 5px 8px;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+
     /* ===== MODAL/POPUP ===== */
     .modal {
       position: fixed;
@@ -481,6 +534,10 @@
       font-size: 1.1rem;
       margin: 0 10px;
     }
+
+    input[type="file"] {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -570,6 +627,24 @@
       <!-- Attributes Grid -->
       <div class="attributes-grid" id="attributes-grid" style="display: none;">
         
+        <!-- SECTION: IMAGES -->
+        <div class="section">
+          <h2>🖼️ Images</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Upload Product Images</span>
+              <span style="font-size: 0.75rem; color: #666;">JPG, PNG (Max 2MB each)</span>
+            </div>
+            <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-input').click()">
+              <div>📷 Click or Drag & Drop Images Here</div>
+              <div style="font-size: 0.8rem; color: #666; margin-top: 10px;">Supports multiple images</div>
+            </div>
+            <input type="file" id="image-input" accept="image/*" multiple onchange="handleImageSelect(event)">
+            <div class="image-preview" id="image-preview"></div>
+          </div>
+        </div>
+
         <!-- SECTION: CONTENT -->
         <div class="section">
           <h2>📝 Content</h2>
@@ -632,19 +707,6 @@
               <span class="char-counter" data-attr="package_content">0 / 2000</span>
             </div>
             <textarea id="attr-package_content" data-limit="2000"></textarea>
-          </div>
-
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>FAQs</span>
-              <span class="char-counter" data-attr="faqs">0 / 65000</span>
-            </div>
-            <textarea id="attr-faqs" data-limit="65000" placeholder="<div class='faq'><strong>Q:</strong> Question?<br><strong>A:</strong> Answer.</div>"></textarea>
-            <div class="html-toggle">
-              <input type="checkbox" id="html-faqs">
-              <label for="html-faqs">Convert to HTML</label>
-            </div>
-            <div class="preview" id="preview-faqs"></div>
           </div>
         </div>
 
@@ -718,7 +780,7 @@
             </div>
             <input type="text" id="attr-meta_keyword" data-limit="255" placeholder="dental, product, buy online">
             <div class="attr-actions">
-              <button class="btn-ai" onclick="generateAI('meta_keywords')">🤖 AI Generate</button>
+              <button class="btn-ai" onclick="generateAI('meta_keyword')">🤖 AI Generate</button>
             </div>
           </div>
         </div>
@@ -762,420 +824,548 @@
     </div>
   </div>
 
- <script>
-  // ===== CALCULATOR LOGIN =====
-  let calcDisplay = '0';
-  let secretPassword = 'pbadmin109'; // Type this on keyboard to unlock
-  let passwordBuffer = '';
+  <script>
+    // ===== CALCULATOR LOGIN =====
+    let calcDisplay = '0';
+    let secretPassword = 'pbadmin109';
+    let passwordBuffer = '';
 
-  function calcInput(val) {
-    // Normal calculator function
-    if (calcDisplay === '0' && val !== '.') {
-      calcDisplay = val;
-    } else {
-      calcDisplay += val;
-    }
-    document.getElementById('calc-display').textContent = calcDisplay;
-  }
-
-  function calcClear() {
-    calcDisplay = '0';
-    document.getElementById('calc-display').textContent = calcDisplay;
-  }
-
-  function calcEquals() {
-    try {
-      const result = eval(calcDisplay);
-      calcDisplay = result.toString();
-      document.getElementById('calc-display').textContent = calcDisplay;
-    } catch (e) {
-      calcDisplay = 'ERROR';
-      document.getElementById('calc-display').textContent = calcDisplay;
-      setTimeout(() => {
-        calcDisplay = '0';
-        document.getElementById('calc-display').textContent = calcDisplay;
-      }, 1000);
-    }
-  }
-
-  // 🔑 KEYBOARD PASSWORD DETECTION
-  document.addEventListener('keydown', function(e) {
-    // Only listen when on calculator screen
-    if (!document.getElementById('calculator-screen').classList.contains('hidden')) {
-      passwordBuffer += e.key.toLowerCase();
-      
-      console.log('[AUTH] Key pressed, buffer length:', passwordBuffer.length);
-      
-      // Check if password is in buffer
-      if (passwordBuffer.includes(secretPassword)) {
-        console.log('[AUTH] ✅ Password detected!');
-        unlock();
-        passwordBuffer = '';
-        return;
-      }
-      
-      // Keep buffer manageable (last 20 characters)
-      if (passwordBuffer.length > 20) {
-        passwordBuffer = passwordBuffer.substring(passwordBuffer.length - 20);
-      }
-    }
-  });
-
-  function unlock() {
-    console.log('[AUTH] 🔓 Access granted');
-    document.getElementById('calculator-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('show');
-    sessionStorage.setItem('authenticated', 'true');
-    passwordBuffer = ''; // Clear buffer
-  }
-
-  function logout() {
-    console.log('[AUTH] 🔒 Logged out');
-    sessionStorage.removeItem('authenticated');
-    document.getElementById('calculator-screen').classList.remove('hidden');
-    document.getElementById('main-app').classList.remove('show');
-    calcClear();
-    passwordBuffer = '';
-  }
-
-  // Check if already authenticated
-  if (sessionStorage.getItem('authenticated') === 'true') {
-    console.log('[AUTH] ✅ Already authenticated');
-    unlock();
-  }
-
-  // ===== PRODUCT MANAGER =====
-  let currentSKU = '';
-  let currentAttributes = {};
-  let currentProductName = '';
-
-  // Character counter
-  document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
-    el.addEventListener('input', function() {
-      const attrCode = this.id.replace('attr-', '');
-      const counter = document.querySelector(`[data-attr="${attrCode}"]`);
-      if (!counter) return;
-      
-      const limit = parseInt(this.dataset.limit);
-      const length = this.value.length;
-      
-      counter.textContent = `${length} / ${limit}`;
-      
-      if (length > limit) {
-        counter.classList.add('error');
-        counter.classList.remove('warning');
-      } else if (length > limit * 0.8) {
-        counter.classList.add('warning');
-        counter.classList.remove('error');
+    function calcInput(val) {
+      if (calcDisplay === '0' && val !== '.') {
+        calcDisplay = val;
       } else {
-        counter.classList.remove('warning', 'error');
+        calcDisplay += val;
       }
+      document.getElementById('calc-display').textContent = calcDisplay;
+    }
 
-      // Update preview
-      const htmlCheckbox = document.getElementById(`html-${attrCode}`);
-      if (htmlCheckbox && htmlCheckbox.checked) {
+    function calcClear() {
+      calcDisplay = '0';
+      document.getElementById('calc-display').textContent = calcDisplay;
+    }
+
+    function calcEquals() {
+      try {
+        const result = eval(calcDisplay);
+        calcDisplay = result.toString();
+        document.getElementById('calc-display').textContent = calcDisplay;
+      } catch (e) {
+        calcDisplay = 'ERROR';
+        document.getElementById('calc-display').textContent = calcDisplay;
+        setTimeout(() => {
+          calcDisplay = '0';
+          document.getElementById('calc-display').textContent = calcDisplay;
+        }, 1000);
+      }
+    }
+
+    // Keyboard password detection
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('calculator-screen').classList.contains('hidden')) {
+        passwordBuffer += e.key.toLowerCase();
+        
+        if (passwordBuffer.includes(secretPassword)) {
+          console.log('[AUTH] ✅ Password detected!');
+          unlock();
+          passwordBuffer = '';
+          return;
+        }
+        
+        if (passwordBuffer.length > 20) {
+          passwordBuffer = passwordBuffer.substring(passwordBuffer.length - 20);
+        }
+      }
+    });
+
+    function unlock() {
+      console.log('[AUTH] 🔓 Access granted');
+      document.getElementById('calculator-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.add('show');
+      sessionStorage.setItem('authenticated', 'true');
+      passwordBuffer = '';
+    }
+
+    function logout() {
+      console.log('[AUTH] 🔒 Logged out');
+      sessionStorage.removeItem('authenticated');
+      document.getElementById('calculator-screen').classList.remove('hidden');
+      document.getElementById('main-app').classList.remove('show');
+      calcClear();
+      passwordBuffer = '';
+    }
+
+    if (sessionStorage.getItem('authenticated') === 'true') {
+      console.log('[AUTH] ✅ Already authenticated');
+      unlock();
+    }
+
+    // ===== PRODUCT MANAGER =====
+    let currentSKU = '';
+    let currentAttributes = {};
+    let currentProductName = '';
+    let uploadedImages = [];
+
+    // Character counter
+    document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
+      el.addEventListener('input', function() {
+        const attrCode = this.id.replace('attr-', '');
+        const counter = document.querySelector(`[data-attr="${attrCode}"]`);
+        if (!counter) return;
+        
+        const limit = parseInt(this.dataset.limit);
+        const length = this.value.length;
+        
+        counter.textContent = `${length} / ${limit}`;
+        
+        if (length > limit) {
+          counter.classList.add('error');
+          counter.classList.remove('warning');
+        } else if (length > limit * 0.8) {
+          counter.classList.add('warning');
+          counter.classList.remove('error');
+        } else {
+          counter.classList.remove('warning', 'error');
+        }
+
+        const htmlCheckbox = document.getElementById(`html-${attrCode}`);
+        if (htmlCheckbox && htmlCheckbox.checked) {
+          updatePreview(attrCode);
+        }
+      });
+    });
+
+    // HTML conversion toggle
+    document.querySelectorAll('[id^="html-"]').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const attrCode = this.id.replace('html-', '');
         updatePreview(attrCode);
+      });
+    });
+
+    // Status toggle
+    document.getElementById('status-toggle').addEventListener('change', function() {
+      document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
+    });
+
+    function updatePreview(attrCode) {
+      const textarea = document.getElementById(`attr-${attrCode}`);
+      const preview = document.getElementById(`preview-${attrCode}`);
+      const checkbox = document.getElementById(`html-${attrCode}`);
+      
+      if (!textarea || !preview || !checkbox) return;
+      
+      if (checkbox.checked && textarea.value.trim()) {
+        const html = convertToHTML(textarea.value);
+        preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
+        preview.classList.add('show');
+      } else {
+        preview.classList.remove('show');
       }
-    });
-  });
-
-  // HTML conversion toggle
-  document.querySelectorAll('[id^="html-"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const attrCode = this.id.replace('html-', '');
-      updatePreview(attrCode);
-    });
-  });
-
-  // Status toggle
-  document.getElementById('status-toggle').addEventListener('change', function() {
-    document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
-  });
-
-  function updatePreview(attrCode) {
-    const textarea = document.getElementById(`attr-${attrCode}`);
-    const preview = document.getElementById(`preview-${attrCode}`);
-    const checkbox = document.getElementById(`html-${attrCode}`);
-    
-    if (!textarea || !preview || !checkbox) return;
-    
-    if (checkbox.checked && textarea.value.trim()) {
-      const html = convertToHTML(textarea.value);
-      preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
-      preview.classList.add('show');
-    } else {
-      preview.classList.remove('show');
     }
-  }
 
-  function convertToHTML(text) {
-    if (!text.trim()) return '';
-    const lines = text.split('\n').filter(l => l.trim());
-    const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-    return `<ul>\n${bullets}\n</ul>`;
-  }
-
-  async function loadProduct() {
-    const sku = document.getElementById('sku-input').value.trim();
-    
-    if (!sku) {
-      showModal('Error', 'Please enter a SKU', 'error');
-      return;
+    function convertToHTML(text) {
+      if (!text.trim()) return '';
+      const lines = text.split('\n').filter(l => l.trim());
+      const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+      return `<ul>\n${bullets}\n</ul>`;
     }
+
+    // IMAGE UPLOAD HANDLERS
+    const uploadArea = document.getElementById('image-upload-area');
     
-    showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
-    
-    console.log('[LOAD] Fetching product:', sku);
-    
-    try {
-      const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
-      const data = await response.json();
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, () => {
+        uploadArea.classList.add('dragging');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, () => {
+        uploadArea.classList.remove('dragging');
+      }, false);
+    });
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles(files);
+    }
+
+    function handleImageSelect(e) {
+      handleFiles(e.target.files);
+    }
+
+    function handleFiles(files) {
+      ([...files]).forEach(uploadImage);
+    }
+
+    function uploadImage(file) {
+      if (!file.type.startsWith('image/')) {
+        showModal('Error', 'Please upload only image files', 'error');
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        showModal('Error', 'Image size must be less than 2MB', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          file: file,
+          preview: e.target.result,
+          uploaded: false
+        };
+        
+        uploadedImages.push(imageData);
+        displayImagePreviews();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function displayImagePreviews() {
+      const preview = document.getElementById('image-preview');
+      preview.innerHTML = '';
       
-      console.log('[LOAD] Response:', data);
+      uploadedImages.forEach((img, index) => {
+        const div = document.createElement('div');
+        div.className = 'image-preview-item';
+        div.innerHTML = `
+          <img src="${img.preview}" alt="Preview">
+          <button class="image-remove" onclick="removeImage(${index})">×</button>
+        `;
+        preview.appendChild(div);
+      });
+    }
+
+    function removeImage(index) {
+      uploadedImages.splice(index, 1);
+      displayImagePreviews();
+    }
+
+    async function uploadImagesToMagento() {
+      if (uploadedImages.length === 0) return;
       
-      if (!data.success) {
-        showModal('Error', data.error || 'Product not found', 'error');
+      showModal('Uploading', '<div class="loading-spinner"></div> Uploading images...', 'loading', false);
+      
+      for (const img of uploadedImages) {
+        if (img.uploaded) continue;
+        
+        const formData = new FormData();
+        formData.append('image', img.file);
+        formData.append('sku', currentSKU);
+        
+        try {
+          const response = await fetch('/.netlify/functions/image-upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            img.uploaded = true;
+            console.log('[IMAGE] ✅ Uploaded:', img.file.name);
+          } else {
+            console.error('[IMAGE] ❌ Failed:', data.error);
+          }
+        } catch (error) {
+          console.error('[IMAGE] Error:', error);
+        }
+      }
+      
+      closeModal();
+      showModal('Success', '✓ Images uploaded successfully!', 'success');
+    }
+
+    async function loadProduct() {
+      const sku = document.getElementById('sku-input').value.trim();
+      
+      if (!sku) {
+        showModal('Error', 'Please enter a SKU', 'error');
         return;
       }
       
-      currentSKU = data.sku;
-      currentAttributes = data.attributes;
-      currentProductName = data.name;
+      showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
       
-      // Populate product info
-      document.getElementById('info-sku').textContent = data.sku;
-      document.getElementById('info-name').textContent = data.name;
-      document.getElementById('info-price').textContent = `₹${data.price}`;
-      document.getElementById('info-id').textContent = data.id;
+      console.log('[LOAD] Fetching product:', sku);
       
-      // Status
-      const isEnabled = data.status === '1' || data.status === 1;
-      document.getElementById('status-toggle').checked = isEnabled;
-      document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
-      
-      // Populate attributes
-      Object.keys(data.attributes).forEach(attr => {
-        const field = document.getElementById(`attr-${attr}`);
-        if (field) {
-          field.value = data.attributes[attr] || '';
-          field.dispatchEvent(new Event('input'));
+      try {
+        const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
+        const data = await response.json();
+        
+        console.log('[LOAD] Response:', data);
+        
+        if (!data.success) {
+          showModal('Error', data.error || 'Product not found', 'error');
+          return;
         }
-      });
-      
-      // Show sections
-      document.getElementById('product-info').classList.add('show');
-      document.getElementById('product-status-toggle').classList.add('show');
-      document.getElementById('attributes-grid').style.display = 'grid';
-      
-      closeModal();
-      showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
-      
-      console.log('[LOAD] Product loaded successfully');
-      
-    } catch (error) {
-      console.error('[LOAD] Error:', error);
-      showModal('Error', 'Error loading product: ' + error.message, 'error');
-    }
-  }
-
-  async function updateProduct() {
-    if (!currentSKU) {
-      showModal('Error', 'Please load a product first', 'error');
-      return;
-    }
-    
-    const updates = [];
-    const attrs = [
-      'description', 'short_description', 'features', 'technical_details',
-      'package_content', 'key_specification1', 'key_specification2',
-      'key_specification3', 'key_specification4', 'meta_title',
-      'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags', 'faqs'
-    ];
-    
-    attrs.forEach(attr => {
-      const field = document.getElementById(`attr-${attr}`);
-      if (!field) return;
-      
-      let value = field.value;
-      
-      // HTML conversion
-      const htmlCheckbox = document.getElementById(`html-${attr}`);
-      if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
-        const lines = value.split('\n').filter(l => l.trim());
-        if (lines.length > 0) {
-          const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-          value = `<ul>\n${bullets}\n</ul>`;
-        }
-      }
-      
-      // Only include if changed
-      if (value !== (currentAttributes[attr] || '')) {
-        updates.push({
-          attribute_code: attr,
-          value: value
+        
+        currentSKU = data.sku;
+        currentAttributes = data.attributes;
+        currentProductName = data.name;
+        
+        document.getElementById('info-sku').textContent = data.sku;
+        document.getElementById('info-name').textContent = data.name;
+        document.getElementById('info-price').textContent = `₹${data.price}`;
+        document.getElementById('info-id').textContent = data.id;
+        
+        const isEnabled = data.status === '1' || data.status === 1;
+        document.getElementById('status-toggle').checked = isEnabled;
+        document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
+        
+        Object.keys(data.attributes).forEach(attr => {
+          const field = document.getElementById(`attr-${attr}`);
+          if (field) {
+            field.value = data.attributes[attr] || '';
+            field.dispatchEvent(new Event('input'));
+          }
         });
+        
+        document.getElementById('product-info').classList.add('show');
+        document.getElementById('product-status-toggle').classList.add('show');
+        document.getElementById('attributes-grid').style.display = 'grid';
+        
+        closeModal();
+        showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
+        
+        console.log('[LOAD] Product loaded successfully');
+        
+      } catch (error) {
+        console.error('[LOAD] Error:', error);
+        showModal('Error', 'Error loading product: ' + error.message, 'error');
       }
+    }
+
+    async function updateProduct() {
+      if (!currentSKU) {
+        showModal('Error', 'Please load a product first', 'error');
+        return;
+      }
+      
+      // Upload images first if any
+      if (uploadedImages.some(img => !img.uploaded)) {
+        await uploadImagesToMagento();
+      }
+      
+      const updates = [];
+      const attrs = [
+        'description', 'short_description', 'features', 'technical_details',
+        'package_content', 'key_specification1', 'key_specification2',
+        'key_specification3', 'key_specification4', 'meta_title',
+        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags'
+      ];
+      
+      attrs.forEach(attr => {
+        const field = document.getElementById(`attr-${attr}`);
+        if (!field) return;
+        
+        let value = field.value;
+        
+        const htmlCheckbox = document.getElementById(`html-${attr}`);
+        if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
+          const lines = value.split('\n').filter(l => l.trim());
+          if (lines.length > 0) {
+            const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+            value = `<ul>\n${bullets}\n</ul>`;
+          }
+        }
+        
+        if (value !== (currentAttributes[attr] || '')) {
+          updates.push({
+            attribute_code: attr,
+            value: value
+          });
+        }
+      });
+      
+      if (updates.length === 0) {
+        showModal('Warning', 'No changes detected', 'error');
+        return;
+      }
+      
+      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
+      
+      console.log('[UPDATE] Sending updates:', updates);
+      
+      try {
+        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+        
+        const data = await response.json();
+        
+        console.log('[UPDATE] Response:', data);
+        
+        if (!data.success) {
+          showModal('Error', data.error || 'Update failed', 'error');
+          return;
+        }
+        
+        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
+        
+        setTimeout(() => loadProduct(), 2000);
+        
+      } catch (error) {
+        console.error('[UPDATE] Error:', error);
+        showModal('Error', 'Error updating product: ' + error.message, 'error');
+      }
+    }
+
+    async function toggleProductStatus() {
+      if (!currentSKU) {
+        showModal('Error', 'Please load a product first', 'error');
+        return;
+      }
+
+      const isEnabled = document.getElementById('status-toggle').checked;
+      const updates = [{
+        attribute_code: 'status',
+        value: isEnabled ? '1' : '2'
+      }];
+
+      showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
+
+      console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
+
+      try {
+        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+
+        const data = await response.json();
+
+        console.log('[STATUS] Response:', data);
+
+        if (!data.success) {
+          showModal('Error', data.error || 'Status update failed', 'error');
+          return;
+        }
+
+        showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
+
+      } catch (error) {
+        console.error('[STATUS] Error:', error);
+        showModal('Error', 'Error updating status: ' + error.message, 'error');
+      }
+    }
+
+    async function generateAI(action) {
+      if (!currentProductName) {
+        showModal('Error', 'Please load a product first', 'error');
+        return;
+      }
+
+      showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
+
+      console.log('[AI] Generating:', action, 'for product:', currentProductName);
+
+      try {
+        const response = await fetch('/.netlify/functions/ai-seo-generator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productName: currentProductName,
+            category: 'dental supplies',
+            action: action
+          })
+        });
+
+        console.log('[AI] HTTP Status:', response.status);
+
+        const data = await response.json();
+        console.log('[AI] Response data:', data);
+
+        if (!data.success) {
+          showModal('Error', data.error || 'AI generation failed', 'error');
+          return;
+        }
+
+        const fieldId = `attr-${action}`;
+        const field = document.getElementById(fieldId);
+        
+        console.log('[AI] Looking for field ID:', fieldId);
+        console.log('[AI] Field found:', !!field);
+        
+        if (field) {
+          field.value = data.generated;
+          field.dispatchEvent(new Event('input'));
+          console.log('[AI] ✅ Field updated successfully');
+          
+          closeModal();
+          showModal('Success', 
+            `✓ AI Generated!<br><br><strong>${data.generated}</strong><br><br>Length: ${data.generated.length} characters`, 
+            'success'
+          );
+        } else {
+          console.error('[AI] ❌ Field not found. Available fields:', 
+            Array.from(document.querySelectorAll('[id^="attr-"]')).map(el => el.id)
+          );
+          
+          closeModal();
+          showModal('Error', `Field "${fieldId}" not found in the page`, 'error');
+        }
+
+      } catch (error) {
+        console.error('[AI] Exception:', error);
+        showModal('Error', 'Network error: ' + error.message, 'error');
+      }
+    }
+
+    function clearForm() {
+      if (confirm('Clear all form data? Unsaved changes will be lost.')) {
+        document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
+          el.value = '';
+          el.dispatchEvent(new Event('input'));
+        });
+        document.querySelectorAll('input[id^="html-"]').forEach(cb => {
+          cb.checked = false;
+        });
+        uploadedImages = [];
+        displayImagePreviews();
+        console.log('[FORM] Cleared');
+      }
+    }
+
+    function showModal(title, message, type = '', closeButton = true) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-message').innerHTML = message;
+      document.getElementById('modal-content').className = `modal-content ${type}`;
+      document.getElementById('modal').classList.add('show');
+      
+      if (!closeButton) {
+        document.querySelector('.modal-close').style.display = 'none';
+      } else {
+        document.querySelector('.modal-close').style.display = 'block';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    document.getElementById('sku-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') loadProduct();
     });
-    
-    if (updates.length === 0) {
-      showModal('Warning', 'No changes detected', 'error');
-      return;
-    }
-    
-    showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
-    
-    console.log('[UPDATE] Sending updates:', updates);
-    
-    try {
-      const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
-      
-      const data = await response.json();
-      
-      console.log('[UPDATE] Response:', data);
-      
-      if (!data.success) {
-        showModal('Error', data.error || 'Update failed', 'error');
-        return;
-      }
-      
-      showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
-      
-      // Reload product
-      setTimeout(() => loadProduct(), 2000);
-      
-    } catch (error) {
-      console.error('[UPDATE] Error:', error);
-      showModal('Error', 'Error updating product: ' + error.message, 'error');
-    }
-  }
 
-  async function toggleProductStatus() {
-    if (!currentSKU) {
-      showModal('Error', 'Please load a product first', 'error');
-      return;
-    }
-
-    const isEnabled = document.getElementById('status-toggle').checked;
-    const updates = [{
-      attribute_code: 'status',
-      value: isEnabled ? '1' : '2'
-    }];
-
-    showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
-
-    console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
-
-    try {
-      const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
-
-      const data = await response.json();
-
-      console.log('[STATUS] Response:', data);
-
-      if (!data.success) {
-        showModal('Error', data.error || 'Status update failed', 'error');
-        return;
-      }
-
-      showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
-
-    } catch (error) {
-      console.error('[STATUS] Error:', error);
-      showModal('Error', 'Error updating status: ' + error.message, 'error');
-    }
-  }
-
-  async function generateAI(action) {
-    if (!currentProductName) {
-      showModal('Error', 'Please load a product first', 'error');
-      return;
-    }
-
-    showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
-
-    console.log('[AI] Generating:', action);
-
-    try {
-      const response = await fetch('/.netlify/functions/ai-seo-generator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: currentProductName,
-          category: 'dental supplies',
-          action: action
-        })
-      });
-
-      const data = await response.json();
-
-      console.log('[AI] Response:', data);
-
-      if (!data.success) {
-        showModal('Error', data.error || 'AI generation failed', 'error');
-        return;
-      }
-
-      // Populate the field
-      const field = document.getElementById(`attr-${action}`);
-      if (field) {
-        field.value = data.generated;
-        field.dispatchEvent(new Event('input'));
-      }
-
-      closeModal();
-      showModal('Success', `✓ AI generated ${action} successfully!`, 'success');
-
-    } catch (error) {
-      console.error('[AI] Error:', error);
-      showModal('Error', 'AI error: ' + error.message, 'error');
-    }
-  }
-
-  function clearForm() {
-    if (confirm('Clear all form data? Unsaved changes will be lost.')) {
-      document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
-        el.value = '';
-        el.dispatchEvent(new Event('input'));
-      });
-      document.querySelectorAll('input[id^="html-"]').forEach(cb => {
-        cb.checked = false;
-      });
-      console.log('[FORM] Cleared');
-    }
-  }
-
-  function showModal(title, message, type = '', closeButton = true) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').innerHTML = message;
-    document.getElementById('modal-content').className = `modal-content ${type}`;
-    document.getElementById('modal').classList.add('show');
-    
-    if (!closeButton) {
-      document.querySelector('.modal-close').style.display = 'none';
-    } else {
-      document.querySelector('.modal-close').style.display = 'block';
-    }
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.remove('show');
-  }
-
-  // Enter key to load
-  document.getElementById('sku-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') loadProduct();
-  });
-
-  console.log('[APP] 🚀 Product Manager loaded');
-  console.log('[AUTH] 🔑 Type "pbadmin109" on your keyboard to unlock');
-</script>
+    console.log('[APP] 🚀 Product Manager loaded');
+    console.log('[AUTH] 🔑 Type "pbadmin109" on your keyboard to unlock');
+  </script>
 </body>
 </html>
