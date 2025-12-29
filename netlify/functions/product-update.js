@@ -12,32 +12,45 @@ const HEADERS = {
 };
 
 function log(msg, data = null) {
-  console.log(`[${new Date().toISOString()}] ${msg}`, data ? JSON.stringify(data).substring(0, 200) : '');
+  const timestamp = new Date().toISOString();
+  if (data) {
+    console.log(`[${timestamp}] ${msg}`, JSON.stringify(data).substring(0, 300));
+  } else {
+    console.log(`[${timestamp}] ${msg}`);
+  }
 }
 
 function makeRequest(url, method, body, timeout = 25000) {
   return new Promise((resolve) => {
     log(`${method} ${url.substring(BASE_URL.length)}`);
-    log(`Payload size: ${JSON.stringify(body).length} bytes`);
+    
+    if (body) {
+      log('Payload', {
+        size: JSON.stringify(body).length + ' bytes',
+        attributes: body.product?.custom_attributes?.map(a => a.attribute_code)
+      });
+    }
     
     const req = https.request(url, { method, headers: HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        log(`Response: ${res.statusCode} | ${(data.length / 1024).toFixed(0)}KB`);
+        log(`Response: ${res.statusCode} | ${(data.length / 1024).toFixed(1)}KB`);
+        
         try {
+          const parsed = JSON.parse(data);
           resolve({ 
             success: res.statusCode >= 200 && res.statusCode < 300, 
             statusCode: res.statusCode, 
-            data: JSON.parse(data) 
+            data: parsed 
           });
         } catch (e) {
-          log('Parse error', { error: e.message, data: data.substring(0, 200) });
+          log('Parse error', { error: e.message, raw: data.substring(0, 200) });
           resolve({ 
             success: false, 
             statusCode: res.statusCode, 
             error: 'Parse error', 
-            raw: data.substring(0, 300) 
+            raw: data.substring(0, 500) 
           });
         }
       });
@@ -49,12 +62,14 @@ function makeRequest(url, method, body, timeout = 25000) {
     });
     
     req.setTimeout(timeout, () => {
-      log('Request timeout after ' + timeout + 'ms');
+      log(`Timeout after ${timeout}ms`);
       req.abort();
-      resolve({ success: false, error: 'Request timeout after ' + (timeout/1000) + 's' });
+      resolve({ success: false, error: `Request timeout after ${timeout/1000}s` });
     });
     
-    if (body) req.write(JSON.stringify(body));
+    if (body) {
+      req.write(JSON.stringify(body));
+    }
     req.end();
   });
 }
@@ -69,10 +84,12 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Headers': 'Content-Type'
   };
   
+  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
   
+  // Check API token
   if (!MAGENTO_TOKEN) {
     log('ERROR: MAGENTO_API_TOKEN not configured');
     return {
@@ -82,21 +99,24 @@ exports.handler = async (event) => {
     };
   }
   
+  // Get SKU from query params
   const sku = event.queryStringParameters?.sku;
   
   if (!sku) {
+    log('ERROR: Missing SKU parameter');
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ success: false, error: 'SKU required' })
+      body: JSON.stringify({ success: false, error: 'SKU parameter required' })
     };
   }
   
+  // Parse request body
   let updates;
   try {
     updates = JSON.parse(event.body || '[]');
   } catch (e) {
-    log('ERROR: Invalid JSON', { error: e.message });
+    log('ERROR: Invalid JSON in request body', { error: e.message });
     return {
       statusCode: 400,
       headers,
@@ -104,7 +124,9 @@ exports.handler = async (event) => {
     };
   }
   
+  // Validate updates array
   if (!Array.isArray(updates) || updates.length === 0) {
+    log('ERROR: Updates must be a non-empty array');
     return {
       statusCode: 400,
       headers,
@@ -113,7 +135,10 @@ exports.handler = async (event) => {
   }
   
   try {
-    log(`✏️ Updating ${sku}`, { count: updates.length, attributes: updates.map(u => u.attribute_code) });
+    log(`✏️ Updating product: ${sku}`, { 
+      updateCount: updates.length, 
+      attributes: updates.map(u => u.attribute_code) 
+    });
     
     // Character limit validation
     const limits = {
@@ -127,43 +152,65 @@ exports.handler = async (event) => {
       package_content: 2000,
       special_offers: 500,
       pdt_tags: 255,
+      meta_keyword: 255,
       description: 65000,
       features: 65000,
-      technical_details: 65000
+      technical_details: 65000,
+      faqs: 65000
     };
     
+    // Validate each update
     for (const update of updates) {
       const limit = limits[update.attribute_code];
       if (limit && update.value && update.value.length > limit) {
-        log(`ERROR: Character limit exceeded for ${update.attribute_code}`);
+        log(`ERROR: Character limit exceeded`, {
+          attribute: update.attribute_code,
+          limit: limit,
+          actual: update.value.length
+        });
         return {
           statusCode: 400,
           headers,
           body: JSON.stringify({ 
             success: false, 
-            error: `${update.attribute_code} exceeds ${limit} character limit (${update.value.length} chars)` 
+            error: `${update.attribute_code} exceeds ${limit} character limit (currently ${update.value.length} chars)` 
           })
         };
       }
     }
     
+    // Build payload - IMPORTANT: Use store_id: 0 for ALL STORE VIEWS
     const payload = {
       product: {
+        sku: sku,
+        store_id: 0, // 🔥 THIS UPDATES ALL STORE VIEWS, NOT JUST DEFAULT
         custom_attributes: updates.map(u => ({
           attribute_code: u.attribute_code,
           value: u.value || ''
         }))
-      }
+      },
+      saveOptions: true
     };
     
+    log('Payload constructed', {
+      sku: payload.product.sku,
+      store_id: payload.product.store_id,
+      attributes_count: payload.product.custom_attributes.length
+    });
+    
+    // Make the API request
     const url = `${BASE_URL}/products/${encodeURIComponent(sku)}`;
     const result = await makeRequest(url, 'PUT', payload, 25000);
     
     const duration = Date.now() - startTime;
-    log(`Request completed in ${duration}ms`);
     
     if (!result.success) {
-      log('ERROR: Update failed', { statusCode: result.statusCode, error: result.error });
+      log('ERROR: Update failed', { 
+        statusCode: result.statusCode, 
+        error: result.error,
+        duration: duration + 'ms'
+      });
+      
       return {
         statusCode: result.statusCode || 500,
         headers,
@@ -176,7 +223,10 @@ exports.handler = async (event) => {
       };
     }
     
-    log(`✓ Successfully updated ${sku}`);
+    log(`✅ Successfully updated ${sku}`, {
+      duration: duration + 'ms',
+      attributes: updates.map(u => u.attribute_code)
+    });
     
     return {
       statusCode: 200,
@@ -186,13 +236,20 @@ exports.handler = async (event) => {
         sku: sku,
         updated_attributes: updates.map(u => u.attribute_code),
         timestamp: new Date().toISOString(),
-        duration: duration
+        duration: duration,
+        store_scope: 'all' // Indicates it updated all store views
       })
     };
     
   } catch (error) {
     const duration = Date.now() - startTime;
-    log('ERROR: Exception', { error: error.message, stack: error.stack });
+    
+    log('ERROR: Exception thrown', { 
+      error: error.message, 
+      stack: error.stack,
+      duration: duration + 'ms'
+    });
+    
     return {
       statusCode: 500,
       headers,
