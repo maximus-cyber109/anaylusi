@@ -2,83 +2,106 @@ const https = require('https');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-function makeGeminiRequest(prompt, timeout = 10000) {
+function makeGeminiRequest(prompt, timeout = 15000) {
   return new Promise((resolve) => {
-    const payload = JSON.stringify({
-      contents: [{
-        parts: [{ text: prompt }]
-      }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 300,
-        topK: 40,
-        topP: 0.95
+    
+    // Try different model endpoints in order
+    const modelPaths = [
+      '/v1beta/models/gemini-1.5-flash:generateContent',
+      '/v1/models/gemini-1.5-flash:generateContent',
+      '/v1beta/models/gemini-pro:generateContent',
+      '/v1/models/gemini-pro:generateContent'
+    ];
+    
+    let currentPathIndex = 0;
+    
+    function tryRequest() {
+      if (currentPathIndex >= modelPaths.length) {
+        console.error('[AI] All model paths failed');
+        resolve({ success: false, error: 'No valid Gemini model found' });
+        return;
       }
-    });
-
-    const options = {
-      hostname: 'generativelanguage.googleapis.com',
-      path: `/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      }
-    };
-
-    console.log('[AI] Generating SEO content...');
-    console.log('[AI] Prompt:', prompt.substring(0, 100) + '...');
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        console.log('[AI] Response status:', res.statusCode);
-        console.log('[AI] Response data:', data.substring(0, 500));
-        
-        try {
-          const result = JSON.parse(data);
-          
-          // Check for errors
-          if (result.error) {
-            console.error('[AI] API Error:', result.error);
-            resolve({ success: false, error: result.error.message || 'API error' });
-            return;
-          }
-          
-          // Extract text from response
-          const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          
-          console.log('[AI] ✓ Generated:', text);
-          
-          if (!text || text.trim() === '') {
-            console.error('[AI] Empty response from Gemini');
-            resolve({ success: false, error: 'Empty response from AI' });
-            return;
-          }
-          
-          resolve({ success: true, text: text.trim() });
-        } catch (e) {
-          console.error('[AI] Parse error:', e.message);
-          console.error('[AI] Raw data:', data);
-          resolve({ success: false, error: 'Failed to parse AI response' });
+      
+      const modelPath = modelPaths[currentPathIndex];
+      console.log(`[AI] Trying: ${modelPath}`);
+      
+      const payload = JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 300
         }
       });
-    });
 
-    req.on('error', (e) => {
-      console.error('[AI] Request error:', e.message);
-      resolve({ success: false, error: e.message });
-    });
+      const options = {
+        hostname: 'generativelanguage.googleapis.com',
+        path: `${modelPath}?key=${GEMINI_API_KEY}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      };
 
-    req.setTimeout(timeout, () => {
-      console.error('[AI] Timeout');
-      req.abort();
-      resolve({ success: false, error: 'AI request timeout' });
-    });
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          console.log(`[AI] Status: ${res.statusCode}`);
+          
+          try {
+            const result = JSON.parse(data);
+            
+            // If error, try next model
+            if (result.error) {
+              console.error(`[AI] Error with ${modelPath}:`, result.error.message);
+              currentPathIndex++;
+              tryRequest(); // Try next model
+              return;
+            }
+            
+            // Success!
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            
+            if (!text || text.trim() === '') {
+              console.error('[AI] Empty response');
+              currentPathIndex++;
+              tryRequest(); // Try next model
+              return;
+            }
+            
+            console.log(`[AI] ✓ Success with ${modelPath}`);
+            console.log(`[AI] Generated: ${text.substring(0, 100)}...`);
+            resolve({ success: true, text: text.trim() });
+            
+          } catch (e) {
+            console.error('[AI] Parse error:', e.message);
+            currentPathIndex++;
+            tryRequest(); // Try next model
+          }
+        });
+      });
 
-    req.write(payload);
-    req.end();
+      req.on('error', (e) => {
+        console.error('[AI] Request error:', e.message);
+        currentPathIndex++;
+        tryRequest(); // Try next model
+      });
+
+      req.setTimeout(timeout, () => {
+        console.error('[AI] Timeout');
+        req.abort();
+        currentPathIndex++;
+        tryRequest(); // Try next model
+      });
+
+      req.write(payload);
+      req.end();
+    }
+    
+    tryRequest(); // Start trying
   });
 }
 
@@ -94,6 +117,7 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
+  console.log('[AI] ═══════════════════════════════');
   console.log('[AI] Function invoked');
 
   if (!GEMINI_API_KEY) {
@@ -101,17 +125,19 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ success: false, error: 'Gemini API key not configured. Add GEMINI_API_KEY to Netlify environment variables.' })
+      body: JSON.stringify({ 
+        success: false, 
+        error: 'GEMINI_API_KEY not set in Netlify environment variables. Get one at: https://aistudio.google.com/app/apikey' 
+      })
     };
   }
 
-  console.log('[AI] API Key present:', GEMINI_API_KEY.substring(0, 10) + '...');
+  console.log('[AI] API Key:', GEMINI_API_KEY.substring(0, 15) + '...');
 
   let data;
   try {
     data = JSON.parse(event.body || '{}');
   } catch (e) {
-    console.error('[AI] Invalid JSON:', e.message);
     return {
       statusCode: 400,
       headers,
@@ -120,14 +146,13 @@ exports.handler = async (event) => {
   }
 
   const { productName, category, action } = data;
-
   console.log('[AI] Request:', { productName, category, action });
 
   if (!productName) {
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ success: false, error: 'Product name required' })
+      body: JSON.stringify({ success: false, error: 'productName required' })
     };
   }
 
@@ -137,41 +162,44 @@ exports.handler = async (event) => {
 
     if (action === 'meta_title') {
       maxLength = 70;
-      prompt = `Create an SEO-optimized meta title (maximum ${maxLength} characters) for: "${productName}". Include "PinkBlue" brand. Make it compelling for Google search. Return ONLY the meta title, no quotes, no explanation.`;
+      prompt = `Write a concise SEO meta title (max ${maxLength} chars) for: "${productName}". Include "PinkBlue". Output only the title.`;
     } else if (action === 'meta_description') {
       maxLength = 160;
-      prompt = `Create an SEO-optimized meta description (maximum ${maxLength} characters) for: "${productName}". Include benefits and call-to-action. Return ONLY the meta description, no quotes, no explanation.`;
+      prompt = `Write a concise SEO description (max ${maxLength} chars) for: "${productName}". Include benefits. Output only the description.`;
     } else if (action === 'meta_keywords') {
       maxLength = 255;
-      prompt = `Generate SEO keywords (comma-separated, maximum ${maxLength} characters) for: "${productName}" in category "${category || 'dental supplies'}". Include product variations, buying keywords, and brand terms. Return ONLY the keywords, no quotes, no explanation.`;
+      prompt = `List SEO keywords (max ${maxLength} chars, comma-separated) for: "${productName}" (dental supplies). Output only keywords.`;
     } else {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Invalid action. Must be: meta_title, meta_description, or meta_keywords' })
+        body: JSON.stringify({ success: false, error: 'Invalid action' })
       };
     }
 
-    console.log('[AI] Calling Gemini API...');
+    console.log('[AI] Prompt:', prompt.substring(0, 80) + '...');
 
     const result = await makeGeminiRequest(prompt);
 
     if (!result.success) {
+      console.error('[AI] Generation failed:', result.error);
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, error: result.error || 'AI generation failed' })
+        body: JSON.stringify(result)
       };
     }
 
-    // Trim to character limit
     let generated = result.text;
+    
+    // Trim to limit
     if (generated.length > maxLength) {
       generated = generated.substring(0, maxLength - 3) + '...';
-      console.log('[AI] Trimmed to', maxLength, 'chars');
+      console.log('[AI] Trimmed to', maxLength);
     }
 
-    console.log('[AI] ✅ Success! Generated:', generated);
+    console.log('[AI] ✅ Final output:', generated);
+    console.log('[AI] ═══════════════════════════════');
 
     return {
       statusCode: 200,
@@ -180,14 +208,12 @@ exports.handler = async (event) => {
         success: true,
         generated: generated,
         action: action,
-        length: generated.length,
-        maxLength: maxLength
+        length: generated.length
       })
     };
 
   } catch (error) {
-    console.error('[AI] Error:', error.message);
-    console.error('[AI] Stack:', error.stack);
+    console.error('[AI] Exception:', error);
     return {
       statusCode: 500,
       headers,
