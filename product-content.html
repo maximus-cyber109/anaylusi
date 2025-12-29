@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>PinkBlue Product Content Editor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alphardex/aqua.css@master/dist/aqua.min.css"/>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: #050013;
+      color: #f5f5ff;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+    h1 { font-size: 1.6rem; margin-bottom: .4rem; }
+    .sku-row {
+      display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+      margin-bottom: 1.2rem;
+    }
+    input[type="text"] {
+      padding: .55rem .8rem;
+      border-radius: .5rem;
+      border: 1px solid #5552;
+      background:#0d0723;
+      color:#f5f5ff;
+      min-width: 220px;
+    }
+    button.primary {
+      background: radial-gradient(circle at 20% 0,#d9b8ff 0,#5a32f0 40%,#2a124f 100%);
+      border: none;
+      border-radius: 999px;
+      padding: .6rem 1.6rem;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,.7), 0 0 18px rgba(194,146,255,.8);
+      cursor: pointer;
+    }
+    button.primary:active { transform: scale(.97) translateY(1px); }
+    .sections {
+      display: grid;
+      grid-template-columns: minmax(0,2fr) minmax(0,1fr);
+      gap: 1.4rem;
+      margin-top: 1.4rem;
+    }
+    @media(max-width:900px) {
+      .sections { grid-template-columns: minmax(0,1fr); }
+    }
+    .section-block {
+      background: rgba(14,6,44,.85);
+      border-radius: 1rem;
+      padding: .9rem .9rem 1.1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 24px rgba(88,62,179,.65);
+    }
+    .section-title {
+      font-weight: 600;
+      margin-bottom: .6rem;
+      font-size: 1rem;
+      letter-spacing:.03em;
+      text-transform: uppercase;
+      color:#e4d3ff;
+    }
+    .field { margin-bottom: .9rem; }
+    .field label {
+      font-size: .85rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: .23rem;
+    }
+    .field textarea,
+    .field input[type="text"].attr {
+      width: 100%;
+      min-height: 3.2rem;
+      padding: .55rem .65rem;
+      background:#0b0523;
+      border-radius:.4rem;
+      border:1px solid #4b3ca099;
+      color:#fdfdff;
+      font-size:.9rem;
+      resize: vertical;
+    }
+    .field-meta {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.78rem;
+      color:#9fa2ff;
+      margin-top:.15rem;
+    }
+    .field-meta span.limit.over { color:#ff7b7b; }
+    .preview-box {
+      background:#050013;
+      border-radius:.7rem;
+      padding:.6rem .7rem;
+      margin-top:.3rem;
+      border:1px solid #34306a;
+      max-height:160px;
+      overflow:auto;
+      font-size:.82rem;
+    }
+    .toggle-row {
+      display:flex;
+      align-items:center;
+      gap:.4rem;
+    }
+    .status {
+      margin-top:.8rem;
+      font-size:.85rem;
+      min-height:1.2rem;
+    }
+    .status.ok { color:#91ffba; }
+    .status.err { color:#ff8787; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Product Content & SEO Editor</h1>
+  <p style="opacity:.8;font-size:.9rem;">Edit Magento content, key specs & SEO directly via REST, with live character limits and HTML bullet conversion.</p>
+
+  <div class="sku-row">
+    <input id="sku-input" type="text" placeholder="Enter SKU (e.g., PBX01_011_01)" />
+    <button id="load-btn" class="primary">Load Product</button>
+    <a href="https://pinkblue.in" target="_blank" style="margin-left:auto;text-decoration:none;">
+      <button class="primary" style="background:radial-gradient(circle at 20% 0,#ffb5d9 0,#ff4fa3 35%,#40112f 100%);">
+        Shop More on PinkBlue
+      </button>
+    </a>
+  </div>
+  <div id="product-info" style="font-size:.88rem;opacity:.85;margin-bottom:.7rem;"></div>
+  <div id="status" class="status"></div>
+
+  <div class="sections" id="sections" style="display:none;"></div>
+  <div style="margin-top:1rem;display:flex;gap:.7rem;flex-wrap:wrap;">
+    <button id="update-selected" class="primary">Update Selected Attributes</button>
+  </div>
+</div>
+
+<script>
+let schema = null;
+let currentAttrs = {};
+let selectedForUpdate = new Set();
+let FN_BASE = '/.netlify/functions/product-content';
+
+async function loadSchema() {
+  const res = await fetch('product-update-schema.json');
+  schema = await res.json();
+  if (schema.api_config?.netlify_function) {
+    FN_BASE = schema.api_config.netlify_function;
+  }
+}
+function convertToHTML(text) {
+  const lines = text.split(/\\r?\\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return '';
+  const li = lines.map(l => '<li>'+l.replace(/[<>]/g,'')+'</li>').join('\\n');
+  return '<ul>\\n'+li+'\\n</ul>';
+}
+function setStatus(msg, ok) {
+  const el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.className = 'status '+(ok===true?'ok':ok===false?'err':'');
+}
+function renderAttributes() {
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+  if (!schema) return;
+  const sections = {};
+  for (const attr of schema.updatable_attributes) {
+    if (!sections[attr.section]) sections[attr.section] = [];
+    sections[attr.section].push(attr);
+  }
+  Object.entries(sections).forEach(([sectionName, attrs]) => {
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.innerHTML = '<div class="section-title">'+sectionName+'</div>';
+    attrs.forEach((attr) => {
+      const val = currentAttrs[attr.attribute_code] || '';
+      const field = document.createElement('div');
+      field.className = 'field';
+      const id = 'attr_'+attr.attribute_code;
+      field.innerHTML = `
+        <label>
+          <input type="checkbox" data-select="${attr.attribute_code}" style="margin-right:4px;vertical-align:middle;"> 
+          ${attr.label} <span style="opacity:.6;font-size:.78rem;">(${attr.attribute_code})</span>
+        </label>
+        ${attr.type === 'html' || attr.type === 'text' ? 
+          '<textarea id="'+id+'" placeholder="'+(attr.placeholder||'')+'"></textarea>' :
+          '<input class="attr" id="'+id+'" type="text" placeholder="'+(attr.placeholder||'')+'"/>'}
+        <div class="field-meta">
+          <div>
+            ${attr.supports_html_conversion ? `
+              <label class="toggle-row">
+                <input type="checkbox" data-html="${attr.attribute_code}">
+                <span>Convert to HTML bullets</span>
+              </label>
+            ` : ''}
+          </div>
+          <span class="limit" id="${id}_limit">0 / ${attr.character_limit}</span>
+        </div>
+        <div id="${id}_preview" class="preview-box" style="display:none;"></div>
+      `;
+      const input = field.querySelector('#'+id);
+      input.value = val || '';
+      const limitSpan = field.querySelector('#'+id+'_limit');
+      const updateCount = () => {
+        const length = input.value.length;
+        limitSpan.textContent = length+' / '+attr.character_limit;
+        limitSpan.classList.toggle('over', length > attr.character_limit);
+      };
+      input.addEventListener('input', updateCount);
+      updateCount();
+
+      if (attr.supports_html_conversion) {
+        const toggle = field.querySelector('[data-html="'+attr.attribute_code+'"]');
+        const preview = field.querySelector('#'+id+'_preview');
+        toggle.addEventListener('change', () => {
+          if (toggle.checked) {
+            preview.style.display = 'block';
+            preview.innerHTML = convertToHTML(input.value);
+          } else preview.style.display = 'none';
+        });
+        input.addEventListener('input', () => {
+          if (toggle.checked) preview.innerHTML = convertToHTML(input.value);
+        });
+      }
+
+      const check = field.querySelector('[data-select="'+attr.attribute_code+'"]');
+      check.addEventListener('change', () => {
+        if (check.checked) selectedForUpdate.add(attr.attribute_code);
+        else selectedForUpdate.delete(attr.attribute_code);
+      });
+
+      block.appendChild(field);
+    });
+    container.appendChild(block);
+  });
+  container.style.display = 'grid';
+}
+
+async function loadProduct(sku) {
+  setStatus('Loading product...', null);
+  const res = await fetch(`${FN_BASE}?type=get_product&sku=${encodeURIComponent(sku)}`);
+  const json = await res.json();
+  if (!json.success) {
+    setStatus('Product not found or failed to load.', false);
+    return;
+  }
+  currentAttrs = json.attributes || {};
+  document.getElementById('product-info').textContent =
+    `Loaded SKU: ${json.sku} | ${json.name} (ID #${json.id})`;
+  setStatus('Product loaded. Edit and select fields to update.', true);
+  selectedForUpdate.clear();
+  renderAttributes();
+}
+
+async function updateSelected(sku) {
+  if (!schema) return;
+  if (!selectedForUpdate.size) {
+    setStatus('Select at least one attribute checkbox to update.', false);
+    return;
+  }
+  const updates = [];
+  let overLimit = false;
+  for (const attr of schema.updatable_attributes) {
+    if (!selectedForUpdate.has(attr.attribute_code)) continue;
+    const id = 'attr_'+attr.attribute_code;
+    const input = document.getElementById(id);
+    if (!input) continue;
+    let value = input.value || '';
+    if (attr.supports_html_conversion) {
+      const toggle = document.querySelector('[data-html="'+attr.attribute_code+'"]');
+      if (toggle && toggle.checked) value = convertToHTML(value);
+    }
+    const length = value.length;
+    if (length > attr.character_limit) {
+      overLimit = true;
+      document.getElementById(id+'_limit').classList.add('over');
+    }
+    updates.push({ attribute_code: attr.attribute_code, value });
+  }
+  if (overLimit) {
+    setStatus('Some fields exceed character limits. Fix them before updating.', false);
+    return;
+  }
+  setStatus('Updating product...', null);
+  const res = await fetch(`${FN_BASE}?type=update_product&sku=${encodeURIComponent(sku)}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(updates)
+  });
+  const json = await res.json();
+  if (!json.success) {
+    setStatus('Update failed: '+(json.error || json.statusCode || 'Unknown error'), false);
+  } else {
+    setStatus('Updated: '+json.updated_attributes.join(', '), true);
+  }
+}
+
+(async () => {
+  await loadSchema();
+  document.getElementById('load-btn').onclick = () => {
+    const sku = document.getElementById('sku-input').value.trim();
+    if (!sku) return setStatus('Enter a SKU first.', false);
+    loadProduct(sku);
+  };
+  document.getElementById('update-selected').onclick = () => {
+    const sku = document.getElementById('sku-input').value.trim();
+    if (!sku) return setStatus('Enter a SKU first.', false);
+    updateSelected(sku);
+  };
+})();
+</script>
+</body>
+</html>
