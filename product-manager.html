@@ -762,405 +762,420 @@
     </div>
   </div>
 
-  <script>
-    // ===== CALCULATOR LOGIN =====
-    let calcBuffer = '';
-    let calcDisplay = '0';
-    let secretPassword = 'pbadmin109'; // Will use env var
-    let passwordBuffer = '';
+ <script>
+  // ===== CALCULATOR LOGIN =====
+  let calcDisplay = '0';
+  let secretPassword = 'pbadmin109'; // Type this on keyboard to unlock
+  let passwordBuffer = '';
 
-    function calcInput(val) {
-      // Hidden password check
-      passwordBuffer += val;
+  function calcInput(val) {
+    // Normal calculator function
+    if (calcDisplay === '0' && val !== '.') {
+      calcDisplay = val;
+    } else {
+      calcDisplay += val;
+    }
+    document.getElementById('calc-display').textContent = calcDisplay;
+  }
+
+  function calcClear() {
+    calcDisplay = '0';
+    document.getElementById('calc-display').textContent = calcDisplay;
+  }
+
+  function calcEquals() {
+    try {
+      const result = eval(calcDisplay);
+      calcDisplay = result.toString();
+      document.getElementById('calc-display').textContent = calcDisplay;
+    } catch (e) {
+      calcDisplay = 'ERROR';
+      document.getElementById('calc-display').textContent = calcDisplay;
+      setTimeout(() => {
+        calcDisplay = '0';
+        document.getElementById('calc-display').textContent = calcDisplay;
+      }, 1000);
+    }
+  }
+
+  // 🔑 KEYBOARD PASSWORD DETECTION
+  document.addEventListener('keydown', function(e) {
+    // Only listen when on calculator screen
+    if (!document.getElementById('calculator-screen').classList.contains('hidden')) {
+      passwordBuffer += e.key.toLowerCase();
+      
+      console.log('[AUTH] Key pressed, buffer length:', passwordBuffer.length);
+      
+      // Check if password is in buffer
       if (passwordBuffer.includes(secretPassword)) {
+        console.log('[AUTH] ✅ Password detected!');
         unlock();
+        passwordBuffer = '';
         return;
       }
-      // Keep buffer short
+      
+      // Keep buffer manageable (last 20 characters)
       if (passwordBuffer.length > 20) {
         passwordBuffer = passwordBuffer.substring(passwordBuffer.length - 20);
       }
+    }
+  });
 
-      // Normal calculator function
-      if (calcDisplay === '0' && val !== '.') {
-        calcDisplay = val;
+  function unlock() {
+    console.log('[AUTH] 🔓 Access granted');
+    document.getElementById('calculator-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.add('show');
+    sessionStorage.setItem('authenticated', 'true');
+    passwordBuffer = ''; // Clear buffer
+  }
+
+  function logout() {
+    console.log('[AUTH] 🔒 Logged out');
+    sessionStorage.removeItem('authenticated');
+    document.getElementById('calculator-screen').classList.remove('hidden');
+    document.getElementById('main-app').classList.remove('show');
+    calcClear();
+    passwordBuffer = '';
+  }
+
+  // Check if already authenticated
+  if (sessionStorage.getItem('authenticated') === 'true') {
+    console.log('[AUTH] ✅ Already authenticated');
+    unlock();
+  }
+
+  // ===== PRODUCT MANAGER =====
+  let currentSKU = '';
+  let currentAttributes = {};
+  let currentProductName = '';
+
+  // Character counter
+  document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
+    el.addEventListener('input', function() {
+      const attrCode = this.id.replace('attr-', '');
+      const counter = document.querySelector(`[data-attr="${attrCode}"]`);
+      if (!counter) return;
+      
+      const limit = parseInt(this.dataset.limit);
+      const length = this.value.length;
+      
+      counter.textContent = `${length} / ${limit}`;
+      
+      if (length > limit) {
+        counter.classList.add('error');
+        counter.classList.remove('warning');
+      } else if (length > limit * 0.8) {
+        counter.classList.add('warning');
+        counter.classList.remove('error');
       } else {
-        calcDisplay += val;
+        counter.classList.remove('warning', 'error');
       }
-      document.getElementById('calc-display').textContent = calcDisplay;
-    }
 
-    function calcClear() {
-      calcDisplay = '0';
-      passwordBuffer = '';
-      document.getElementById('calc-display').textContent = calcDisplay;
-    }
-
-    function calcEquals() {
-      try {
-        const result = eval(calcDisplay);
-        calcDisplay = result.toString();
-        document.getElementById('calc-display').textContent = calcDisplay;
-      } catch (e) {
-        calcDisplay = 'ERROR';
-        document.getElementById('calc-display').textContent = calcDisplay;
-        setTimeout(() => {
-          calcDisplay = '0';
-          document.getElementById('calc-display').textContent = calcDisplay;
-        }, 1000);
-      }
-    }
-
-    function unlock() {
-      console.log('[AUTH] Access granted');
-      document.getElementById('calculator-screen').classList.add('hidden');
-      document.getElementById('main-app').classList.add('show');
-      sessionStorage.setItem('authenticated', 'true');
-    }
-
-    function logout() {
-      sessionStorage.removeItem('authenticated');
-      document.getElementById('calculator-screen').classList.remove('hidden');
-      document.getElementById('main-app').classList.remove('show');
-      calcClear();
-    }
-
-    // Check if already authenticated
-    if (sessionStorage.getItem('authenticated') === 'true') {
-      unlock();
-    }
-
-    // ===== PRODUCT MANAGER =====
-    let currentSKU = '';
-    let currentAttributes = {};
-    let currentProductName = '';
-
-    // Character counter
-    document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
-      el.addEventListener('input', function() {
-        const attrCode = this.id.replace('attr-', '');
-        const counter = document.querySelector(`[data-attr="${attrCode}"]`);
-        if (!counter) return;
-        
-        const limit = parseInt(this.dataset.limit);
-        const length = this.value.length;
-        
-        counter.textContent = `${length} / ${limit}`;
-        
-        if (length > limit) {
-          counter.classList.add('error');
-          counter.classList.remove('warning');
-        } else if (length > limit * 0.8) {
-          counter.classList.add('warning');
-          counter.classList.remove('error');
-        } else {
-          counter.classList.remove('warning', 'error');
-        }
-
-        // Update preview
-        const htmlCheckbox = document.getElementById(`html-${attrCode}`);
-        if (htmlCheckbox && htmlCheckbox.checked) {
-          updatePreview(attrCode);
-        }
-      });
-    });
-
-    // HTML conversion toggle
-    document.querySelectorAll('[id^="html-"]').forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-        const attrCode = this.id.replace('html-', '');
+      // Update preview
+      const htmlCheckbox = document.getElementById(`html-${attrCode}`);
+      if (htmlCheckbox && htmlCheckbox.checked) {
         updatePreview(attrCode);
-      });
-    });
-
-    // Status toggle
-    document.getElementById('status-toggle').addEventListener('change', function() {
-      document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
-    });
-
-    function updatePreview(attrCode) {
-      const textarea = document.getElementById(`attr-${attrCode}`);
-      const preview = document.getElementById(`preview-${attrCode}`);
-      const checkbox = document.getElementById(`html-${attrCode}`);
-      
-      if (!textarea || !preview || !checkbox) return;
-      
-      if (checkbox.checked && textarea.value.trim()) {
-        const html = convertToHTML(textarea.value);
-        preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
-        preview.classList.add('show');
-      } else {
-        preview.classList.remove('show');
       }
-    }
+    });
+  });
 
-    function convertToHTML(text) {
-      if (!text.trim()) return '';
-      const lines = text.split('\n').filter(l => l.trim());
-      const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-      return `<ul>\n${bullets}\n</ul>`;
-    }
+  // HTML conversion toggle
+  document.querySelectorAll('[id^="html-"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const attrCode = this.id.replace('html-', '');
+      updatePreview(attrCode);
+    });
+  });
 
-    async function loadProduct() {
-      const sku = document.getElementById('sku-input').value.trim();
+  // Status toggle
+  document.getElementById('status-toggle').addEventListener('change', function() {
+    document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
+  });
+
+  function updatePreview(attrCode) {
+    const textarea = document.getElementById(`attr-${attrCode}`);
+    const preview = document.getElementById(`preview-${attrCode}`);
+    const checkbox = document.getElementById(`html-${attrCode}`);
+    
+    if (!textarea || !preview || !checkbox) return;
+    
+    if (checkbox.checked && textarea.value.trim()) {
+      const html = convertToHTML(textarea.value);
+      preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
+      preview.classList.add('show');
+    } else {
+      preview.classList.remove('show');
+    }
+  }
+
+  function convertToHTML(text) {
+    if (!text.trim()) return '';
+    const lines = text.split('\n').filter(l => l.trim());
+    const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+    return `<ul>\n${bullets}\n</ul>`;
+  }
+
+  async function loadProduct() {
+    const sku = document.getElementById('sku-input').value.trim();
+    
+    if (!sku) {
+      showModal('Error', 'Please enter a SKU', 'error');
+      return;
+    }
+    
+    showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
+    
+    console.log('[LOAD] Fetching product:', sku);
+    
+    try {
+      const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
+      const data = await response.json();
       
-      if (!sku) {
-        showModal('Error', 'Please enter a SKU', 'error');
+      console.log('[LOAD] Response:', data);
+      
+      if (!data.success) {
+        showModal('Error', data.error || 'Product not found', 'error');
         return;
       }
       
-      showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
+      currentSKU = data.sku;
+      currentAttributes = data.attributes;
+      currentProductName = data.name;
       
-      console.log('[LOAD] Fetching product:', sku);
+      // Populate product info
+      document.getElementById('info-sku').textContent = data.sku;
+      document.getElementById('info-name').textContent = data.name;
+      document.getElementById('info-price').textContent = `₹${data.price}`;
+      document.getElementById('info-id').textContent = data.id;
       
-      try {
-        const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
-        const data = await response.json();
-        
-        console.log('[LOAD] Response:', data);
-        
-        if (!data.success) {
-          showModal('Error', data.error || 'Product not found', 'error');
-          return;
-        }
-        
-        currentSKU = data.sku;
-        currentAttributes = data.attributes;
-        currentProductName = data.name;
-        
-        // Populate product info
-        document.getElementById('info-sku').textContent = data.sku;
-        document.getElementById('info-name').textContent = data.name;
-        document.getElementById('info-price').textContent = `₹${data.price}`;
-        document.getElementById('info-id').textContent = data.id;
-        
-        // Status
-        const isEnabled = data.status === '1' || data.status === 1;
-        document.getElementById('status-toggle').checked = isEnabled;
-        document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
-        
-        // Populate attributes
-        Object.keys(data.attributes).forEach(attr => {
-          const field = document.getElementById(`attr-${attr}`);
-          if (field) {
-            field.value = data.attributes[attr] || '';
-            field.dispatchEvent(new Event('input'));
-          }
-        });
-        
-        // Show sections
-        document.getElementById('product-info').classList.add('show');
-        document.getElementById('product-status-toggle').classList.add('show');
-        document.getElementById('attributes-grid').style.display = 'grid';
-        
-        closeModal();
-        showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
-        
-        console.log('[LOAD] Product loaded successfully');
-        
-      } catch (error) {
-        console.error('[LOAD] Error:', error);
-        showModal('Error', 'Error loading product: ' + error.message, 'error');
-      }
-    }
-
-    async function updateProduct() {
-      if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
+      // Status
+      const isEnabled = data.status === '1' || data.status === 1;
+      document.getElementById('status-toggle').checked = isEnabled;
+      document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
       
-      const updates = [];
-      const attrs = [
-        'description', 'short_description', 'features', 'technical_details',
-        'package_content', 'key_specification1', 'key_specification2',
-        'key_specification3', 'key_specification4', 'meta_title',
-        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags', 'faqs'
-      ];
-      
-      attrs.forEach(attr => {
+      // Populate attributes
+      Object.keys(data.attributes).forEach(attr => {
         const field = document.getElementById(`attr-${attr}`);
-        if (!field) return;
-        
-        let value = field.value;
-        
-        // HTML conversion
-        const htmlCheckbox = document.getElementById(`html-${attr}`);
-        if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
-          const lines = value.split('\n').filter(l => l.trim());
-          if (lines.length > 0) {
-            const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
-            value = `<ul>\n${bullets}\n</ul>`;
-          }
-        }
-        
-        // Only include if changed
-        if (value !== (currentAttributes[attr] || '')) {
-          updates.push({
-            attribute_code: attr,
-            value: value
-          });
-        }
-      });
-      
-      if (updates.length === 0) {
-        showModal('Warning', 'No changes detected', 'error');
-        return;
-      }
-      
-      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
-      
-      console.log('[UPDATE] Sending updates:', updates);
-      
-      try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        });
-        
-        const data = await response.json();
-        
-        console.log('[UPDATE] Response:', data);
-        
-        if (!data.success) {
-          showModal('Error', data.error || 'Update failed', 'error');
-          return;
-        }
-        
-        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
-        
-        // Reload product
-        setTimeout(() => loadProduct(), 2000);
-        
-      } catch (error) {
-        console.error('[UPDATE] Error:', error);
-        showModal('Error', 'Error updating product: ' + error.message, 'error');
-      }
-    }
-
-    async function toggleProductStatus() {
-      if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
-
-      const isEnabled = document.getElementById('status-toggle').checked;
-      const updates = [{
-        attribute_code: 'status',
-        value: isEnabled ? '1' : '2'
-      }];
-
-      showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
-
-      console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
-
-      try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        });
-
-        const data = await response.json();
-
-        console.log('[STATUS] Response:', data);
-
-        if (!data.success) {
-          showModal('Error', data.error || 'Status update failed', 'error');
-          return;
-        }
-
-        showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
-
-      } catch (error) {
-        console.error('[STATUS] Error:', error);
-        showModal('Error', 'Error updating status: ' + error.message, 'error');
-      }
-    }
-
-    async function generateAI(action) {
-      if (!currentProductName) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
-
-      showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
-
-      console.log('[AI] Generating:', action);
-
-      try {
-        const response = await fetch('/.netlify/functions/ai-seo-generator', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productName: currentProductName,
-            category: 'dental supplies',
-            action: action
-          })
-        });
-
-        const data = await response.json();
-
-        console.log('[AI] Response:', data);
-
-        if (!data.success) {
-          showModal('Error', data.error || 'AI generation failed', 'error');
-          return;
-        }
-
-        // Populate the field
-        const field = document.getElementById(`attr-${action}`);
         if (field) {
-          field.value = data.generated;
+          field.value = data.attributes[attr] || '';
           field.dispatchEvent(new Event('input'));
         }
-
-        closeModal();
-        showModal('Success', `✓ AI generated ${action} successfully!`, 'success');
-
-      } catch (error) {
-        console.error('[AI] Error:', error);
-        showModal('Error', 'AI error: ' + error.message, 'error');
-      }
-    }
-
-    function clearForm() {
-      if (confirm('Clear all form data? Unsaved changes will be lost.')) {
-        document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
-          el.value = '';
-          el.dispatchEvent(new Event('input'));
-        });
-        document.querySelectorAll('input[id^="html-"]').forEach(cb => {
-          cb.checked = false;
-        });
-        console.log('[FORM] Cleared');
-      }
-    }
-
-    function showModal(title, message, type = '', closeButton = true) {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal-message').innerHTML = message;
-      document.getElementById('modal-content').className = `modal-content ${type}`;
-      document.getElementById('modal').classList.add('show');
+      });
       
-      if (!closeButton) {
-        document.querySelector('.modal-close').style.display = 'none';
-      } else {
-        document.querySelector('.modal-close').style.display = 'block';
+      // Show sections
+      document.getElementById('product-info').classList.add('show');
+      document.getElementById('product-status-toggle').classList.add('show');
+      document.getElementById('attributes-grid').style.display = 'grid';
+      
+      closeModal();
+      showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
+      
+      console.log('[LOAD] Product loaded successfully');
+      
+    } catch (error) {
+      console.error('[LOAD] Error:', error);
+      showModal('Error', 'Error loading product: ' + error.message, 'error');
+    }
+  }
+
+  async function updateProduct() {
+    if (!currentSKU) {
+      showModal('Error', 'Please load a product first', 'error');
+      return;
+    }
+    
+    const updates = [];
+    const attrs = [
+      'description', 'short_description', 'features', 'technical_details',
+      'package_content', 'key_specification1', 'key_specification2',
+      'key_specification3', 'key_specification4', 'meta_title',
+      'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags', 'faqs'
+    ];
+    
+    attrs.forEach(attr => {
+      const field = document.getElementById(`attr-${attr}`);
+      if (!field) return;
+      
+      let value = field.value;
+      
+      // HTML conversion
+      const htmlCheckbox = document.getElementById(`html-${attr}`);
+      if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
+        const lines = value.split('\n').filter(l => l.trim());
+        if (lines.length > 0) {
+          const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+          value = `<ul>\n${bullets}\n</ul>`;
+        }
       }
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    // Enter key to load
-    document.getElementById('sku-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') loadProduct();
+      
+      // Only include if changed
+      if (value !== (currentAttributes[attr] || '')) {
+        updates.push({
+          attribute_code: attr,
+          value: value
+        });
+      }
     });
+    
+    if (updates.length === 0) {
+      showModal('Warning', 'No changes detected', 'error');
+      return;
+    }
+    
+    showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
+    
+    console.log('[UPDATE] Sending updates:', updates);
+    
+    try {
+      const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      
+      const data = await response.json();
+      
+      console.log('[UPDATE] Response:', data);
+      
+      if (!data.success) {
+        showModal('Error', data.error || 'Update failed', 'error');
+        return;
+      }
+      
+      showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
+      
+      // Reload product
+      setTimeout(() => loadProduct(), 2000);
+      
+    } catch (error) {
+      console.error('[UPDATE] Error:', error);
+      showModal('Error', 'Error updating product: ' + error.message, 'error');
+    }
+  }
 
-    console.log('[APP] Product Manager loaded');
-  </script>
+  async function toggleProductStatus() {
+    if (!currentSKU) {
+      showModal('Error', 'Please load a product first', 'error');
+      return;
+    }
+
+    const isEnabled = document.getElementById('status-toggle').checked;
+    const updates = [{
+      attribute_code: 'status',
+      value: isEnabled ? '1' : '2'
+    }];
+
+    showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
+
+    console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
+
+    try {
+      const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      const data = await response.json();
+
+      console.log('[STATUS] Response:', data);
+
+      if (!data.success) {
+        showModal('Error', data.error || 'Status update failed', 'error');
+        return;
+      }
+
+      showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
+
+    } catch (error) {
+      console.error('[STATUS] Error:', error);
+      showModal('Error', 'Error updating status: ' + error.message, 'error');
+    }
+  }
+
+  async function generateAI(action) {
+    if (!currentProductName) {
+      showModal('Error', 'Please load a product first', 'error');
+      return;
+    }
+
+    showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
+
+    console.log('[AI] Generating:', action);
+
+    try {
+      const response = await fetch('/.netlify/functions/ai-seo-generator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: currentProductName,
+          category: 'dental supplies',
+          action: action
+        })
+      });
+
+      const data = await response.json();
+
+      console.log('[AI] Response:', data);
+
+      if (!data.success) {
+        showModal('Error', data.error || 'AI generation failed', 'error');
+        return;
+      }
+
+      // Populate the field
+      const field = document.getElementById(`attr-${action}`);
+      if (field) {
+        field.value = data.generated;
+        field.dispatchEvent(new Event('input'));
+      }
+
+      closeModal();
+      showModal('Success', `✓ AI generated ${action} successfully!`, 'success');
+
+    } catch (error) {
+      console.error('[AI] Error:', error);
+      showModal('Error', 'AI error: ' + error.message, 'error');
+    }
+  }
+
+  function clearForm() {
+    if (confirm('Clear all form data? Unsaved changes will be lost.')) {
+      document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
+        el.value = '';
+        el.dispatchEvent(new Event('input'));
+      });
+      document.querySelectorAll('input[id^="html-"]').forEach(cb => {
+        cb.checked = false;
+      });
+      console.log('[FORM] Cleared');
+    }
+  }
+
+  function showModal(title, message, type = '', closeButton = true) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').innerHTML = message;
+    document.getElementById('modal-content').className = `modal-content ${type}`;
+    document.getElementById('modal').classList.add('show');
+    
+    if (!closeButton) {
+      document.querySelector('.modal-close').style.display = 'none';
+    } else {
+      document.querySelector('.modal-close').style.display = 'block';
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+  }
+
+  // Enter key to load
+  document.getElementById('sku-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') loadProduct();
+  });
+
+  console.log('[APP] 🚀 Product Manager loaded');
+  console.log('[AUTH] 🔑 Type "pbadmin109" on your keyboard to unlock');
+</script>
 </body>
 </html>
