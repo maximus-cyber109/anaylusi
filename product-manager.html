@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PinkBlue Product Manager</title>
+  <title>Product Manager - PinkBlue</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -14,21 +14,115 @@
       --accent: #0f0;
       --error: #f00;
       --warning: #ff0;
+      --success: #0f0;
     }
     
     body {
       background: var(--bg);
       color: var(--text);
       font-family: 'Courier New', monospace;
-      padding: 20px;
       min-height: 100vh;
+      overflow-x: hidden;
     }
-    
+
+    /* ===== CALCULATOR LOGIN SCREEN ===== */
+    #calculator-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #calculator-screen.hidden {
+      display: none;
+    }
+
+    .calc-title {
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      border: 1px solid var(--text);
+      padding: 10px 20px;
+    }
+
+    .calculator {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    .calc-display {
+      background: #000;
+      border: 1px solid var(--accent);
+      padding: 20px;
+      font-size: 2rem;
+      text-align: right;
+      margin-bottom: 15px;
+      min-height: 60px;
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+    }
+
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      gap: 10px;
+    }
+
+    .calc-btn {
+      background: #111;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.2rem;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .calc-btn:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .calc-btn.operator {
+      background: #222;
+    }
+
+    .calc-btn.equals {
+      grid-column: span 2;
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .calc-btn.clear {
+      background: var(--error);
+      color: var(--bg);
+    }
+
+    /* ===== MAIN APP ===== */
+    #main-app {
+      display: none;
+      padding: 20px;
+    }
+
+    #main-app.show {
+      display: block;
+    }
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
     }
-    
+
     header {
       border-bottom: 1px solid var(--border);
       padding-bottom: 20px;
@@ -37,7 +131,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     h1 {
       font-size: 1.5rem;
       letter-spacing: 3px;
@@ -45,20 +139,25 @@
       padding: 10px 20px;
       display: inline-block;
     }
-    
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
     .search-box {
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       padding: 20px;
       margin-bottom: 20px;
     }
-    
+
     .input-group {
       display: flex;
       gap: 10px;
       margin-bottom: 15px;
     }
-    
+
     input, textarea, select, button {
       background: #000;
       color: var(--text);
@@ -67,45 +166,50 @@
       font-family: inherit;
       font-size: 0.9rem;
     }
-    
+
     input:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
     }
-    
+
     input[type="text"] {
       flex: 1;
     }
-    
+
     button {
       cursor: pointer;
       transition: all 0.2s;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    
-    button:hover {
+
+    button:hover:not(:disabled) {
       background: var(--text);
       color: var(--bg);
     }
-    
+
     button:disabled {
       opacity: 0.3;
       cursor: not-allowed;
     }
-    
+
     .btn-primary {
       background: var(--accent);
       color: var(--bg);
       border-color: var(--accent);
     }
-    
-    .btn-danger {
-      background: var(--error);
-      color: var(--bg);
-      border-color: var(--error);
+
+    .btn-secondary {
+      background: #333;
+      border-color: #666;
     }
-    
+
+    .btn-ai {
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+      color: var(--text);
+      border: none;
+    }
+
     .product-info {
       background: rgba(0,255,0,0.05);
       border: 1px solid var(--accent);
@@ -113,33 +217,92 @@
       margin-bottom: 20px;
       display: none;
     }
-    
+
     .product-info.show {
       display: block;
     }
-    
+
     .info-row {
       display: flex;
       justify-content: space-between;
       padding: 5px 0;
       border-bottom: 1px solid var(--border);
     }
-    
+
     .info-row:last-child {
       border-bottom: none;
     }
-    
+
+    .product-status-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .product-status-toggle.show {
+      display: flex;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 30px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+
     .attributes-grid {
       display: grid;
       gap: 20px;
     }
-    
+
     .section {
       border: 1px solid var(--border);
       padding: 20px;
       background: rgba(255,255,255,0.02);
     }
-    
+
     .section h2 {
       font-size: 1rem;
       margin-bottom: 15px;
@@ -147,46 +310,58 @@
       text-transform: uppercase;
       letter-spacing: 2px;
     }
-    
+
     .attr-row {
       margin-bottom: 20px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 20px;
     }
-    
+
     .attr-row:last-child {
       border-bottom: none;
       margin-bottom: 0;
       padding-bottom: 0;
     }
-    
+
     .attr-label {
       font-size: 0.85rem;
       color: #888;
       margin-bottom: 5px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
-    
+
     .char-counter {
       font-size: 0.75rem;
       color: #666;
     }
-    
+
     .char-counter.warning {
       color: var(--warning);
     }
-    
+
     .char-counter.error {
       color: var(--error);
     }
-    
+
     textarea {
       width: 100%;
       min-height: 80px;
       resize: vertical;
     }
-    
+
+    .attr-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .attr-actions button {
+      font-size: 0.75rem;
+      padding: 5px 10px;
+    }
+
     .html-toggle {
       display: flex;
       align-items: center;
@@ -194,11 +369,11 @@
       margin-top: 5px;
       font-size: 0.8rem;
     }
-    
+
     .html-toggle input[type="checkbox"] {
       width: auto;
     }
-    
+
     .preview {
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
@@ -208,275 +383,471 @@
       color: #aaa;
       display: none;
     }
-    
+
     .preview.show {
       display: block;
     }
-    
-    .status {
+
+    /* ===== MODAL/POPUP ===== */
+    .modal {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      z-index: 10000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 15px 20px;
-      min-width: 300px;
-      display: none;
-      z-index: 1000;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
     }
-    
-    .status.show {
-      display: block;
+
+    .modal-content.success {
+      border-color: var(--success);
     }
-    
-    .status.success {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    
-    .status.error {
+
+    .modal-content.error {
       border-color: var(--error);
-      color: var(--error);
     }
-    
-    .loading {
+
+    .modal-content.loading {
+      border-color: var(--accent);
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .modal-message {
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-close {
+      background: var(--text);
+      color: var(--bg);
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .loading-spinner {
       display: inline-block;
-      width: 12px;
-      height: 12px;
+      width: 20px;
+      height: 20px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
+      margin-right: 10px;
     }
-    
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
+
     .hidden {
       display: none !important;
+    }
+
+    .update-actions {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .update-actions button {
+      padding: 15px 50px;
+      font-size: 1.1rem;
+      margin: 0 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>PRODUCT MANAGER</h1>
-      <div>
-        <a href="index.html" style="color: var(--text); text-decoration: none; border: 1px solid var(--border); padding: 10px 15px; display: inline-block;">← BACK TO ANALYTICS</a>
-      </div>
-    </header>
 
-    <!-- Search Box -->
-    <div class="search-box">
-      <div class="input-group">
-        <input type="text" id="sku-input" placeholder="Enter Product SKU (e.g., PBX01_011_01)" autocomplete="off">
-        <button onclick="loadProduct()">LOAD PRODUCT</button>
-      </div>
-    </div>
-
-    <!-- Product Info -->
-    <div class="product-info" id="product-info">
-      <div class="info-row">
-        <strong>SKU:</strong>
-        <span id="info-sku">-</span>
-      </div>
-      <div class="info-row">
-        <strong>Name:</strong>
-        <span id="info-name">-</span>
-      </div>
-      <div class="info-row">
-        <strong>Price:</strong>
-        <span id="info-price">-</span>
-      </div>
-      <div class="info-row">
-        <strong>Status:</strong>
-        <span id="info-status">-</span>
-      </div>
-    </div>
-
-    <!-- Attributes Grid -->
-    <div class="attributes-grid" id="attributes-grid" style="display: none;">
-      
-      <!-- SECTION: CONTENT -->
-      <div class="section">
-        <h2>📝 Content</h2>
+  <!-- CALCULATOR LOGIN SCREEN -->
+  <div id="calculator-screen">
+    <div class="calc-title">CALCULATOR</div>
+    <div class="calculator">
+      <div class="calc-display" id="calc-display">0</div>
+      <div class="calc-buttons">
+        <button class="calc-btn clear" onclick="calcClear()">C</button>
+        <button class="calc-btn" onclick="calcInput('(')">(</button>
+        <button class="calc-btn" onclick="calcInput(')')">)</button>
+        <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
         
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Description</span>
-            <span class="char-counter" data-attr="description">0 / 65000</span>
-          </div>
-          <textarea id="attr-description" data-limit="65000"></textarea>
-          <div class="html-toggle">
-            <input type="checkbox" id="html-description">
-            <label for="html-description">Convert to HTML bullets</label>
-          </div>
-          <div class="preview" id="preview-description"></div>
-        </div>
+        <button class="calc-btn" onclick="calcInput('7')">7</button>
+        <button class="calc-btn" onclick="calcInput('8')">8</button>
+        <button class="calc-btn" onclick="calcInput('9')">9</button>
+        <button class="calc-btn operator" onclick="calcInput('*')">×</button>
         
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Short Description</span>
-            <span class="char-counter" data-attr="short_description">0 / 255</span>
-          </div>
-          <textarea id="attr-short_description" data-limit="255"></textarea>
-          <div class="html-toggle">
-            <input type="checkbox" id="html-short_description">
-            <label for="html-short_description">Convert to HTML bullets</label>
-          </div>
-          <div class="preview" id="preview-short_description"></div>
-        </div>
+        <button class="calc-btn" onclick="calcInput('4')">4</button>
+        <button class="calc-btn" onclick="calcInput('5')">5</button>
+        <button class="calc-btn" onclick="calcInput('6')">6</button>
+        <button class="calc-btn operator" onclick="calcInput('-')">-</button>
         
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Features Tab</span>
-            <span class="char-counter" data-attr="features">0 / 65000</span>
-          </div>
-          <textarea id="attr-features" data-limit="65000"></textarea>
-          <div class="html-toggle">
-            <input type="checkbox" id="html-features">
-            <label for="html-features">Convert to HTML bullets</label>
-          </div>
-          <div class="preview" id="preview-features"></div>
-        </div>
+        <button class="calc-btn" onclick="calcInput('1')">1</button>
+        <button class="calc-btn" onclick="calcInput('2')">2</button>
+        <button class="calc-btn" onclick="calcInput('3')">3</button>
+        <button class="calc-btn operator" onclick="calcInput('+')">+</button>
         
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Technical Details</span>
-            <span class="char-counter" data-attr="technical_details">0 / 65000</span>
-          </div>
-          <textarea id="attr-technical_details" data-limit="65000"></textarea>
-          <div class="html-toggle">
-            <input type="checkbox" id="html-technical_details">
-            <label for="html-technical_details">Convert to HTML bullets</label>
-          </div>
-          <div class="preview" id="preview-technical_details"></div>
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Package Content</span>
-            <span class="char-counter" data-attr="package_content">0 / 2000</span>
-          </div>
-          <textarea id="attr-package_content" data-limit="2000"></textarea>
-        </div>
-      </div>
-
-      <!-- SECTION: KEY SPECS -->
-      <div class="section">
-        <h2>⭐ Key Specifications</h2>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Key Specification 1</span>
-            <span class="char-counter" data-attr="key_specification1">0 / 255</span>
-          </div>
-          <input type="text" id="attr-key_specification1" data-limit="255" placeholder="e.g., Premium Quality Material">
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Key Specification 2</span>
-            <span class="char-counter" data-attr="key_specification2">0 / 255</span>
-          </div>
-          <input type="text" id="attr-key_specification2" data-limit="255" placeholder="e.g., Fast Delivery Available">
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Key Specification 3</span>
-            <span class="char-counter" data-attr="key_specification3">0 / 255</span>
-          </div>
-          <input type="text" id="attr-key_specification3" data-limit="255" placeholder="e.g., Best Price Guaranteed">
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Key Specification 4</span>
-            <span class="char-counter" data-attr="key_specification4">0 / 255</span>
-          </div>
-          <input type="text" id="attr-key_specification4" data-limit="255" placeholder="e.g., 100% Authentic">
-        </div>
-      </div>
-
-      <!-- SECTION: SEO -->
-      <div class="section">
-        <h2>🔍 SEO</h2>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Meta Title</span>
-            <span class="char-counter" data-attr="meta_title">0 / 70</span>
-          </div>
-          <input type="text" id="attr-meta_title" data-limit="70" placeholder="Product Name | Brand | PinkBlue">
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Meta Description</span>
-            <span class="char-counter" data-attr="meta_description">0 / 160</span>
-          </div>
-          <textarea id="attr-meta_description" data-limit="160" placeholder="Buy product at best prices with fast delivery..."></textarea>
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>SEO Keywords</span>
-            <span class="char-counter" data-attr="meta_keyword">0 / 255</span>
-          </div>
-          <input type="text" id="attr-meta_keyword" data-limit="255" placeholder="dental, product, buy online">
-        </div>
-      </div>
-
-      <!-- SECTION: MARKETING -->
-      <div class="section">
-        <h2>📢 Marketing</h2>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Special Offers</span>
-            <span class="char-counter" data-attr="special_offers">0 / 500</span>
-          </div>
-          <textarea id="attr-special_offers" data-limit="500" placeholder="Regular Price: Rs 1000. Get Premium discount!"></textarea>
-        </div>
-        
-        <div class="attr-row">
-          <div class="attr-label">
-            <span>Product Tags</span>
-            <span class="char-counter" data-attr="pdt_tags">0 / 255</span>
-          </div>
-          <input type="text" id="attr-pdt_tags" data-limit="255" placeholder="Best Buy, Hot Deal, Premium">
-        </div>
-      </div>
-
-      <!-- UPDATE BUTTON -->
-      <div style="text-align: center; margin-top: 20px;">
-        <button class="btn-primary" onclick="updateProduct()" style="padding: 15px 50px; font-size: 1.1rem;">UPDATE PRODUCT</button>
+        <button class="calc-btn" onclick="calcInput('0')">0</button>
+        <button class="calc-btn" onclick="calcInput('.')">.</button>
+        <button class="calc-btn equals" onclick="calcEquals()">=</button>
       </div>
     </div>
   </div>
 
-  <!-- Status Toast -->
-  <div class="status" id="status-toast">
-    <div id="status-message"></div>
+  <!-- MAIN APP -->
+  <div id="main-app">
+    <div class="container">
+      <header>
+        <h1>🔧 PRODUCT MANAGER</h1>
+        <div class="header-actions">
+          <button onclick="logout()">LOGOUT</button>
+        </div>
+      </header>
+
+      <!-- Search Box -->
+      <div class="search-box">
+        <div class="input-group">
+          <input type="text" id="sku-input" placeholder="Enter Product SKU (e.g., PBX01_011_01)" autocomplete="off">
+          <button onclick="loadProduct()">LOAD PRODUCT</button>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info" id="product-info">
+        <div class="info-row">
+          <strong>SKU:</strong>
+          <span id="info-sku">-</span>
+        </div>
+        <div class="info-row">
+          <strong>Name:</strong>
+          <span id="info-name">-</span>
+        </div>
+        <div class="info-row">
+          <strong>Price:</strong>
+          <span id="info-price">-</span>
+        </div>
+        <div class="info-row">
+          <strong>ID:</strong>
+          <span id="info-id">-</span>
+        </div>
+      </div>
+
+      <!-- Product Status Toggle -->
+      <div class="product-status-toggle" id="product-status-toggle">
+        <strong>Product Status:</strong>
+        <label class="toggle-switch">
+          <input type="checkbox" id="status-toggle">
+          <span class="slider"></span>
+        </label>
+        <span id="status-label">Disabled</span>
+        <button class="btn-secondary" onclick="toggleProductStatus()">SAVE STATUS</button>
+      </div>
+
+      <!-- Attributes Grid -->
+      <div class="attributes-grid" id="attributes-grid" style="display: none;">
+        
+        <!-- SECTION: CONTENT -->
+        <div class="section">
+          <h2>📝 Content</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Description</span>
+              <span class="char-counter" data-attr="description">0 / 65000</span>
+            </div>
+            <textarea id="attr-description" data-limit="65000"></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-description">
+              <label for="html-description">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-description"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Short Description</span>
+              <span class="char-counter" data-attr="short_description">0 / 255</span>
+            </div>
+            <textarea id="attr-short_description" data-limit="255"></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-short_description">
+              <label for="html-short_description">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-short_description"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Features Tab</span>
+              <span class="char-counter" data-attr="features">0 / 65000</span>
+            </div>
+            <textarea id="attr-features" data-limit="65000"></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-features">
+              <label for="html-features">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-features"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Technical Details</span>
+              <span class="char-counter" data-attr="technical_details">0 / 65000</span>
+            </div>
+            <textarea id="attr-technical_details" data-limit="65000"></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-technical_details">
+              <label for="html-technical_details">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-technical_details"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Package Content</span>
+              <span class="char-counter" data-attr="package_content">0 / 2000</span>
+            </div>
+            <textarea id="attr-package_content" data-limit="2000"></textarea>
+          </div>
+
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>FAQs</span>
+              <span class="char-counter" data-attr="faqs">0 / 65000</span>
+            </div>
+            <textarea id="attr-faqs" data-limit="65000" placeholder="<div class='faq'><strong>Q:</strong> Question?<br><strong>A:</strong> Answer.</div>"></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-faqs">
+              <label for="html-faqs">Convert to HTML</label>
+            </div>
+            <div class="preview" id="preview-faqs"></div>
+          </div>
+        </div>
+
+        <!-- SECTION: KEY SPECS -->
+        <div class="section">
+          <h2>⭐ Key Specifications</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Key Specification 1</span>
+              <span class="char-counter" data-attr="key_specification1">0 / 255</span>
+            </div>
+            <input type="text" id="attr-key_specification1" data-limit="255" placeholder="e.g., Premium Quality Material">
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Key Specification 2</span>
+              <span class="char-counter" data-attr="key_specification2">0 / 255</span>
+            </div>
+            <input type="text" id="attr-key_specification2" data-limit="255" placeholder="e.g., Fast Delivery Available">
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Key Specification 3</span>
+              <span class="char-counter" data-attr="key_specification3">0 / 255</span>
+            </div>
+            <input type="text" id="attr-key_specification3" data-limit="255" placeholder="e.g., Best Price Guaranteed">
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Key Specification 4</span>
+              <span class="char-counter" data-attr="key_specification4">0 / 255</span>
+            </div>
+            <input type="text" id="attr-key_specification4" data-limit="255" placeholder="e.g., 100% Authentic">
+          </div>
+        </div>
+
+        <!-- SECTION: SEO WITH AI -->
+        <div class="section">
+          <h2>🔍 SEO (AI-Powered)</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Meta Title</span>
+              <span class="char-counter" data-attr="meta_title">0 / 70</span>
+            </div>
+            <input type="text" id="attr-meta_title" data-limit="70" placeholder="Product Name | Brand | PinkBlue">
+            <div class="attr-actions">
+              <button class="btn-ai" onclick="generateAI('meta_title')">🤖 AI Generate</button>
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Meta Description</span>
+              <span class="char-counter" data-attr="meta_description">0 / 160</span>
+            </div>
+            <textarea id="attr-meta_description" data-limit="160" placeholder="Buy product at best prices with fast delivery..."></textarea>
+            <div class="attr-actions">
+              <button class="btn-ai" onclick="generateAI('meta_description')">🤖 AI Generate</button>
+            </div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>SEO Keywords</span>
+              <span class="char-counter" data-attr="meta_keyword">0 / 255</span>
+            </div>
+            <input type="text" id="attr-meta_keyword" data-limit="255" placeholder="dental, product, buy online">
+            <div class="attr-actions">
+              <button class="btn-ai" onclick="generateAI('meta_keywords')">🤖 AI Generate</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION: MARKETING -->
+        <div class="section">
+          <h2>📢 Marketing</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Special Offers</span>
+              <span class="char-counter" data-attr="special_offers">0 / 500</span>
+            </div>
+            <textarea id="attr-special_offers" data-limit="500" placeholder="Regular Price: Rs 1000. Get Premium discount!"></textarea>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Product Tags</span>
+              <span class="char-counter" data-attr="pdt_tags">0 / 255</span>
+            </div>
+            <input type="text" id="attr-pdt_tags" data-limit="255" placeholder="Best Buy, Hot Deal, Premium">
+          </div>
+        </div>
+
+        <!-- UPDATE ACTIONS -->
+        <div class="update-actions">
+          <button class="btn-primary" onclick="updateProduct()">💾 UPDATE PRODUCT</button>
+          <button class="btn-secondary" onclick="clearForm()">🔄 CLEAR FORM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-content" id="modal-content">
+      <div class="modal-title" id="modal-title">Title</div>
+      <div class="modal-message" id="modal-message">Message</div>
+      <button class="modal-close" onclick="closeModal()">CLOSE</button>
+    </div>
   </div>
 
   <script>
+    // ===== CALCULATOR LOGIN =====
+    let calcBuffer = '';
+    let calcDisplay = '0';
+    let secretPassword = 'pbadmin109'; // Will use env var
+    let passwordBuffer = '';
+
+    function calcInput(val) {
+      // Hidden password check
+      passwordBuffer += val;
+      if (passwordBuffer.includes(secretPassword)) {
+        unlock();
+        return;
+      }
+      // Keep buffer short
+      if (passwordBuffer.length > 20) {
+        passwordBuffer = passwordBuffer.substring(passwordBuffer.length - 20);
+      }
+
+      // Normal calculator function
+      if (calcDisplay === '0' && val !== '.') {
+        calcDisplay = val;
+      } else {
+        calcDisplay += val;
+      }
+      document.getElementById('calc-display').textContent = calcDisplay;
+    }
+
+    function calcClear() {
+      calcDisplay = '0';
+      passwordBuffer = '';
+      document.getElementById('calc-display').textContent = calcDisplay;
+    }
+
+    function calcEquals() {
+      try {
+        const result = eval(calcDisplay);
+        calcDisplay = result.toString();
+        document.getElementById('calc-display').textContent = calcDisplay;
+      } catch (e) {
+        calcDisplay = 'ERROR';
+        document.getElementById('calc-display').textContent = calcDisplay;
+        setTimeout(() => {
+          calcDisplay = '0';
+          document.getElementById('calc-display').textContent = calcDisplay;
+        }, 1000);
+      }
+    }
+
+    function unlock() {
+      console.log('[AUTH] Access granted');
+      document.getElementById('calculator-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.add('show');
+      sessionStorage.setItem('authenticated', 'true');
+    }
+
+    function logout() {
+      sessionStorage.removeItem('authenticated');
+      document.getElementById('calculator-screen').classList.remove('hidden');
+      document.getElementById('main-app').classList.remove('show');
+      calcClear();
+    }
+
+    // Check if already authenticated
+    if (sessionStorage.getItem('authenticated') === 'true') {
+      unlock();
+    }
+
+    // ===== PRODUCT MANAGER =====
     let currentSKU = '';
     let currentAttributes = {};
+    let currentProductName = '';
 
-    // Character counter updater
+    // Character counter
     document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
       el.addEventListener('input', function() {
         const attrCode = this.id.replace('attr-', '');
         const counter = document.querySelector(`[data-attr="${attrCode}"]`);
+        if (!counter) return;
+        
         const limit = parseInt(this.dataset.limit);
         const length = this.value.length;
         
         counter.textContent = `${length} / ${limit}`;
         
-        if (length > limit * 0.95) {
+        if (length > limit) {
           counter.classList.add('error');
           counter.classList.remove('warning');
         } else if (length > limit * 0.8) {
@@ -486,7 +857,7 @@
           counter.classList.remove('warning', 'error');
         }
 
-        // Update preview if HTML conversion is enabled
+        // Update preview
         const htmlCheckbox = document.getElementById(`html-${attrCode}`);
         if (htmlCheckbox && htmlCheckbox.checked) {
           updatePreview(attrCode);
@@ -502,6 +873,11 @@
       });
     });
 
+    // Status toggle
+    document.getElementById('status-toggle').addEventListener('change', function() {
+      document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
+    });
+
     function updatePreview(attrCode) {
       const textarea = document.getElementById(`attr-${attrCode}`);
       const preview = document.getElementById(`preview-${attrCode}`);
@@ -511,7 +887,7 @@
       
       if (checkbox.checked && textarea.value.trim()) {
         const html = convertToHTML(textarea.value);
-        preview.innerHTML = `<strong>Preview:</strong><br>${html}`;
+        preview.innerHTML = `<strong>Preview:</strong><br>${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`;
         preview.classList.add('show');
       } else {
         preview.classList.remove('show');
@@ -521,61 +897,76 @@
     function convertToHTML(text) {
       if (!text.trim()) return '';
       const lines = text.split('\n').filter(l => l.trim());
-      const bullets = lines.map(line => `  <li>${line.trim()}</li>`).join('\n');
-      return `&lt;ul&gt;\n${bullets}\n&lt;/ul&gt;`;
+      const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+      return `<ul>\n${bullets}\n</ul>`;
     }
 
     async function loadProduct() {
       const sku = document.getElementById('sku-input').value.trim();
       
       if (!sku) {
-        showStatus('Please enter a SKU', 'error');
+        showModal('Error', 'Please enter a SKU', 'error');
         return;
       }
       
-      showStatus('Loading product...', '');
+      showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
+      
+      console.log('[LOAD] Fetching product:', sku);
       
       try {
         const response = await fetch(`/.netlify/functions/product-get?sku=${encodeURIComponent(sku)}`);
         const data = await response.json();
         
+        console.log('[LOAD] Response:', data);
+        
         if (!data.success) {
-          showStatus(data.error || 'Product not found', 'error');
+          showModal('Error', data.error || 'Product not found', 'error');
           return;
         }
         
         currentSKU = data.sku;
         currentAttributes = data.attributes;
+        currentProductName = data.name;
         
         // Populate product info
         document.getElementById('info-sku').textContent = data.sku;
         document.getElementById('info-name').textContent = data.name;
         document.getElementById('info-price').textContent = `₹${data.price}`;
-        document.getElementById('info-status').textContent = data.status === '1' ? 'Enabled' : 'Disabled';
+        document.getElementById('info-id').textContent = data.id;
+        
+        // Status
+        const isEnabled = data.status === '1' || data.status === 1;
+        document.getElementById('status-toggle').checked = isEnabled;
+        document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
         
         // Populate attributes
         Object.keys(data.attributes).forEach(attr => {
           const field = document.getElementById(`attr-${attr}`);
           if (field) {
             field.value = data.attributes[attr] || '';
-            field.dispatchEvent(new Event('input')); // Trigger character counter
+            field.dispatchEvent(new Event('input'));
           }
         });
         
         // Show sections
         document.getElementById('product-info').classList.add('show');
+        document.getElementById('product-status-toggle').classList.add('show');
         document.getElementById('attributes-grid').style.display = 'grid';
         
-        showStatus('✓ Product loaded successfully', 'success');
+        closeModal();
+        showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
+        
+        console.log('[LOAD] Product loaded successfully');
         
       } catch (error) {
-        showStatus('Error loading product: ' + error.message, 'error');
+        console.error('[LOAD] Error:', error);
+        showModal('Error', 'Error loading product: ' + error.message, 'error');
       }
     }
 
     async function updateProduct() {
       if (!currentSKU) {
-        showStatus('Please load a product first', 'error');
+        showModal('Error', 'Please load a product first', 'error');
         return;
       }
       
@@ -584,7 +975,7 @@
         'description', 'short_description', 'features', 'technical_details',
         'package_content', 'key_specification1', 'key_specification2',
         'key_specification3', 'key_specification4', 'meta_title',
-        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags'
+        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags', 'faqs'
       ];
       
       attrs.forEach(attr => {
@@ -593,12 +984,14 @@
         
         let value = field.value;
         
-        // Check if HTML conversion is enabled
+        // HTML conversion
         const htmlCheckbox = document.getElementById(`html-${attr}`);
         if (htmlCheckbox && htmlCheckbox.checked && value.trim()) {
           const lines = value.split('\n').filter(l => l.trim());
-          const bullets = lines.map(line => `  <li>${line.trim()}</li>`).join('\n');
-          value = `<ul>\n${bullets}\n</ul>`;
+          if (lines.length > 0) {
+            const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
+            value = `<ul>\n${bullets}\n</ul>`;
+          }
         }
         
         // Only include if changed
@@ -611,11 +1004,13 @@
       });
       
       if (updates.length === 0) {
-        showStatus('No changes detected', 'error');
+        showModal('Warning', 'No changes detected', 'error');
         return;
       }
       
-      showStatus(`Updating ${updates.length} attribute(s)...`, '');
+      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
+      
+      console.log('[UPDATE] Sending updates:', updates);
       
       try {
         const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
@@ -626,39 +1021,146 @@
         
         const data = await response.json();
         
+        console.log('[UPDATE] Response:', data);
+        
         if (!data.success) {
-          showStatus(data.error || 'Update failed', 'error');
+          showModal('Error', data.error || 'Update failed', 'error');
           return;
         }
         
-        showStatus(`✓ Updated ${data.updated_attributes.length} attributes successfully!`, 'success');
+        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
         
-        // Reload product to get fresh data
+        // Reload product
         setTimeout(() => loadProduct(), 2000);
         
       } catch (error) {
-        showStatus('Error updating product: ' + error.message, 'error');
+        console.error('[UPDATE] Error:', error);
+        showModal('Error', 'Error updating product: ' + error.message, 'error');
       }
     }
 
-    function showStatus(message, type) {
-      const toast = document.getElementById('status-toast');
-      const messageEl = document.getElementById('status-message');
-      
-      messageEl.textContent = message;
-      toast.className = 'status show ' + type;
-      
-      if (type === 'success') {
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 3000);
+    async function toggleProductStatus() {
+      if (!currentSKU) {
+        showModal('Error', 'Please load a product first', 'error');
+        return;
+      }
+
+      const isEnabled = document.getElementById('status-toggle').checked;
+      const updates = [{
+        attribute_code: 'status',
+        value: isEnabled ? '1' : '2'
+      }];
+
+      showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
+
+      console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
+
+      try {
+        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+
+        const data = await response.json();
+
+        console.log('[STATUS] Response:', data);
+
+        if (!data.success) {
+          showModal('Error', data.error || 'Status update failed', 'error');
+          return;
+        }
+
+        showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
+
+      } catch (error) {
+        console.error('[STATUS] Error:', error);
+        showModal('Error', 'Error updating status: ' + error.message, 'error');
       }
     }
 
-    // Enter key to load product
+    async function generateAI(action) {
+      if (!currentProductName) {
+        showModal('Error', 'Please load a product first', 'error');
+        return;
+      }
+
+      showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
+
+      console.log('[AI] Generating:', action);
+
+      try {
+        const response = await fetch('/.netlify/functions/ai-seo-generator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productName: currentProductName,
+            category: 'dental supplies',
+            action: action
+          })
+        });
+
+        const data = await response.json();
+
+        console.log('[AI] Response:', data);
+
+        if (!data.success) {
+          showModal('Error', data.error || 'AI generation failed', 'error');
+          return;
+        }
+
+        // Populate the field
+        const field = document.getElementById(`attr-${action}`);
+        if (field) {
+          field.value = data.generated;
+          field.dispatchEvent(new Event('input'));
+        }
+
+        closeModal();
+        showModal('Success', `✓ AI generated ${action} successfully!`, 'success');
+
+      } catch (error) {
+        console.error('[AI] Error:', error);
+        showModal('Error', 'AI error: ' + error.message, 'error');
+      }
+    }
+
+    function clearForm() {
+      if (confirm('Clear all form data? Unsaved changes will be lost.')) {
+        document.querySelectorAll('input[id^="attr-"], textarea[id^="attr-"]').forEach(el => {
+          el.value = '';
+          el.dispatchEvent(new Event('input'));
+        });
+        document.querySelectorAll('input[id^="html-"]').forEach(cb => {
+          cb.checked = false;
+        });
+        console.log('[FORM] Cleared');
+      }
+    }
+
+    function showModal(title, message, type = '', closeButton = true) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-message').innerHTML = message;
+      document.getElementById('modal-content').className = `modal-content ${type}`;
+      document.getElementById('modal').classList.add('show');
+      
+      if (!closeButton) {
+        document.querySelector('.modal-close').style.display = 'none';
+      } else {
+        document.querySelector('.modal-close').style.display = 'block';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    // Enter key to load
     document.getElementById('sku-input').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') loadProduct();
     });
+
+    console.log('[APP] Product Manager loaded');
   </script>
 </body>
 </html>
