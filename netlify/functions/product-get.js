@@ -84,7 +84,7 @@ exports.handler = async (event) => {
   try {
     log(`📦 Getting product: ${sku}`);
     
-    const url = `${BASE_URL}/products/${encodeURIComponent(sku)}`;
+    const url = `https://pinkblue.in/rest/all/V1/products/${encodeURIComponent(sku)}`;
     const result = await makeRequest(url);
     
     if (!result.success) {
@@ -100,7 +100,7 @@ exports.handler = async (event) => {
     
     const product = result.data;
     
-    // Extract updatable attributes
+    // Extract updatable attributes (NO FAQs)
     const updatableAttrs = [
       'description', 'short_description', 'features', 'technical_details',
       'package_content', 'key_specification1', 'key_specification2',
@@ -113,6 +113,8 @@ exports.handler = async (event) => {
       const found = product.custom_attributes?.find(ca => ca.attribute_code === attr);
       attributes[attr] = found ? found.value : '';
     });
+    
+    log(`✓ Found ${Object.keys(attributes).length} attributes`);
     
     return {
       statusCode: 200,
