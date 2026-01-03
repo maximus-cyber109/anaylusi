@@ -233,65 +233,6 @@
       border-bottom: none;
     }
 
-    .product-status-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .product-status-toggle.show {
-      display: flex;
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 60px;
-      height: 30px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 30px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 22px;
-      width: 22px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(30px);
-    }
-
     .attributes-grid {
       display: grid;
       gap: 20px;
@@ -388,59 +329,6 @@
       display: block;
     }
 
-    /* IMAGE UPLOAD */
-    .image-upload-area {
-      border: 2px dashed var(--border);
-      padding: 20px;
-      text-align: center;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .image-upload-area:hover {
-      border-color: var(--accent);
-      background: rgba(0,255,0,0.05);
-    }
-
-    .image-upload-area.dragging {
-      border-color: var(--accent);
-      background: rgba(0,255,0,0.1);
-    }
-
-    .image-preview {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .image-preview-item {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .image-preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .image-remove {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: var(--error);
-      color: var(--text);
-      border: none;
-      padding: 5px 8px;
-      cursor: pointer;
-      font-size: 0.7rem;
-    }
-
     /* ===== MODAL/POPUP ===== */
     .modal {
       position: fixed;
@@ -534,10 +422,6 @@
       font-size: 1.1rem;
       margin: 0 10px;
     }
-
-    input[type="file"] {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -613,38 +497,9 @@
         </div>
       </div>
 
-      <!-- Product Status Toggle -->
-      <div class="product-status-toggle" id="product-status-toggle">
-        <strong>Product Status:</strong>
-        <label class="toggle-switch">
-          <input type="checkbox" id="status-toggle">
-          <span class="slider"></span>
-        </label>
-        <span id="status-label">Disabled</span>
-        <button class="btn-secondary" onclick="toggleProductStatus()">SAVE STATUS</button>
-      </div>
-
       <!-- Attributes Grid -->
       <div class="attributes-grid" id="attributes-grid" style="display: none;">
         
-        <!-- SECTION: IMAGES -->
-        <div class="section">
-          <h2>🖼️ Images</h2>
-          
-          <div class="attr-row">
-            <div class="attr-label">
-              <span>Upload Product Images</span>
-              <span style="font-size: 0.75rem; color: #666;">JPG, PNG (Max 2MB each)</span>
-            </div>
-            <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-input').click()">
-              <div>📷 Click or Drag & Drop Images Here</div>
-              <div style="font-size: 0.8rem; color: #666; margin-top: 10px;">Supports multiple images</div>
-            </div>
-            <input type="file" id="image-input" accept="image/*" multiple onchange="handleImageSelect(event)">
-            <div class="image-preview" id="image-preview"></div>
-          </div>
-        </div>
-
         <!-- SECTION: CONTENT -->
         <div class="section">
           <h2>📝 Content</h2>
@@ -859,7 +714,6 @@
       }
     }
 
-    // Keyboard password detection
     document.addEventListener('keydown', function(e) {
       if (!document.getElementById('calculator-screen').classList.contains('hidden')) {
         passwordBuffer += e.key.toLowerCase();
@@ -903,7 +757,6 @@
     let currentSKU = '';
     let currentAttributes = {};
     let currentProductName = '';
-    let uploadedImages = [];
 
     // Character counter
     document.querySelectorAll('input[data-limit], textarea[data-limit]').forEach(el => {
@@ -942,11 +795,6 @@
       });
     });
 
-    // Status toggle
-    document.getElementById('status-toggle').addEventListener('change', function() {
-      document.getElementById('status-label').textContent = this.checked ? 'Enabled' : 'Disabled';
-    });
-
     function updatePreview(attrCode) {
       const textarea = document.getElementById(`attr-${attrCode}`);
       const preview = document.getElementById(`preview-${attrCode}`);
@@ -969,141 +817,6 @@
       const bullets = lines.map(line => `<li>${line.trim()}</li>`).join('\n');
       return `<ul>\n${bullets}\n</ul>`;
     }
-
-    // IMAGE UPLOAD HANDLERS
-    const uploadArea = document.getElementById('image-upload-area');
-    
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      uploadArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-      uploadArea.addEventListener(eventName, () => {
-        uploadArea.classList.add('dragging');
-      }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-      uploadArea.addEventListener(eventName, () => {
-        uploadArea.classList.remove('dragging');
-      }, false);
-    });
-
-    uploadArea.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-      const dt = e.dataTransfer;
-      const files = dt.files;
-      handleFiles(files);
-    }
-
-    function handleImageSelect(e) {
-      handleFiles(e.target.files);
-    }
-
-    function handleFiles(files) {
-      ([...files]).forEach(uploadImage);
-    }
-
-    function uploadImage(file) {
-      if (!file.type.startsWith('image/')) {
-        showModal('Error', 'Please upload only image files', 'error');
-        return;
-      }
-
-      if (file.size > 2 * 1024 * 1024) {
-        showModal('Error', 'Image size must be less than 2MB', 'error');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageData = {
-          file: file,
-          preview: e.target.result,
-          uploaded: false
-        };
-        
-        uploadedImages.push(imageData);
-        displayImagePreviews();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function displayImagePreviews() {
-      const preview = document.getElementById('image-preview');
-      preview.innerHTML = '';
-      
-      uploadedImages.forEach((img, index) => {
-        const div = document.createElement('div');
-        div.className = 'image-preview-item';
-        div.innerHTML = `
-          <img src="${img.preview}" alt="Preview">
-          <button class="image-remove" onclick="removeImage(${index})">×</button>
-        `;
-        preview.appendChild(div);
-      });
-    }
-
-    function removeImage(index) {
-      uploadedImages.splice(index, 1);
-      displayImagePreviews();
-    }
-
-async function uploadImagesToMagento() {
-  if (uploadedImages.length === 0) return;
-  
-  showModal('Uploading', `<div class="loading-spinner"></div> Uploading ${uploadedImages.filter(img => !img.uploaded).length} image(s)...`, 'loading', false);
-  
-  let successCount = 0;
-  let failCount = 0;
-  
-  for (const img of uploadedImages) {
-    if (img.uploaded) continue;
-    
-    try {
-      console.log('[IMAGE] Uploading:', img.file.name);
-      
-      const response = await fetch('/.netlify/functions/image-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sku: currentSKU,
-          imageData: img.preview, // Already base64
-          filename: img.file.name,
-          label: img.file.name.replace(/\.[^/.]+$/, '')
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        img.uploaded = true;
-        successCount++;
-        console.log('[IMAGE] ✅ Uploaded:', img.file.name, '→ ID:', data.imageId);
-      } else {
-        failCount++;
-        console.error('[IMAGE] ❌ Failed:', img.file.name, '→', data.error);
-      }
-    } catch (error) {
-      failCount++;
-      console.error('[IMAGE] Error:', error);
-    }
-  }
-  
-  closeModal();
-  
-  if (failCount === 0) {
-    showModal('Success', `✓ All ${successCount} image(s) uploaded successfully!`, 'success');
-  } else {
-    showModal('Warning', `Uploaded ${successCount} image(s). Failed: ${failCount}`, 'error');
-  }
-}
 
     async function loadProduct() {
       const sku = document.getElementById('sku-input').value.trim();
@@ -1137,10 +850,6 @@ async function uploadImagesToMagento() {
         document.getElementById('info-price').textContent = `₹${data.price}`;
         document.getElementById('info-id').textContent = data.id;
         
-        const isEnabled = data.status === '1' || data.status === 1;
-        document.getElementById('status-toggle').checked = isEnabled;
-        document.getElementById('status-label').textContent = isEnabled ? 'Enabled' : 'Disabled';
-        
         Object.keys(data.attributes).forEach(attr => {
           const field = document.getElementById(`attr-${attr}`);
           if (field) {
@@ -1150,7 +859,6 @@ async function uploadImagesToMagento() {
         });
         
         document.getElementById('product-info').classList.add('show');
-        document.getElementById('product-status-toggle').classList.add('show');
         document.getElementById('attributes-grid').style.display = 'grid';
         
         closeModal();
@@ -1168,11 +876,6 @@ async function uploadImagesToMagento() {
       if (!currentSKU) {
         showModal('Error', 'Please load a product first', 'error');
         return;
-      }
-      
-      // Upload images first if any
-      if (uploadedImages.some(img => !img.uploaded)) {
-        await uploadImagesToMagento();
       }
       
       const updates = [];
@@ -1211,7 +914,7 @@ async function uploadImagesToMagento() {
         return;
       }
       
-      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...`, 'loading', false);
+      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...<br><br><small>This may take 15-20 seconds...</small>`, 'loading', false);
       
       console.log('[UPDATE] Sending updates:', updates);
       
@@ -1230,51 +933,15 @@ async function uploadImagesToMagento() {
           showModal('Error', data.error || 'Update failed', 'error');
           return;
         }
-        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}<br><br>Changes saved to Magento.`, 'success');
+        
+        showModal('Success', 
+          `✓ Updated ${data.updated_attributes.length} attribute(s) successfully!<br><br><strong>Updated:</strong> ${data.updated_attributes.join(', ')}<br><br>✅ Changes saved to Magento`, 
+          'success'
+        );
         
       } catch (error) {
         console.error('[UPDATE] Error:', error);
         showModal('Error', 'Error updating product: ' + error.message, 'error');
-      }
-    }
-
-    async function toggleProductStatus() {
-      if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
-        return;
-      }
-
-      const isEnabled = document.getElementById('status-toggle').checked;
-      const updates = [{
-        attribute_code: 'status',
-        value: isEnabled ? '1' : '2'
-      }];
-
-      showModal('Updating', '<div class="loading-spinner"></div> Updating product status...', 'loading', false);
-
-      console.log('[STATUS] Changing to:', isEnabled ? 'Enabled' : 'Disabled');
-
-      try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates)
-        });
-
-        const data = await response.json();
-
-        console.log('[STATUS] Response:', data);
-
-        if (!data.success) {
-          showModal('Error', data.error || 'Status update failed', 'error');
-          return;
-        }
-
-        showModal('Success', `✓ Product ${isEnabled ? 'enabled' : 'disabled'} successfully!`, 'success');
-
-      } catch (error) {
-        console.error('[STATUS] Error:', error);
-        showModal('Error', 'Error updating status: ' + error.message, 'error');
       }
     }
 
@@ -1349,8 +1016,6 @@ async function uploadImagesToMagento() {
         document.querySelectorAll('input[id^="html-"]').forEach(cb => {
           cb.checked = false;
         });
-        uploadedImages = [];
-        displayImagePreviews();
         console.log('[FORM] Cleared');
       }
     }
