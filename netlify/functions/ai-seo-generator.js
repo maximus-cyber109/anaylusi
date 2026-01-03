@@ -4,12 +4,11 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 function callGemini(prompt) {
   return new Promise(async (resolve) => {
-    // Try current working models in order (as of Dec 2025)
     const models = [
-      'gemini-2.5-flash',      // Stable, GA (June 2025)
-      'gemini-2.0-flash-001',  // Stable, GA (Feb 2025)
-      'gemini-3-flash-preview', // Latest preview (Dec 2025)
-      'gemini-pro'             // Legacy fallback
+      'gemini-2.5-flash',
+      'gemini-2.0-flash-001',
+      'gemini-3-flash-preview',
+      'gemini-pro'
     ];
     
     for (const modelName of models) {
@@ -94,8 +93,10 @@ exports.handler = async (event) => {
   }
 
   console.log('[AI] ════════════════════════════════');
+  console.log('[AI] Request body:', event.body);
 
   if (!GEMINI_API_KEY) {
+    console.error('[AI] GEMINI_API_KEY not configured');
     return {
       statusCode: 500,
       headers,
@@ -106,7 +107,9 @@ exports.handler = async (event) => {
   let data;
   try {
     data = JSON.parse(event.body || '{}');
+    console.log('[AI] Parsed data:', data);
   } catch (e) {
+    console.error('[AI] JSON parse error:', e.message);
     return {
       statusCode: 400,
       headers,
@@ -116,45 +119,57 @@ exports.handler = async (event) => {
 
   const { productName, action } = data;
 
+  console.log('[AI] Product Name:', productName);
+  console.log('[AI] Action:', action);
+
   if (!productName || !action) {
+    console.error('[AI] Missing required fields');
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ success: false, error: 'productName and action required' })
+      body: JSON.stringify({ 
+        success: false, 
+        error: 'productName and action required',
+        received: { productName, action }
+      })
     };
   }
 
   try {
     let prompt, maxLen;
 
-    switch (action) {
-      case 'meta_title':
-        maxLen = 70;
-        prompt = `Write SEO title under ${maxLen} chars: "${productName}". Include PinkBlue brand. Output title only.`;
-        break;
-      case 'meta_description':
-        maxLen = 160;
-        prompt = `Write SEO description under ${maxLen} chars: "${productName}". Include benefits. Output description only.`;
-        break;
-      case 'meta_keywords':
-        maxLen = 255;
-        prompt = `List SEO keywords under ${maxLen} chars (comma-separated): "${productName}" dental product. Output keywords only.`;
-        break;
-      default:
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ success: false, error: 'Invalid action' })
-        };
+    // Normalize action to lowercase for comparison
+    const actionLower = action.toLowerCase();
+
+    if (actionLower === 'meta_title') {
+      maxLen = 70;
+      prompt = `Write SEO title under ${maxLen} chars: "${productName}". Include PinkBlue brand. Output title only.`;
+    } else if (actionLower === 'meta_description') {
+      maxLen = 160;
+      prompt = `Write SEO description under ${maxLen} chars: "${productName}". Include benefits. Output description only.`;
+    } else if (actionLower === 'meta_keyword' || actionLower === 'meta_keywords') {
+      maxLen = 255;
+      prompt = `Generate SEO keywords (comma-separated, under ${maxLen} chars) for: "${productName}" dental product. Output only the keywords, no explanations.`;
+    } else {
+      console.error('[AI] Invalid action:', action);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          error: `Invalid action: ${action}. Must be meta_title, meta_description, or meta_keyword` 
+        })
+      };
     }
 
     console.log('[AI] Action:', action);
-    console.log('[AI] Prompt:', prompt.substring(0, 80));
+    console.log('[AI] Max Length:', maxLen);
+    console.log('[AI] Prompt:', prompt.substring(0, 100) + '...');
 
     const result = await callGemini(prompt);
 
     if (!result.success) {
-      console.error('[AI] Failed:', result.error);
+      console.error('[AI] Generation failed:', result.error);
       return {
         statusCode: 500,
         headers,
@@ -163,11 +178,15 @@ exports.handler = async (event) => {
     }
 
     let generated = result.text;
+    
+    // Trim to max length if needed
     if (generated.length > maxLen) {
+      console.log('[AI] Trimming from', generated.length, 'to', maxLen);
       generated = generated.substring(0, maxLen);
     }
 
     console.log('[AI] ✅ Generated:', generated);
+    console.log('[AI] Length:', generated.length, '/', maxLen);
     console.log('[AI] ════════════════════════════════');
 
     return {
@@ -181,7 +200,8 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-    console.error('[AI] Exception:', error);
+    console.error('[AI] Exception:', error.message);
+    console.error('[AI] Stack:', error.stack);
     return {
       statusCode: 500,
       headers,
