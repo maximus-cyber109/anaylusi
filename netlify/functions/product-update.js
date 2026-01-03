@@ -14,7 +14,7 @@ const HEADERS = {
 function log(msg, data = null) {
   const timestamp = new Date().toISOString();
   if (data) {
-    console.log(`[${timestamp}] ${msg}`, JSON.stringify(data).substring(0, 300));
+    console.log(`[${timestamp}] ${msg}`, JSON.stringify(data));
   } else {
     console.log(`[${timestamp}] ${msg}`);
   }
@@ -37,20 +37,36 @@ function makeRequest(url, method, body, timeout = 25000) {
       res.on('end', () => {
         log(`Response: ${res.statusCode} | ${(data.length / 1024).toFixed(1)}KB`);
         
+        // 🔥 ALWAYS LOG RAW RESPONSE FOR DEBUGGING
+        if (res.statusCode >= 400) {
+          log('🚨 ERROR RESPONSE:', data);
+        }
+        
         try {
           const parsed = JSON.parse(data);
+          
+          // 🔥 LOG PARSED ERROR TOO
+          if (parsed.message || parsed.error) {
+            log('🚨 MAGENTO ERROR:', {
+              message: parsed.message,
+              error: parsed.error,
+              parameters: parsed.parameters,
+              trace: parsed.trace
+            });
+          }
+          
           resolve({ 
             success: res.statusCode >= 200 && res.statusCode < 300, 
             statusCode: res.statusCode, 
             data: parsed 
           });
         } catch (e) {
-          log('Parse error', { error: e.message, raw: data.substring(0, 200) });
+          log('Parse error', { error: e.message, raw: data });
           resolve({ 
             success: false, 
             statusCode: res.statusCode, 
             error: 'Parse error', 
-            raw: data.substring(0, 500) 
+            raw: data
           });
         }
       });
@@ -135,7 +151,7 @@ exports.handler = async (event) => {
       attributes: updates.map(u => u.attribute_code) 
     });
     
-    // Character limit validation (NO FAQs)
+    // Character limit validation
     const limits = {
       meta_title: 70,
       meta_description: 160,
@@ -172,25 +188,26 @@ exports.handler = async (event) => {
       }
     }
     
+    // 🔥 TRY DIFFERENT PAYLOAD FORMATS
+    
+    // Format 1: WITHOUT store_id (let Magento use default)
     const payload = {
       product: {
-        sku: sku,
-        store_id: 0, // ALL STORE VIEWS
         custom_attributes: updates.map(u => ({
           attribute_code: u.attribute_code,
           value: u.value || ''
         }))
-      },
-      saveOptions: true
+      }
     };
     
     log('Payload constructed', {
-      sku: payload.product.sku,
-      store_id: payload.product.store_id,
-      attributes_count: payload.product.custom_attributes.length
+      sku: sku,
+      attributes_count: payload.product.custom_attributes.length,
+      format: 'without store_id'
     });
     
-    const url = `${BASE_URL}/products/${encodeURIComponent(sku)}`;
+    // 🔥 USE /all/V1 endpoint for all store views
+    const url = `https://pinkblue.in/rest/all/V1/products/${encodeURIComponent(sku)}`;
     const result = await makeRequest(url, 'PUT', payload, 25000);
     
     const duration = Date.now() - startTime;
@@ -198,17 +215,19 @@ exports.handler = async (event) => {
     if (!result.success) {
       log('ERROR: Update failed', { 
         statusCode: result.statusCode, 
-        error: result.error,
+        magentoError: result.data,
         duration: duration + 'ms'
       });
       
+      // 🔥 RETURN FULL MAGENTO ERROR TO FRONTEND
       return {
         statusCode: result.statusCode || 500,
         headers,
         body: JSON.stringify({ 
           success: false, 
-          error: result.error || 'Update failed',
-          details: result.raw,
+          error: result.data?.message || result.error || 'Update failed',
+          magento_details: result.data, // Full Magento error
+          raw: result.raw,
           duration: duration
         })
       };
@@ -227,8 +246,7 @@ exports.handler = async (event) => {
         sku: sku,
         updated_attributes: updates.map(u => u.attribute_code),
         timestamp: new Date().toISOString(),
-        duration: duration,
-        store_scope: 'all'
+        duration: duration
       })
     };
     
