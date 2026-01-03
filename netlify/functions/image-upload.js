@@ -1,5 +1,4 @@
 const https = require('https');
-const { Buffer } = require('buffer');
 
 const MAGENTO_TOKEN = process.env.MAGENTO_API_TOKEN;
 const BASE_URL = 'https://pinkblue.in/rest/V1';
@@ -8,15 +7,14 @@ const HEADERS = {
   'Authorization': `Bearer ${MAGENTO_TOKEN}`,
   'Content-Type': 'application/json',
   'User-Agent': 'PB_ProductManager',
-  'X-Source-App': 'ImageUpload',
-  'X-Netlify-Secret': 'X-PB-NetlifY2025-901AD7EE35110CCB445F3CA0EBEB1494'
+  'X-Source-App': 'ImageUpload'
 };
 
 function log(msg, data = null) {
-  console.log(`[${new Date().toISOString()}] ${msg}`, data || '');
+  console.log(`[${new Date().toISOString()}] [IMG] ${msg}`, data || '');
 }
 
-function makeRequest(url, method, body, timeout = 30000) {
+function makeRequest(url, method, body, timeout = 45000) {
   return new Promise((resolve) => {
     log(`${method} ${url.substring(BASE_URL.length)}`);
     
@@ -26,8 +24,20 @@ function makeRequest(url, method, body, timeout = 30000) {
       res.on('end', () => {
         log(`Response: ${res.statusCode}`);
         
+        if (res.statusCode >= 400) {
+          log('ERROR RESPONSE:', data);
+        }
+        
         try {
           const parsed = JSON.parse(data);
+          
+          if (parsed.message || parsed.error) {
+            log('MAGENTO ERROR:', {
+              message: parsed.message,
+              error: parsed.error
+            });
+          }
+          
           resolve({ 
             success: res.statusCode >= 200 && res.statusCode < 300, 
             statusCode: res.statusCode, 
@@ -38,7 +48,7 @@ function makeRequest(url, method, body, timeout = 30000) {
             success: false, 
             statusCode: res.statusCode, 
             error: 'Parse error', 
-            raw: data.substring(0, 500) 
+            raw: data
           });
         }
       });
@@ -84,27 +94,10 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Parse multipart form data
-    const boundary = event.headers['content-type'].split('boundary=')[1];
-    const parts = event.body.split(`--${boundary}`);
+    const data = JSON.parse(event.body || '{}');
     
-    let imageData = null;
-    let sku = null;
-    let filename = null;
-
-    for (const part of parts) {
-      if (part.includes('Content-Disposition: form-data; name="sku"')) {
-        sku = part.split('\r\n\r\n')[1].split('\r\n')[0].trim();
-      } else if (part.includes('Content-Disposition: form-data; name="image"')) {
-        const match = part.match(/filename="(.+?)"/);
-        if (match) {
-          filename = match[1];
-          const base64Data = part.split('\r\n\r\n')[1].split('\r\n--')[0];
-          imageData = base64Data;
-        }
-      }
-    }
-
+    const { sku, imageData, filename, label } = data;
+    
     if (!sku) {
       return {
         statusCode: 400,
@@ -117,35 +110,60 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Image file required' })
+        body: JSON.stringify({ success: false, error: 'Image data and filename required' })
       };
     }
 
-    log(`📸 Uploading image for SKU: ${sku}`, { filename });
+    log(`Uploading image for SKU: ${sku}`, { 
+      filename,
+      dataSize: imageData.length + ' chars'
+    });
+
+    // Extract base64 data (remove data:image/jpeg;base64, prefix if present)
+    const base64Data = imageData.includes(',') 
+      ? imageData.split(',')[1] 
+      : imageData;
+
+    // Detect image type from filename
+    const ext = filename.toLowerCase().split('.').pop();
+    const mimeTypes = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp'
+    };
+    const mimeType = mimeTypes[ext] || 'image/jpeg';
 
     // Create media entry payload
     const payload = {
       entry: {
         media_type: 'image',
-        label: filename.replace(/\.[^/.]+$/, ''),
-        position: 1,
+        label: label || filename.replace(/\.[^/.]+$/, ''),
+        position: 0,
         disabled: false,
         types: ['image', 'small_image', 'thumbnail'],
         content: {
-          base64_encoded_data: imageData,
-          type: 'image/jpeg',
+          base64_encoded_data: base64Data,
+          type: mimeType,
           name: filename
         }
       }
     };
 
+    log('Payload constructed', {
+      mimeType,
+      label: payload.entry.label,
+      types: payload.entry.types
+    });
+
     const url = `${BASE_URL}/products/${encodeURIComponent(sku)}/media`;
-    const result = await makeRequest(url, 'POST', payload, 30000);
+    const result = await makeRequest(url, 'POST', payload, 45000);
 
     if (!result.success) {
       log('ERROR: Image upload failed', { 
-        statusCode: result.statusCode, 
-        error: result.error 
+        statusCode: result.statusCode,
+        error: result.data
       });
       
       return {
@@ -153,13 +171,16 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({ 
           success: false, 
-          error: result.error || 'Image upload failed',
-          details: result.raw
+          error: result.data?.message || result.error || 'Image upload failed',
+          magento_details: result.data
         })
       };
     }
 
-    log(`✅ Image uploaded successfully`, { imageId: result.data.id });
+    log('✅ Image uploaded successfully', { 
+      imageId: result.data.id,
+      file: result.data.file
+    });
 
     return {
       statusCode: 200,
@@ -167,6 +188,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         imageId: result.data.id,
+        imageUrl: result.data.file,
         message: 'Image uploaded successfully'
       })
     };
