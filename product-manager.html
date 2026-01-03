@@ -1055,40 +1055,55 @@
       displayImagePreviews();
     }
 
-    async function uploadImagesToMagento() {
-      if (uploadedImages.length === 0) return;
+async function uploadImagesToMagento() {
+  if (uploadedImages.length === 0) return;
+  
+  showModal('Uploading', `<div class="loading-spinner"></div> Uploading ${uploadedImages.filter(img => !img.uploaded).length} image(s)...`, 'loading', false);
+  
+  let successCount = 0;
+  let failCount = 0;
+  
+  for (const img of uploadedImages) {
+    if (img.uploaded) continue;
+    
+    try {
+      console.log('[IMAGE] Uploading:', img.file.name);
       
-      showModal('Uploading', '<div class="loading-spinner"></div> Uploading images...', 'loading', false);
+      const response = await fetch('/.netlify/functions/image-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sku: currentSKU,
+          imageData: img.preview, // Already base64
+          filename: img.file.name,
+          label: img.file.name.replace(/\.[^/.]+$/, '')
+        })
+      });
       
-      for (const img of uploadedImages) {
-        if (img.uploaded) continue;
-        
-        const formData = new FormData();
-        formData.append('image', img.file);
-        formData.append('sku', currentSKU);
-        
-        try {
-          const response = await fetch('/.netlify/functions/image-upload', {
-            method: 'POST',
-            body: formData
-          });
-          
-          const data = await response.json();
-          
-          if (data.success) {
-            img.uploaded = true;
-            console.log('[IMAGE] ✅ Uploaded:', img.file.name);
-          } else {
-            console.error('[IMAGE] ❌ Failed:', data.error);
-          }
-        } catch (error) {
-          console.error('[IMAGE] Error:', error);
-        }
+      const data = await response.json();
+      
+      if (data.success) {
+        img.uploaded = true;
+        successCount++;
+        console.log('[IMAGE] ✅ Uploaded:', img.file.name, '→ ID:', data.imageId);
+      } else {
+        failCount++;
+        console.error('[IMAGE] ❌ Failed:', img.file.name, '→', data.error);
       }
-      
-      closeModal();
-      showModal('Success', '✓ Images uploaded successfully!', 'success');
+    } catch (error) {
+      failCount++;
+      console.error('[IMAGE] Error:', error);
     }
+  }
+  
+  closeModal();
+  
+  if (failCount === 0) {
+    showModal('Success', `✓ All ${successCount} image(s) uploaded successfully!`, 'success');
+  } else {
+    showModal('Warning', `Uploaded ${successCount} image(s). Failed: ${failCount}`, 'error');
+  }
+}
 
     async function loadProduct() {
       const sku = document.getElementById('sku-input').value.trim();
@@ -1215,10 +1230,7 @@
           showModal('Error', data.error || 'Update failed', 'error');
           return;
         }
-        
-        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}`, 'success');
-        
-        setTimeout(() => loadProduct(), 2000);
+        showModal('Success', `✓ Updated ${data.updated_attributes.length} attributes successfully!<br><br>Updated: ${data.updated_attributes.join(', ')}<br><br>Changes saved to Magento.`, 'success');
         
       } catch (error) {
         console.error('[UPDATE] Error:', error);
