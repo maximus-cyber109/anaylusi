@@ -1,14 +1,11 @@
 const https = require('https');
 
 const MAGENTO_TOKEN = process.env.MAGENTO_API_TOKEN;
-const BASE_URL = 'https://pinkblue.in/rest/V1';
 
 const HEADERS = {
   'Authorization': `Bearer ${MAGENTO_TOKEN}`,
   'Content-Type': 'application/json',
-  'User-Agent': 'PB_ProductManager',
-  'X-Source-App': 'ProductUpdate',
-  'X-Netlify-Secret': 'X-PB-NetlifY2025-901AD7EE35110CCB445F3CA0EBEB1494'
+  'User-Agent': 'PB_ProductManager'
 };
 
 function log(msg, data = null) {
@@ -20,38 +17,27 @@ function log(msg, data = null) {
   }
 }
 
-function makeRequest(url, method, body, timeout = 25000) {
+function makeRequest(url, method, body, timeout = 30000) {
   return new Promise((resolve) => {
-    log(`${method} ${url.substring(BASE_URL.length)}`);
-    
-    if (body) {
-      log('Payload', {
-        size: JSON.stringify(body).length + ' bytes',
-        attributes: body.product?.custom_attributes?.map(a => a.attribute_code)
-      });
-    }
+    log(`${method} ${url.substring(url.indexOf('/rest'))}`);
     
     const req = https.request(url, { method, headers: HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        log(`Response: ${res.statusCode} | ${(data.length / 1024).toFixed(1)}KB`);
+        log(`Response: ${res.statusCode}`);
         
-        // 🔥 ALWAYS LOG RAW RESPONSE FOR DEBUGGING
         if (res.statusCode >= 400) {
-          log('🚨 ERROR RESPONSE:', data);
+          log('ERROR RESPONSE:', data.substring(0, 500));
         }
         
         try {
           const parsed = JSON.parse(data);
           
-          // 🔥 LOG PARSED ERROR TOO
           if (parsed.message || parsed.error) {
-            log('🚨 MAGENTO ERROR:', {
+            log('MAGENTO ERROR:', {
               message: parsed.message,
-              error: parsed.error,
-              parameters: parsed.parameters,
-              trace: parsed.trace
+              error: parsed.error
             });
           }
           
@@ -61,7 +47,6 @@ function makeRequest(url, method, body, timeout = 25000) {
             data: parsed 
           });
         } catch (e) {
-          log('Parse error', { error: e.message, raw: data });
           resolve({ 
             success: false, 
             statusCode: res.statusCode, 
@@ -80,7 +65,7 @@ function makeRequest(url, method, body, timeout = 25000) {
     req.setTimeout(timeout, () => {
       log(`Timeout after ${timeout}ms`);
       req.abort();
-      resolve({ success: false, error: `Request timeout after ${timeout/1000}s` });
+      resolve({ success: false, error: `Timeout after ${timeout/1000}s` });
     });
     
     if (body) {
@@ -151,7 +136,6 @@ exports.handler = async (event) => {
       attributes: updates.map(u => u.attribute_code) 
     });
     
-    // Character limit validation
     const limits = {
       meta_title: 70,
       meta_description: 160,
@@ -188,9 +172,6 @@ exports.handler = async (event) => {
       }
     }
     
-    // 🔥 TRY DIFFERENT PAYLOAD FORMATS
-    
-    // Format 1: WITHOUT store_id (let Magento use default)
     const payload = {
       product: {
         custom_attributes: updates.map(u => ({
@@ -200,15 +181,10 @@ exports.handler = async (event) => {
       }
     };
     
-    log('Payload constructed', {
-      sku: sku,
-      attributes_count: payload.product.custom_attributes.length,
-      format: 'without store_id'
-    });
+    log('Payload size:', (JSON.stringify(payload).length / 1024).toFixed(1) + ' KB');
     
-    // 🔥 USE /all/V1 endpoint for all store views
     const url = `https://pinkblue.in/rest/all/V1/products/${encodeURIComponent(sku)}`;
-    const result = await makeRequest(url, 'PUT', payload, 25000);
+    const result = await makeRequest(url, 'PUT', payload, 30000);
     
     const duration = Date.now() - startTime;
     
@@ -219,14 +195,13 @@ exports.handler = async (event) => {
         duration: duration + 'ms'
       });
       
-      // 🔥 RETURN FULL MAGENTO ERROR TO FRONTEND
       return {
         statusCode: result.statusCode || 500,
         headers,
         body: JSON.stringify({ 
           success: false, 
           error: result.data?.message || result.error || 'Update failed',
-          magento_details: result.data, // Full Magento error
+          magento_details: result.data,
           raw: result.raw,
           duration: duration
         })
