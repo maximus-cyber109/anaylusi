@@ -25,6 +25,133 @@
       overflow-x: hidden;
     }
 
+    /* ===== TOAST NOTIFICATION SYSTEM ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+    }
+
+    .toast {
+      background: rgba(0,0,0,0.95);
+      border: 1px solid var(--border);
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(450px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(450px); opacity: 0; }
+    }
+
+    .toast.hide {
+      animation: slideOut 0.3s ease-out forwards;
+    }
+
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    .toast.loading { border-color: var(--accent); }
+    .toast.warning { border-color: var(--warning); }
+
+    .toast-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .toast-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .toast.success .toast-title { color: var(--success); }
+    .toast.error .toast-title { color: var(--error); }
+    .toast.loading .toast-title { color: var(--accent); }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      line-height: 1;
+    }
+
+    .toast-close:hover {
+      color: var(--text);
+    }
+
+    .toast-message {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .toast-progress {
+      width: 100%;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .toast-progress-bar {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .toast-meta {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    /* ===== QUEUE STATUS BAR ===== */
+    .queue-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.95);
+      border: 1px solid var(--accent);
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      display: none;
+      z-index: 9999;
+    }
+
+    .queue-status.show {
+      display: block;
+    }
+
     /* ===== CALCULATOR LOGIN SCREEN ===== */
     #calculator-screen {
       position: fixed;
@@ -112,6 +239,7 @@
     #main-app {
       display: none;
       padding: 20px;
+      padding-bottom: 80px;
     }
 
     #main-app.show {
@@ -329,84 +457,6 @@
       display: block;
     }
 
-    /* ===== MODAL/POPUP ===== */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      z-index: 10000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      position: relative;
-    }
-
-    .modal-content.success {
-      border-color: var(--success);
-    }
-
-    .modal-content.error {
-      border-color: var(--error);
-    }
-
-    .modal-content.loading {
-      border-color: var(--accent);
-    }
-
-    .modal-title {
-      font-size: 1.2rem;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .modal-message {
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .modal-close {
-      background: var(--text);
-      color: var(--bg);
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
     .update-actions {
       position: sticky;
       bottom: 0;
@@ -425,6 +475,14 @@
   </style>
 </head>
 <body>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- QUEUE STATUS -->
+  <div class="queue-status" id="queue-status">
+    <strong>Queue:</strong> <span id="queue-count">0</span> updates pending
+  </div>
 
   <!-- CALCULATOR LOGIN SCREEN -->
   <div id="calculator-screen">
@@ -670,16 +728,81 @@
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-content" id="modal-content">
-      <div class="modal-title" id="modal-title">Title</div>
-      <div class="modal-message" id="modal-message">Message</div>
-      <button class="modal-close" onclick="closeModal()">CLOSE</button>
-    </div>
-  </div>
-
   <script>
+    // ===== TOAST NOTIFICATION SYSTEM =====
+    let toastIdCounter = 0;
+    const updateQueue = [];
+
+    function showToast(title, message, type = 'loading', duration = 0, id = null) {
+      const toastId = id || `toast-${++toastIdCounter}`;
+      const container = document.getElementById('toast-container');
+      
+      // Check if toast already exists (for updates)
+      let existingToast = document.getElementById(toastId);
+      
+      if (existingToast) {
+        // Update existing toast
+        existingToast.querySelector('.toast-title').textContent = title;
+        existingToast.querySelector('.toast-message').innerHTML = message;
+        existingToast.className = `toast ${type}`;
+        return toastId;
+      }
+      
+      // Create new toast
+      const toast = document.createElement('div');
+      toast.id = toastId;
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="toast-header">
+          <div class="toast-title">${title}</div>
+          <button class="toast-close" onclick="removeToast('${toastId}')">×</button>
+        </div>
+        <div class="toast-message">${message}</div>
+        ${type === 'loading' ? '<div class="toast-progress"><div class="toast-progress-bar" style="width: 0%"></div></div>' : ''}
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto-dismiss success/error toasts
+      if (duration > 0) {
+        setTimeout(() => removeToast(toastId), duration);
+      }
+      
+      return toastId;
+    }
+
+    function updateToastProgress(toastId, progress) {
+      const toast = document.getElementById(toastId);
+      if (toast) {
+        const progressBar = toast.querySelector('.toast-progress-bar');
+        if (progressBar) {
+          progressBar.style.width = `${progress}%`;
+        }
+      }
+    }
+
+    function removeToast(toastId) {
+      const toast = document.getElementById(toastId);
+      if (toast) {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 300);
+      }
+    }
+
+    function updateQueueStatus() {
+      const queueStatus = document.getElementById('queue-status');
+      const queueCount = document.getElementById('queue-count');
+      const count = updateQueue.length;
+      
+      queueCount.textContent = count;
+      
+      if (count > 0) {
+        queueStatus.classList.add('show');
+      } else {
+        queueStatus.classList.remove('show');
+      }
+    }
+
     // ===== CALCULATOR LOGIN =====
     let calcDisplay = '0';
     let secretPassword = 'pbadmin109';
@@ -822,11 +945,11 @@
       const sku = document.getElementById('sku-input').value.trim();
       
       if (!sku) {
-        showModal('Error', 'Please enter a SKU', 'error');
+        showToast('Error', 'Please enter a SKU', 'error', 3000);
         return;
       }
       
-      showModal('Loading', '<div class="loading-spinner"></div> Loading product...', 'loading', false);
+      const toastId = showToast('Loading', `Loading product ${sku}...`, 'loading');
       
       console.log('[LOAD] Fetching product:', sku);
       
@@ -837,7 +960,8 @@
         console.log('[LOAD] Response:', data);
         
         if (!data.success) {
-          showModal('Error', data.error || 'Product not found', 'error');
+          removeToast(toastId);
+          showToast('Error', data.error || 'Product not found', 'error', 5000);
           return;
         }
         
@@ -861,20 +985,21 @@
         document.getElementById('product-info').classList.add('show');
         document.getElementById('attributes-grid').style.display = 'grid';
         
-        closeModal();
-        showModal('Success', `✓ Product "${data.name}" loaded successfully!`, 'success');
+        removeToast(toastId);
+        showToast('Success', `Loaded: ${data.name}`, 'success', 3000);
         
         console.log('[LOAD] Product loaded successfully');
         
       } catch (error) {
         console.error('[LOAD] Error:', error);
-        showModal('Error', 'Error loading product: ' + error.message, 'error');
+        removeToast(toastId);
+        showToast('Error', 'Error loading product: ' + error.message, 'error', 5000);
       }
     }
 
     async function updateProduct() {
       if (!currentSKU) {
-        showModal('Error', 'Please load a product first', 'error');
+        showToast('Error', 'Please load a product first', 'error', 3000);
         return;
       }
       
@@ -910,16 +1035,51 @@
       });
       
       if (updates.length === 0) {
-        showModal('Warning', 'No changes detected', 'error');
+        showToast('Warning', 'No changes detected', 'warning', 3000);
         return;
       }
       
-      showModal('Updating', `<div class="loading-spinner"></div> Updating ${updates.length} attribute(s)...<br><br><small>This may take 15-20 seconds...</small>`, 'loading', false);
+      // Add to queue and process in background
+      const queueItem = {
+        sku: currentSKU,
+        name: currentProductName,
+        updates: updates,
+        toastId: `update-${Date.now()}`
+      };
       
-      console.log('[UPDATE] Sending updates:', updates);
+      updateQueue.push(queueItem);
+      updateQueueStatus();
+      
+      console.log('[QUEUE] Added to queue:', queueItem);
+      
+      // Show toast immediately
+      showToast(
+        'Updating', 
+        `${currentProductName}<br><small>Updating ${updates.length} attribute(s)...</small>`, 
+        'loading',
+        0,
+        queueItem.toastId
+      );
+      
+      // Process in background
+      processUpdate(queueItem);
+    }
+
+    async function processUpdate(queueItem) {
+      const { sku, name, updates, toastId } = queueItem;
+      
+      console.log('[UPDATE] Processing:', sku);
+      
+      // Simulate progress
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 5;
+        if (progress > 90) progress = 90;
+        updateToastProgress(toastId, progress);
+      }, 1000);
       
       try {
-        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(currentSKU)}`, {
+        const response = await fetch(`/.netlify/functions/product-update?sku=${encodeURIComponent(sku)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates)
@@ -929,29 +1089,50 @@
         
         console.log('[UPDATE] Response:', data);
         
+        clearInterval(progressInterval);
+        updateToastProgress(toastId, 100);
+        
+        // Remove from queue
+        const index = updateQueue.findIndex(item => item.toastId === toastId);
+        if (index > -1) updateQueue.splice(index, 1);
+        updateQueueStatus();
+        
         if (!data.success) {
-          showModal('Error', data.error || 'Update failed', 'error');
+          removeToast(toastId);
+          showToast('Error', `Failed: ${name}<br>${data.error}`, 'error', 5000);
           return;
         }
         
-        showModal('Success', 
-          `✓ Updated ${data.updated_attributes.length} attribute(s) successfully!<br><br><strong>Updated:</strong> ${data.updated_attributes.join(', ')}<br><br>✅ Changes saved to Magento`, 
-          'success'
+        // Show success
+        removeToast(toastId);
+        showToast(
+          'Success', 
+          `✓ Updated: ${name}<br><small>${data.updated_attributes.join(', ')}</small>`, 
+          'success', 
+          3000
         );
         
       } catch (error) {
         console.error('[UPDATE] Error:', error);
-        showModal('Error', 'Error updating product: ' + error.message, 'error');
+        clearInterval(progressInterval);
+        
+        // Remove from queue
+        const index = updateQueue.findIndex(item => item.toastId === toastId);
+        if (index > -1) updateQueue.splice(index, 1);
+        updateQueueStatus();
+        
+        removeToast(toastId);
+        showToast('Error', `Error updating ${name}: ${error.message}`, 'error', 5000);
       }
     }
 
     async function generateAI(action) {
       if (!currentProductName) {
-        showModal('Error', 'Please load a product first', 'error');
+        showToast('Error', 'Please load a product first', 'error', 3000);
         return;
       }
 
-      showModal('AI Generating', '<div class="loading-spinner"></div> AI is generating content...', 'loading', false);
+      const toastId = showToast('AI Generating', 'Generating content with AI...', 'loading');
 
       console.log('[AI] Generating:', action, 'for product:', currentProductName);
 
@@ -966,44 +1147,33 @@
           })
         });
 
-        console.log('[AI] HTTP Status:', response.status);
-
         const data = await response.json();
         console.log('[AI] Response data:', data);
 
         if (!data.success) {
-          showModal('Error', data.error || 'AI generation failed', 'error');
+          removeToast(toastId);
+          showToast('Error', data.error || 'AI generation failed', 'error', 5000);
           return;
         }
 
         const fieldId = `attr-${action}`;
         const field = document.getElementById(fieldId);
         
-        console.log('[AI] Looking for field ID:', fieldId);
-        console.log('[AI] Field found:', !!field);
-        
         if (field) {
           field.value = data.generated;
           field.dispatchEvent(new Event('input'));
-          console.log('[AI] ✅ Field updated successfully');
           
-          closeModal();
-          showModal('Success', 
-            `✓ AI Generated!<br><br><strong>${data.generated}</strong><br><br>Length: ${data.generated.length} characters`, 
-            'success'
-          );
+          removeToast(toastId);
+          showToast('AI Success', `Generated ${action}<br><small>${data.generated}</small>`, 'success', 5000);
         } else {
-          console.error('[AI] ❌ Field not found. Available fields:', 
-            Array.from(document.querySelectorAll('[id^="attr-"]')).map(el => el.id)
-          );
-          
-          closeModal();
-          showModal('Error', `Field "${fieldId}" not found in the page`, 'error');
+          removeToast(toastId);
+          showToast('Error', `Field "${fieldId}" not found`, 'error', 3000);
         }
 
       } catch (error) {
         console.error('[AI] Exception:', error);
-        showModal('Error', 'Network error: ' + error.message, 'error');
+        removeToast(toastId);
+        showToast('Error', 'Network error: ' + error.message, 'error', 5000);
       }
     }
 
@@ -1016,25 +1186,9 @@
         document.querySelectorAll('input[id^="html-"]').forEach(cb => {
           cb.checked = false;
         });
+        showToast('Cleared', 'Form data cleared', 'success', 2000);
         console.log('[FORM] Cleared');
       }
-    }
-
-    function showModal(title, message, type = '', closeButton = true) {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal-message').innerHTML = message;
-      document.getElementById('modal-content').className = `modal-content ${type}`;
-      document.getElementById('modal').classList.add('show');
-      
-      if (!closeButton) {
-        document.querySelector('.modal-close').style.display = 'none';
-      } else {
-        document.querySelector('.modal-close').style.display = 'block';
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
     }
 
     document.getElementById('sku-input').addEventListener('keypress', function(e) {
@@ -1042,7 +1196,6 @@
     });
 
     console.log('[APP] 🚀 Product Manager loaded');
-    console.log('[AUTH] 🔑 Type "pbadmin109" on your keyboard to unlock');
   </script>
 </body>
 </html>
