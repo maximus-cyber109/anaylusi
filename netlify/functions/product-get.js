@@ -2,10 +2,13 @@ const https = require('https');
 
 const MAGENTO_TOKEN = process.env.MAGENTO_API_TOKEN;
 
-const HEADERS = {
+// FIREWALL BYPASS HEADERS (WHITELISTED)
+const FIREWALL_HEADERS = {
   'Authorization': `Bearer ${MAGENTO_TOKEN}`,
   'Content-Type': 'application/json',
-  'User-Agent': 'PB_ProductManager'
+  'User-Agent': 'PB_Netlify',
+  'X-Source-App': 'GameOfCrowns',
+  'X-Netlify-Secret': 'X-PB-NetlifY2025-901AD7EE35110CCB445F3CA0EBEB1494'
 };
 
 function log(msg, data = null) {
@@ -16,7 +19,7 @@ function makeRequest(url, timeout = 8000) {
   return new Promise((resolve) => {
     log(`GET ${url.substring(url.indexOf('/rest'))}`);
     
-    const req = https.request(url, { method: 'GET', headers: HEADERS }, (res) => {
+    const req = https.request(url, { method: 'GET', headers: FIREWALL_HEADERS }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
