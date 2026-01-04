@@ -100,17 +100,33 @@ exports.handler = async (event) => {
     
     const product = result.data;
     
+    // ALL updatable attributes (Complete List)
     const updatableAttrs = [
+      // Content
       'description', 'short_description', 'features', 'technical_details',
-      'package_content', 'key_specification1', 'key_specification2',
-      'key_specification3', 'key_specification4', 'meta_title',
-      'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags'
+      'package_content',
+      
+      // Key Specs
+      'key_specification1', 'key_specification2',
+      'key_specification3', 'key_specification4',
+      
+      // SEO
+      'meta_title', 'meta_description', 'meta_keyword',
+      
+      // Marketing
+      'special_offers', 'pdt_tags',
+      
+      // Product Information (NEW)
+      'faq', 'indications', 'directions', 'benefits',
+      'manufacturer_importer', 'downloads', 'others'
     ];
     
     const attributes = {};
     updatableAttrs.forEach(attr => {
       const found = product.custom_attributes?.find(ca => ca.attribute_code === attr);
-      attributes[attr] = found ? found.value : '';
+      if (found) {
+        attributes[attr] = found.value;
+      }
     });
     
     log(`✓ Found ${Object.keys(attributes).length} attributes`);
