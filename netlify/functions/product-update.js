@@ -139,7 +139,9 @@ exports.handler = async (event) => {
       attributes: updates.map(u => u.attribute_code) 
     });
     
+    // Character limits for ALL attributes
     const limits = {
+      // Existing
       meta_title: 70,
       meta_description: 160,
       short_description: 255,
@@ -153,7 +155,16 @@ exports.handler = async (event) => {
       meta_keyword: 255,
       description: 65000,
       features: 65000,
-      technical_details: 65000
+      technical_details: 65000,
+      
+      // NEW Product Information
+      faq: 65000,
+      indications: 65000,
+      directions: 65000,
+      benefits: 65000,
+      manufacturer_importer: 1000,
+      downloads: 65000,
+      others: 65000
     };
     
     for (const update of updates) {
