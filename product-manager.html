@@ -660,6 +660,92 @@
           </div>
         </div>
 
+        <!-- SECTION: PRODUCT INFORMATION (NEW) -->
+        <div class="section">
+          <h2>📋 Product Information</h2>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>FAQs</span>
+              <span class="char-counter" data-attr="faq">0 / 65000</span>
+            </div>
+            <textarea id="attr-faq" data-limit="65000" placeholder="Frequently asked questions..."></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-faq">
+              <label for="html-faq">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-faq"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Indications</span>
+              <span class="char-counter" data-attr="indications">0 / 65000</span>
+            </div>
+            <textarea id="attr-indications" data-limit="65000" placeholder="Indications for use..."></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-indications">
+              <label for="html-indications">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-indications"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Directions</span>
+              <span class="char-counter" data-attr="directions">0 / 65000</span>
+            </div>
+            <textarea id="attr-directions" data-limit="65000" placeholder="Directions for use..."></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-directions">
+              <label for="html-directions">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-directions"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Benefits</span>
+              <span class="char-counter" data-attr="benefits">0 / 65000</span>
+            </div>
+            <textarea id="attr-benefits" data-limit="65000" placeholder="Product benefits..."></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-benefits">
+              <label for="html-benefits">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-benefits"></div>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Manufacturer/Importer Details</span>
+              <span class="char-counter" data-attr="manufacturer_importer">0 / 1000</span>
+            </div>
+            <textarea id="attr-manufacturer_importer" data-limit="1000" placeholder="Manufacturer and importer information..."></textarea>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Downloads</span>
+              <span class="char-counter" data-attr="downloads">0 / 65000</span>
+            </div>
+            <textarea id="attr-downloads" data-limit="65000" placeholder="Download links, documents..."></textarea>
+          </div>
+          
+          <div class="attr-row">
+            <div class="attr-label">
+              <span>Others (Storage, etc.)</span>
+              <span class="char-counter" data-attr="others">0 / 65000</span>
+            </div>
+            <textarea id="attr-others" data-limit="65000" placeholder="Storage conditions, additional information..."></textarea>
+            <div class="html-toggle">
+              <input type="checkbox" id="html-others">
+              <label for="html-others">Convert to HTML bullets</label>
+            </div>
+            <div class="preview" id="preview-others"></div>
+          </div>
+        </div>
+
         <!-- SECTION: SEO WITH AI -->
         <div class="section">
           <h2>🔍 SEO (AI-Powered)</h2>
@@ -737,18 +823,15 @@
       const toastId = id || `toast-${++toastIdCounter}`;
       const container = document.getElementById('toast-container');
       
-      // Check if toast already exists (for updates)
       let existingToast = document.getElementById(toastId);
       
       if (existingToast) {
-        // Update existing toast
         existingToast.querySelector('.toast-title').textContent = title;
         existingToast.querySelector('.toast-message').innerHTML = message;
         existingToast.className = `toast ${type}`;
         return toastId;
       }
       
-      // Create new toast
       const toast = document.createElement('div');
       toast.id = toastId;
       toast.className = `toast ${type}`;
@@ -763,7 +846,6 @@
       
       container.appendChild(toast);
       
-      // Auto-dismiss success/error toasts
       if (duration > 0) {
         setTimeout(() => removeToast(toastId), duration);
       }
@@ -1004,11 +1086,15 @@
       }
       
       const updates = [];
+      
+      // ALL attributes including new ones
       const attrs = [
         'description', 'short_description', 'features', 'technical_details',
         'package_content', 'key_specification1', 'key_specification2',
         'key_specification3', 'key_specification4', 'meta_title',
-        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags'
+        'meta_description', 'meta_keyword', 'special_offers', 'pdt_tags',
+        'faq', 'indications', 'directions', 'benefits',
+        'manufacturer_importer', 'downloads', 'others'
       ];
       
       attrs.forEach(attr => {
@@ -1039,7 +1125,6 @@
         return;
       }
       
-      // Add to queue and process in background
       const queueItem = {
         sku: currentSKU,
         name: currentProductName,
@@ -1052,7 +1137,6 @@
       
       console.log('[QUEUE] Added to queue:', queueItem);
       
-      // Show toast immediately
       showToast(
         'Updating', 
         `${currentProductName}<br><small>Updating ${updates.length} attribute(s)...</small>`, 
@@ -1061,7 +1145,6 @@
         queueItem.toastId
       );
       
-      // Process in background
       processUpdate(queueItem);
     }
 
@@ -1070,7 +1153,6 @@
       
       console.log('[UPDATE] Processing:', sku);
       
-      // Simulate progress
       let progress = 0;
       const progressInterval = setInterval(() => {
         progress += 5;
@@ -1092,7 +1174,6 @@
         clearInterval(progressInterval);
         updateToastProgress(toastId, 100);
         
-        // Remove from queue
         const index = updateQueue.findIndex(item => item.toastId === toastId);
         if (index > -1) updateQueue.splice(index, 1);
         updateQueueStatus();
@@ -1103,7 +1184,6 @@
           return;
         }
         
-        // Show success
         removeToast(toastId);
         showToast(
           'Success', 
@@ -1116,7 +1196,6 @@
         console.error('[UPDATE] Error:', error);
         clearInterval(progressInterval);
         
-        // Remove from queue
         const index = updateQueue.findIndex(item => item.toastId === toastId);
         if (index > -1) updateQueue.splice(index, 1);
         updateQueueStatus();
@@ -1132,43 +1211,60 @@
         return;
       }
 
-      const toastId = showToast('AI Generating', 'Generating content with AI...', 'loading');
+      const toastId = showToast('AI Generating', `Generating ${action}...`, 'loading');
 
-      console.log('[AI] Generating:', action, 'for product:', currentProductName);
+      console.log('[AI] ════════════════════════════════');
+      console.log('[AI] Product Name:', currentProductName);
+      console.log('[AI] Action:', action);
 
       try {
+        const requestBody = {
+          productName: currentProductName,
+          category: 'dental supplies',
+          action: action
+        };
+        
+        console.log('[AI] Request body:', requestBody);
+
         const response = await fetch('/.netlify/functions/ai-seo-generator', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productName: currentProductName,
-            category: 'dental supplies',
-            action: action
-          })
+          body: JSON.stringify(requestBody)
         });
+
+        console.log('[AI] HTTP Status:', response.status);
 
         const data = await response.json();
         console.log('[AI] Response data:', data);
 
         if (!data.success) {
           removeToast(toastId);
-          showToast('Error', data.error || 'AI generation failed', 'error', 5000);
+          showToast('AI Error', data.error || 'AI generation failed', 'error', 5000);
+          console.error('[AI] ❌ Error:', data.error);
           return;
         }
 
         const fieldId = `attr-${action}`;
         const field = document.getElementById(fieldId);
         
+        console.log('[AI] Looking for field:', fieldId);
+        console.log('[AI] Field found:', !!field);
+        
         if (field) {
           field.value = data.generated;
           field.dispatchEvent(new Event('input'));
           
           removeToast(toastId);
-          showToast('AI Success', `Generated ${action}<br><small>${data.generated}</small>`, 'success', 5000);
+          showToast('AI Success', `Generated ${action}<br><small>${data.generated.substring(0, 50)}...</small>`, 'success', 5000);
+          console.log('[AI] ✅ Success! Generated:', data.generated);
         } else {
+          console.error('[AI] ❌ Field not found:', fieldId);
+          
           removeToast(toastId);
           showToast('Error', `Field "${fieldId}" not found`, 'error', 3000);
         }
+
+        console.log('[AI] ════════════════════════════════');
 
       } catch (error) {
         console.error('[AI] Exception:', error);
